@@ -19,8 +19,8 @@ skeletonize = function(vertices, holes, tol = 1e-10) {
   total_sum_det = 0
   #Remove vertices that come in straight lines
   for(i in seq_len(nrow(vertices_pad)-1)[-1]) {
-    v1 = vertices_pad[i,] - vertices_pad[i-1,]
-    v2 = vertices_pad[i+1,] - vertices_pad[i,]
+    v1 = vertices_pad[i,]
+    v2 = vertices_pad[i+1,]
     tmp_det = determinant2x2(v1,v2)
     if(abs(tmp_det) < tol) {
       remove_verts[[i]] = i
