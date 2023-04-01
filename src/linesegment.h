@@ -4,17 +4,20 @@
 #include "point2.h"
 #include "float.h"
 #include "vec2.h"
+#include <algorithm>
 
 struct LineSegment {
   LineSegment() {};
-  LineSegment(point2f _origin, point2f _adjacent) :
+  LineSegment(point2f _origin, point2f _adjacent, int _id) :
     origin(_origin), adjacent(_adjacent) {
     d = adjacent - origin;
+    id = _id;
   };
   LineSegment(const LineSegment &l) {
     origin = l.origin;
     adjacent = l.adjacent;
     d = l.d;
+    id = l.id;
   }
   ~LineSegment() {};
   inline bool is_equivalent(LineSegment l, Float tolerance) {
@@ -24,20 +27,21 @@ struct LineSegment {
            adjacent.is_equivalent(l.origin,tolerance)));
   }
   inline Float distance_to_point(point2f p) {
-      // Return minimum distance between line segment vw and point p
-      const Float l2 = d.squared_length();  // i.e. |w-v|^2 -  avoid a sqrt
-      if (l2 == 0.0) return (p-origin).length();   // v == w case
-      // Consider the line extending the segment, parameterized as v + t (w - v).
-      // We find projection of point p onto the line.
-      // It falls where t = [(p-v) . (w-v)] / |w-v|^2
-      // We clamp t from [0,1] to handle points outside the segment vw.
-      const float t = std::fmax(0, std::fmin(1, dot(p - origin, d) / l2));
-      const point2f projection = origin + t * d;  // Projection falls on the segment
-      return((p-projection).length());
+      Float l2 = d.squared_length();
+      if (l2 == 0.0) {
+        return((p-origin).length());
+      }
+      vec2f pa = p - origin;
+      // Float t = std::max<Float>(0, std::min<Float>(1, dot(pa, d) / l2));
+      // Float t = std::fmin(1,std::fmax(0,dot(pa, d) / l2));
+      Float t = dot(pa, d) / l2;
+
+      return((pa - t*d).length());
   }
   point2f origin;
   point2f adjacent;
   vec2f d;
+  int id;
 };
 
 #endif

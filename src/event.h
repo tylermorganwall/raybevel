@@ -4,6 +4,7 @@
 #include "float.h"
 #include "point2.h"
 #include "linesegment.h"
+#include <iostream>
 
 struct LAVertex;
 struct Event {
@@ -29,11 +30,13 @@ struct Event {
     vertex_a(vertex_a),
     vertex_b(vertex_b),
     split(split), none(false) {}
+  friend std::ostream& operator<<(std::ostream& os, const Event& e);
   Float distance;
   point2f intersection;
   LAVertex* vertex_a;
   LAVertex* vertex_b;
   LineSegment opposite_edge;
+  void printInfo();
   bool split;
   bool none;
 };
@@ -43,6 +46,8 @@ struct CompareEvents {
     return e1.distance > e2.distance;
   }
 };
+
+std::ostream& operator<<(std::ostream& os, const Event& e);
 
 
 #endif

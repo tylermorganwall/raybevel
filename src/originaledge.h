@@ -11,13 +11,13 @@
 struct OriginalEdge {
   OriginalEdge() {}
   OriginalEdge(point2f vertex, point2f prev_vertex,
-               Ray bisector, Ray prev_bisector) {
-    Edge = LineSegment(prev_vertex, vertex);
+               Ray bisector, Ray prev_bisector, int id) {
+    Edge = LineSegment(prev_vertex, vertex, id);
     PrevBisector = prev_bisector;
     Bisector = bisector;
-    Rcpp::Rcout << "Constructing Original Edge: Origin " << Edge.origin << " Adj: " << Edge.adjacent <<
-      " PBi " << PrevBisector.o << " , " << PrevBisector.d << " Bi " << Bisector.o << " , " << Bisector.d <<
-        "\n";
+    // Rcpp::Rcout << "Constructing Original Edge: Origin " << Edge.origin << " Adj: " << Edge.adjacent <<
+    //   " PBi " << PrevBisector.o << " , " << PrevBisector.d << " Bi " << Bisector.o << " , " << Bisector.d <<
+    //     "\n";
 
   }
   LineSegment Edge;

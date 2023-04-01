@@ -4,12 +4,20 @@
 #include "event.h"
 
 void SLAV::remove(LAV* lav) {
+  // for(size_t i = 0; i < lavs.size(); i++) {
+  //   if(lavs[i].get() == lav) {
+  //     Rcpp::Rcout << "Erasing lav #" << i << " of " << lavs.size() << "\n";
+  //     lavs.erase(lavs.begin() + i);
+  //   }
+  // }
   for(size_t i = 0; i < lavs.size(); i++) {
     if(lavs[i].get() == lav) {
-      lavs.erase(lavs.begin() + i);
+      Rcpp::Rcout << "Erasing lav #" << i << " of " << lavs.size() << "\n";
+      lav_valid[i] = false;
     }
   }
 }
+
 
 std::pair<Subtree, std::vector<Event>> SLAV::handle_edge_event(Event event) {
   //     """Resolves adjacency of new edge event.
@@ -28,27 +36,33 @@ std::pair<Subtree, std::vector<Event>> SLAV::handle_edge_event(Event event) {
 
   LAV* lav = event.vertex_a->lav;
   // # Triangle, one sink point
+  // Rcpp::Rcout << "VA: " << event.vertex_a->prev->vertex << " VB: " << event.vertex_b->next->vertex << "\n";
   if(event.vertex_a->prev->vertex.is_equivalent(event.vertex_b->next->vertex, tol)) {
-    // log.info('%.2f Peak event at intersection %s from <%s,%s,%s> in %s',
-    //          event.distance, event.intersection_point, event.vertex_a,
-    //          event.vertex_b, event.vertex_a.prev, lav)
-    std::shared_ptr<LAVertex> current_vert = lav->head;
-    Rcpp::Rcout << "Vertex id: " << current_vert->vertex_id  << " " << current_vert->vertex << "\n";
-
+    Rcpp::Rcout << event.distance << " Peak event at intersection " <<  event.intersection << " from <" <<
+      event.vertex_a->vertex_id << "," << event.vertex_b->vertex_id << "," << event.vertex_a->prev->vertex_id << ">\n";
+    LAVertex* current_vert = lav->head;
+    // Rcpp::Rcout << "Vertex id: " << current_vert->vertex_id  << " " << current_vert->vertex << "\n";
+    // Rcpp::Rcout << "PEAK EVENT" << "\n";
     for(size_t i = 0; i < lav->len; i++) {
       sinks.push_back(current_vert->vertex);
-      current_vert->invalidate();
+      invalidate_verts.push_back(current_vert);
+      // current_vert->invalidate();
       current_vert = current_vert->next;
     }
+    events.push_back(event);
     remove(lav);
   } else {
+    Rcpp::Rcout << event.distance << " Edge event at intersection " <<  event.intersection << " from <" <<
+      event.vertex_a->vertex_id << "," << event.vertex_b->vertex_id << ">\n";
     //     log.info('%.2f Edge event at intersection %s from <%s,%s> in %s',
     //              event.distance, event.intersection_point, event.vertex_a,
     //              event.vertex_b, lav)
-    std::shared_ptr<LAVertex> new_vertex = lav->unify(event.vertex_a,
-                                                      event.vertex_b,
-                                                      event.intersection);
-    if(lav->head.get() == event.vertex_a || lav->head.get() == event.vertex_b) {
+    LAVertex* new_vertex = lav->unify(event.vertex_a,
+                                      event.vertex_b,
+                                      event.intersection,
+                                      false);
+    if(lav->head == event.vertex_a || lav->head == event.vertex_b) {
+      // Rcpp::Rcout << "Setting new head for vertex #" << new_vertex->vertex_id << "\n";
       lav->head = new_vertex;
     }
     sinks.push_back(event.vertex_a->vertex);
@@ -56,6 +70,8 @@ std::pair<Subtree, std::vector<Event>> SLAV::handle_edge_event(Event event) {
     Event next_event = new_vertex->next_event();
     if(!next_event.none) {
       events.push_back(next_event);
+    } else {
+      // Rcpp::Rcout << "NO EVENTS FOR VERTEX #" << new_vertex->vertex_id << "\n";
     }
   }
   return(std::pair<Subtree, std::vector<Event> >(Subtree(event.intersection, event.distance, sinks), events));
@@ -75,6 +91,8 @@ std::pair<Subtree, std::vector<Event>> SLAV::handle_split_event(Event event) {
   // """
   //
   LAV* lav = event.vertex_a->lav;
+  Rcpp::Rcout << event.distance << " Split event at intersection " <<  event.intersection << " for vertex " <<
+    event.vertex_a->vertex_id << " at " << event.opposite_edge.id << "\n";
   // log.info(
   //   '%.2f Split event at intersection %s from vertex %s, for edge %s in %s',
   //   event.distance,
@@ -86,51 +104,57 @@ std::pair<Subtree, std::vector<Event>> SLAV::handle_split_event(Event event) {
   std::vector<std::shared_ptr<LAVertex> > vertices;
 
   sinks.push_back(event.vertex_a->vertex);
-  std::shared_ptr<LAVertex> x = nullptr;// = None  # right vertex
-  std::shared_ptr<LAVertex> y = nullptr;// = None  # left vertex
-  vec2f norm = unit_vector(event.opposite_edge.d);
+  LAVertex* x = nullptr;// = None  # right vertex
+  LAVertex* y = nullptr;// = None  # left vertex
+  // vec2f norm = unit_vector(event.opposite_edge.d);
+  int edge_id = event.opposite_edge.id;
+
   // for v in chain.from_iterable(self._lavs) {
   for(size_t i = 0; i < lavs.size(); i++) {
-    std::shared_ptr<LAVertex> v = lavs[i]->head;
-    for(size_t j = 0; j < lavs[i]->len; j++) {
-      bool equal_to_edge_left_p = event.opposite_edge.origin.is_equivalent(
-        v->edge_left.origin, tol);
-      bool equal_to_edge_right_p = event.opposite_edge.origin.is_equivalent(
-        v->edge_right.origin, tol);
-      if(norm.is_equivalent(unit_vector(v->edge_left.d), tol) &&
-         equal_to_edge_left_p) {
-        x = v;
-        y = x->prev;
-      } else if (norm.is_equivalent(unit_vector(v->edge_right.d), tol) &&
-                 equal_to_edge_right_p) {
-        y = v;
-        x = y->next;
-      }
-      if(x) {
-        bool xleft = determinant(unit_vector(y->bisector.d),
-                                 unit_vector(event.intersection - y->vertex)) >= 0;
-        bool xright = determinant(unit_vector(x->bisector.d),
-                                 unit_vector(event.intersection - x->vertex)) <= 0;
+    if(lav_valid[i]) {
+      LAVertex* v = lavs[i]->head;
+      for(size_t j = 0; j < lavs[i]->len; j++) {
+        // Rcpp::Rcout << v->vertex_id << "\n";
+        bool equal_to_edge_left_p = edge_id == v->edge_left.id;
+        bool equal_to_edge_right_p = edge_id == v->edge_right.id;
 
-        // log.debug(
-        //   'Vertex %s holds edge as %s edge (%s, %s)', v,
-        //   ('left' if x == v else 'right'), xleft, xright)
-
-        if(xleft && xright) {
-          break;
-        } else {
-          x = nullptr;
-          y = nullptr;
+        if(equal_to_edge_left_p) {
+          x = v;
+          y = x->prev;
+        } else if (equal_to_edge_right_p) {
+          y = v;
+          x = y->next;
         }
+        if(x) {
+          bool xleft = determinant(unit_vector(y->bisector.d),
+                                   unit_vector(event.intersection - y->vertex)) <= tol;
+          bool xright = determinant(unit_vector(x->bisector.d),
+                                    unit_vector(event.intersection - x->vertex)) >= -tol;
+          Rcpp::Rcout << "Vertex " << v->vertex_id << " holds edge as " << (x == v ? "left" : "right") <<
+            " edge (" << xleft << "," << xright << ")\n";
+          if(xleft && xright) {
+            // Rcpp::Rcout << "vertex found\n";
+            break;
+          } else {
+            x = nullptr;
+            y = nullptr;
+          }
+        }
+        v = v->next;
       }
     }
   }
   if(!x) {
-    // log.info(
-    //   'Failed split event %s (equivalent edge event is expected to follow)',
-    //   event
-    // )
+    Rcpp::Rcout << "Failed split event at " << event.intersection << "\n";
     std::vector<Event> empty_events;
+    lav->slav->error_return = false;
+    return(std::pair<Subtree, std::vector<Event>>(Subtree(), empty_events));
+  }
+  if(event.vertex_a->edge_left.id == event.opposite_edge.id ||
+     event.vertex_a->edge_right.id == event.opposite_edge.id) {
+    Rcpp::Rcout << "Edge IDs identical \n";
+    std::vector<Event> empty_events;
+    lav->slav->error_return = true;
     return(std::pair<Subtree, std::vector<Event>>(Subtree(), empty_events));
   }
   std::shared_ptr<LAVertex> v1 = std::make_shared<LAVertex>(
@@ -147,53 +171,64 @@ std::pair<Subtree, std::vector<Event>> SLAV::handle_split_event(Event event) {
     current_vertex_id,
     tol
   );
+  all_vertices.push_back(v1);
+  all_vertices.push_back(v2);
+  new_verts.push_back(v1.get());
+  new_verts.push_back(v2.get());
 
   v1->prev = event.vertex_a->prev;
   v1->next = x;
-  event.vertex_a->prev->next = v1;
-  x->prev = v1;
+  event.vertex_a->prev->next = v1.get();
+  x->prev = v1.get();
 
   v2->prev = y;
   v2->next = event.vertex_a->next;
-  event.vertex_a->next->prev = v2;
-  y->next = v2;
+  event.vertex_a->next->prev = v2.get();
+  y->next = v2.get();
 
   std::vector<std::shared_ptr<LAV> > new_lavs;
   remove(lav);
   if(lav != x->lav) {
     // the split event actually merges two lavs
-    new_lavs.push_back(std::make_shared<LAV>(v1, this));
     remove(x->lav);
+
+    new_lavs.push_back(std::make_shared<LAV>(v1.get(), this));
   } else {
-    new_lavs.push_back(std::make_shared<LAV>(v1, this));
-    new_lavs.push_back(std::make_shared<LAV>(v2, this));
+    new_lavs.push_back(std::make_shared<LAV>(v1.get(), this));
+    new_lavs.push_back(std::make_shared<LAV>(v2.get(), this));
   }
   for(size_t i = 0; i < new_lavs.size(); i++) {
     std::shared_ptr<LAV> lv = new_lavs[i];
-    // log.debug(lv)
     if(lv->len > 2) {
+      Rcpp::Rcout << "Pushing new lav #" << i << " of length " << lv->len << "\n";
       lavs.push_back(lv);
-      vertices.push_back(lv->head);
+      lav_valid.push_back(true);
     } else {
-        // log.info(
-        //   'LAV %s has collapsed into the line %s--%s',
-        //   lv, lv.head.point, lv.head.next.point
-        // )
+      Rcpp::Rcout << "lav collapsed to line " << lv->head->vertex << " to " << lv->head->next->vertex << "\n";
+
       sinks.push_back(lv->head->next->vertex);
-      LAVertex* cur = lv->head.get();
+      LAVertex* cur = lv->head;
       for(size_t j = 0; j < lv->len; j++) {
-        cur->invalidate();
-        cur = cur->next.get();
+        invalidate_verts.push_back(cur);
+        // cur->invalidate();
+        cur = cur->next;
       }
     }
   }
   std::vector<Event> events;
+  // if(vertices.empty()) {
+  //   throw std::runtime_error("Err");
+  // }
   for(size_t i = 0; i < vertices.size(); i++) {
     Event next_event = vertices[i]->next_event();
     if(!next_event.none) {
       events.push_back(next_event);
+    } else {
+      Rcpp::Rcout << "NO EVENTS FOR VERTEX #" << vertices[i]->vertex_id << "\n";
     }
   }
-  event.vertex_a->invalidate();
+  invalidate_verts.push_back(event.vertex_a);
+  // event.vertex_a->invalidate();
+
   return(std::pair<Subtree, std::vector<Event> >(Subtree(event.intersection, event.distance, sinks), events));
 }
