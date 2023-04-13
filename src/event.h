@@ -30,6 +30,8 @@ struct Event {
     vertex_a(vertex_a),
     vertex_b(vertex_b),
     split(split), none(false) {}
+  bool IsObsolete();
+  bool SharesParent(Event e2, Float tol);
   friend std::ostream& operator<<(std::ostream& os, const Event& e);
   Float distance;
   point2f intersection;

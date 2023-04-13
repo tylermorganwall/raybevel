@@ -13,6 +13,10 @@ struct LineSegment {
     d = adjacent - origin;
     id = _id;
   };
+  LineSegment(point2f _origin, vec2f d) :
+    origin(_origin), d(d), adjacent(_origin + d) {
+    id = 0;
+  };
   LineSegment(const LineSegment &l) {
     origin = l.origin;
     adjacent = l.adjacent;
@@ -32,9 +36,7 @@ struct LineSegment {
         return((p-origin).length());
       }
       vec2f pa = p - origin;
-      // Float t = std::max<Float>(0, std::min<Float>(1, dot(pa, d) / l2));
-      // Float t = std::fmin(1,std::fmax(0,dot(pa, d) / l2));
-      Float t = dot(pa, d) / l2;
+      Float t = dot(pa, d) / l2; //Assume infinite line
 
       return((pa - t*d).length());
   }

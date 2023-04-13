@@ -11,15 +11,15 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // skeletonize_rcpp
-List skeletonize_rcpp(NumericMatrix vertices, List holes, double tol);
-RcppExport SEXP _rayskeleton_skeletonize_rcpp(SEXP verticesSEXP, SEXP holesSEXP, SEXP tolSEXP) {
+List skeletonize_rcpp(NumericMatrix vertices, List holes, double tolerance);
+RcppExport SEXP _rayskeleton_skeletonize_rcpp(SEXP verticesSEXP, SEXP holesSEXP, SEXP toleranceSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type vertices(verticesSEXP);
     Rcpp::traits::input_parameter< List >::type holes(holesSEXP);
-    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
-    rcpp_result_gen = Rcpp::wrap(skeletonize_rcpp(vertices, holes, tol));
+    Rcpp::traits::input_parameter< double >::type tolerance(toleranceSEXP);
+    rcpp_result_gen = Rcpp::wrap(skeletonize_rcpp(vertices, holes, tolerance));
     return rcpp_result_gen;
 END_RCPP
 }

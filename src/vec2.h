@@ -38,7 +38,8 @@ public:
   inline Float squared_length() const { return e[0]*e[0] + e[1]*e[1]; }
   inline void make_unit_vector();
   inline bool is_equivalent(vec2<T> p, Float tolerance) {
-    return(abs(p.e[0] - e[0]) < tolerance && abs(p.e[1] - e[1]) < tolerance);
+    return(approximateEqualFloat(p.e[0],e[0],tolerance) &&
+           approximateEqualFloat(p.e[1],e[1],tolerance));
   }
   inline bool is_equivalent(point2<T> p, Float tolerance);
   Float e[2];

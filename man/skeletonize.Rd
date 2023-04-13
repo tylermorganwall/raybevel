@@ -4,7 +4,7 @@
 \alias{skeletonize}
 \title{Title}
 \usage{
-skeletonize(vertices, holes, tol = 1e-10)
+skeletonize(vertices, holes = list(), tol = 1e-10, debug = FALSE)
 }
 \arguments{
 \item{vertices}{DUM}
@@ -12,6 +12,8 @@ skeletonize(vertices, holes, tol = 1e-10)
 \item{holes}{DEE}
 
 \item{tol}{DOO}
+
+\item{debug}{}
 }
 \value{
 Value

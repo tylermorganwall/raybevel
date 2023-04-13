@@ -15,10 +15,6 @@ struct OriginalEdge {
     Edge = LineSegment(prev_vertex, vertex, id);
     PrevBisector = prev_bisector;
     Bisector = bisector;
-    // Rcpp::Rcout << "Constructing Original Edge: Origin " << Edge.origin << " Adj: " << Edge.adjacent <<
-    //   " PBi " << PrevBisector.o << " , " << PrevBisector.d << " Bi " << Bisector.o << " , " << Bisector.d <<
-    //     "\n";
-
   }
   LineSegment Edge;
   Ray PrevBisector;

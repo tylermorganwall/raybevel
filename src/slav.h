@@ -17,14 +17,14 @@ typedef std::vector<std::tuple<point2f, vec2f, point2f, point2f, int, int, int, 
 typedef std::vector<std::tuple<point2f, point2f, point2f, point2f, int, int, int, int, int, point2f>> EdgeInfo;
 
 struct SLAV {
-  SLAV(std::vector<std::vector<point2f> > contours, Float tol) {
+  SLAV(std::vector<std::vector<point2f> > contours, Float _tol) {
+    tol = _tol;
     current_vertex_id = 0;
+    current_edge_id   = 0;
     for(size_t i = 0; i < contours.size(); i++) {
       lavs.push_back(std::make_shared<LAV>(contours[i], tol, this, current_vertex_id));
-      lav_valid.push_back(true);
     }
     //We need the original edges because they drive the bisector angle
-    int edge_count = 0;
     for(size_t i = 0; i < lavs.size(); i++) {
       LAVertex* tmp = lavs[i]->head;
       for(size_t j = 0; j < lavs[i]->len; j++) {
@@ -32,22 +32,18 @@ struct SLAV {
                                              tmp->prev->vertex,
                                              tmp->bisector,
                                              tmp->prev->bisector,
-                                             edge_count));
-        edge_count++;
+                                             current_edge_id));
+        current_edge_id++;
         tmp = tmp->next;
       }
     }
     error_return = false;
   };
   size_t len() {
-    size_t n = 0;
-    for(size_t i = 0; i < lav_valid.size(); i++) {
-      n += lav_valid[i] ? 1 : 0;
-    }
-    return(n);
+    return(lavs.size());
   }
   bool empty() {
-    return(len() == 0);
+    return(lavs.empty());
   }
   LAV* operator[](size_t i) {
     return(lavs[i].get());
@@ -55,39 +51,35 @@ struct SLAV {
   int TotalValidVertices() {
     int n_valid = 0;
     for(size_t i = 0; i < lavs.size(); i++) {
-      if(lav_valid[i]) {
-        LAVertex* tmp = lavs[i]->head;
-        for(size_t j = 0; j < lavs[i]->len; j++) {
-          if(tmp->is_valid) {
-            n_valid++;
-          }
-          tmp = tmp->next;
+      LAVertex* tmp = lavs[i]->head;
+      for(size_t j = 0; j < lavs[i]->len; j++) {
+        if(tmp->is_valid) {
+          n_valid++;
         }
+        tmp = tmp->next;
       }
     }
     return(n_valid);
   }
   void PrintVertices() {
     for(size_t i = 0; i < lavs.size(); i++) {
-      if(lav_valid[i]) {
-        LAVertex* tmp = lavs[i]->head;
-        for(size_t j = 0; j < lavs[i]->len; j++) {
-          if(tmp->is_valid) {
-            Rcpp::Rcout << "Vert: " << tmp->vertex_id << " Valid: " << tmp->is_valid << "\n";
-          }
-          tmp = tmp->next;
+      LAVertex* tmp = lavs[i]->head;
+      for(size_t j = 0; j < lavs[i]->len; j++) {
+        if(tmp->is_valid) {
+          Rcpp::Rcout << "LAV: " << i << " Size: " << lavs[i]->len << " Vert: " << tmp->vertex_id << " Valid: " << tmp->is_valid << " Loc: " <<  tmp->vertex << "\n";
         }
+        tmp = tmp->next;
       }
     }
   }
   void remove(LAV* lav);
   std::pair<Subtree, std::vector<Event>> handle_split_event(Event event);
   std::pair<Subtree, std::vector<Event>> handle_edge_event(Event event);
-  // std::pair<Subtree, std::vector<Event>> handle_simultaneous_event(Event event, );
+  std::vector<std::pair<Subtree, std::vector<Event>>> handle_multi_event(std::vector<Event> events);
 
   Float tol;
   std::vector<std::shared_ptr<LAV> > lavs;
-  std::vector<bool> lav_valid;
+  // std::vector<bool> lav_valid;
 
   std::vector<OriginalEdge> OriginalEdges;
   std::vector<std::tuple<point2f, point2f, int, int, int>> discarded_points;
@@ -97,9 +89,9 @@ struct SLAV {
   RayRayInterectionInfo event_rays;
   std::vector<std::shared_ptr<LAVertex> > all_vertices;
   std::vector<LAVertex* > invalidate_verts;
-  std::vector<LAVertex* > new_verts;
 
   int current_vertex_id;
+  int current_edge_id;
 };
 
 
