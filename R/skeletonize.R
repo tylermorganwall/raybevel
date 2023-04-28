@@ -121,12 +121,9 @@ generate_offset_polygon = function(ss, offset) {
   links = ss$links
   nodes = ss$nodes
   max_time = max(links$destination_time)
-  stopifnot(offset < max_time)
-  # links = rbind(links,data.frame(source = seq_len(sum(links$edge)),
-  #                                destination = c(seq(2,sum(links$edge)),1),
-  #                                edge = TRUE,
-  #                                source_time = 0,
-  #                                destination_time = 0))
+  if(offset > max_time) {
+    offset == max_time
+  }
   links$visited = links$edge
   first_node = links[which(!links$edge)[1],1]
   tmp_source = first_node
@@ -220,8 +217,6 @@ generate_offset_polygon = function(ss, offset) {
         best_source = nodes$id[candidate_source]
       }
     }
-    # print(best_angle)
-
     tmp_source = best_source
     tmp_dest = best_dest
   }
