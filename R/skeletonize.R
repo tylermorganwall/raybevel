@@ -13,7 +13,7 @@
 skeletonize = function(vertices, holes = list(), tol = 1e-10, debug = FALSE) {
   stopifnot(all(vertices[1,] == vertices[nrow(vertices),]))
   stopifnot(ncol(vertices) == 2)
-  vertices_pad = rbind(vertices[nrow(vertices)-1,], vertices)
+  vertices_pad = rbind(vertices,vertices[2,])
   remove_verts = list()
 
   total_sum_det = 0
@@ -35,18 +35,20 @@ skeletonize = function(vertices, holes = list(), tol = 1e-10, debug = FALSE) {
   if(total_sum_det < 0) {
     stop("`vertices` is not CCW polygon")
   }
-  for(i in seq_len(length(holes))) {
-    holes_pad = rbind(holes[[i]][nrow(holes[[i]])-1,], holes[[i]])
+  if(length(holes) > 0) {
+    for(i in seq_len(length(holes))) {
+      holes_pad = rbind(holes[[i]][nrow(holes[[i]])-1,], holes[[i]])
 
-    total_sum_det_holes = 0
-    for(i in seq_len(nrow(vertices_pad)-1)[-1]) {
-      v1 = holes_pad[i,]
-      v2 = holes_pad[i+1,]
-      tmp_det = determinant2x2(v1,v2)
-      total_sum_det_holes = total_sum_det_holes + tmp_det
-    }
-    if(total_sum_det_holes > 0) {
-      stop(sprintf("`holes[[%i]]` is not CW polygon",i))
+      total_sum_det_holes = 0
+      for(i in seq_len(nrow(vertices_pad)-1)[-1]) {
+        v1 = holes_pad[i,]
+        v2 = holes_pad[i+1,]
+        tmp_det = determinant2x2(v1,v2)
+        total_sum_det_holes = total_sum_det_holes + tmp_det
+      }
+      if(total_sum_det_holes > 0) {
+        stop(sprintf("`holes[[%i]]` is not CW polygon",i))
+      }
     }
   }
   verts_to_remove = c(1,unlist(remove_verts))
@@ -56,107 +58,33 @@ skeletonize = function(vertices, holes = list(), tol = 1e-10, debug = FALSE) {
     warning("Polygon is not simple--not computing straight skeleton.")
     return()
   }
-  ss = do.call("rbind", return_data$ss)
-  colnames(ss) = c("end_x","end_y","start_x","start_y","time","split","id")
-  from_split = ss[,6]
-  ss = ss[,c(3:4,1:2,5)]
-  dig = log10(tol)
-  if(dig > 0) {
-    dig = -dig
-  }
-  all_vertices = unique(rbind(ss[,c(1:2)],ss[,c(3:4)]))
-  colnames(all_vertices) = c("x","y")
-  ss = unique(round(ss, digits=-dig))
-  ss = as.data.frame(ss)
-  rounded_verts = as.data.frame(unique(round(vertices, digits=-dig)))
-  rounded_holes = do.call("rbind",holes)
-  rounded_verts = rbind(rounded_verts,rounded_holes)
-  colnames(rounded_verts) = c("x","y")
-  nodes = as.data.frame(unique(round(all_vertices, digits=-dig)))
-  is_edge_nodes = which(nodes$x %in% rounded_verts$x & nodes$y %in% rounded_verts$y)
-  nodes$edge = FALSE
-  nodes$edge[is_edge_nodes] = TRUE
-  nodes = nodes[order(!nodes$edge),]
-  nodes$id = NA
-  for(i in seq_len(length(is_edge_nodes))) {
-    nodes$id[i] = which(rounded_verts$x == nodes$x[i] &
-                        rounded_verts$y == nodes$y[i])
-  }
-  nodes = nodes[order(nodes$id),]
-  max_id = max(nodes$id, na.rm=TRUE)
-  internal_verts = sum(!nodes$edge)
-  nodes$id[which(is.na(nodes$id))] = seq(max_id+1,max_id+internal_verts)
-  ss$edge = FALSE
-  ss$source = NA
-  ss$destination = NA
-  ss$source_time = 0
-  for(i in seq_len(nrow(ss))) {
-    idx = which(ss$start_x[i] == nodes$x &
-                ss$start_y[i] == nodes$y)
-    dest_idx = which(ss$end_x[i] == nodes$x &
-                     ss$end_y[i] == nodes$y)
-    ss$source[i] = nodes$id[idx]
-    ss$destination[i] = nodes$id[dest_idx]
-    ss$edge[i] = nodes$edge[idx]
-  }
-  internal_node_times = unique(ss[,c("time","destination")])
-  for(i in seq_len(nrow(ss))) {
-    if(!ss$edge[i]) {
-      s_time = internal_node_times$time[ss$source[i] == internal_node_times$destination]
-      if(length(s_time) == 1) {
-        ss$source_time[i] = internal_node_times$time[ss$source[i] == internal_node_times$destination]
-      }
-    }
-  }
-  reorder_verts = order(ss$source, ss$source_time, ss$time)
-  ss2 = ss[reorder_verts,]
-  ss2 = ss2[,c(7,8,6,9,5)]
-  rownames(ss2) = seq_len(nrow(ss2))
-  colnames(ss2) = c("source","destination", "edge" ,"source_time","destination_time")
-  node_with_times = unique(data.frame(id = c(ss2[,1],ss2[,2]),time = c(ss2[,4],ss2[,5])))
-  nodes$time = 0
-  for(i in seq_len(nrow(nodes))) {
-    idx = which(nodes$id[i] == node_with_times$id)
-    nodes$time[i] = node_with_times$time[idx]
-  }
-  nodes = nodes[,c("id","x","y","edge","time")]
-  rownames(nodes) = seq_len(nrow(nodes))
-  return_val = list(nodes = nodes,
-                    links = ss2)
-  if(debug) {
-    dp = as.data.frame(return_data$dp)
-    lavs = as.data.frame(return_data$lavs)
-    debug = as.data.frame(return_data$int_debug_data)
-    split_debug = as.data.frame(return_data$split_debug_data)
-    oe = as.data.frame(return_data$original_edges)
-    bisector_debug = as.data.frame(return_data$bisector_debug)
-    debug_reflex = as.data.frame(return_data$debug_reflex)
-    simple = return_data$simple
-
-
-    names(dp) = c("x","y","vx","vy","id","reflex","split")
-    names(lavs) = c("x","y","lav","counter","valid","len")
-    names(debug) = c("o1x","o1y","d1x","d1y",
-                     "o2x","o2y","d2x","d2y",
-                     "intx","inty","valid", "id", "edge_id")
-    names(split_debug) = c("p1x","p1y","d1x","d1y",
-                           "p3x","p3y","bx","by",
-                           "left","right","edge","id", "edge_id",
-                           "vx","vy","d2x","d2y","bpointx","bpointy")
-    names(bisector_debug) = c("box","boy","bdx","bdy")
-    names(debug_reflex) = c("x","y","reflex")
-
-    attr(return_val,"dp") = dp
-    attr(return_val,"lavs") = lavs
-    attr(return_val,"debug") = debug
-    attr(return_val,"split_debug") = split_debug
-    attr(return_val,"from_split") = from_split
-    attr(return_val,"original_edges") = oe
-    attr(return_val,"bisector_debug") = bisector_debug
-    attr(return_val,"debug_reflex") = debug_reflex
-    attr(return_val,"simple_polygon") = simple
-  }
-  return(return_val)
+  ss = do.call("rbind", return_data$bisectors)
+  colnames(ss) = c("end_x","end_y","start_x","start_y","time","time_start", "id", "id_start")
+  #De-duplicate half edges
+  ss = ss[ss[,"id_start"] < ss[,"id"],]
+  #Re-connect first vertex so everything is CCW
+  stopifnot(ss[1:2,"id_start"] == 0)
+  ss[1,] = ss[1,c(3,4,1,2,5,6,8,7)]
+  ss = unique(as.data.frame(ss))
+  ss$edge = ss$time == 0 & ss$time_start == 0
+  start_nodes = as.data.frame(ss[,c("id_start", "start_x", "start_y", "time_start")])
+  start_nodes = dplyr::arrange(unique(start_nodes[start_nodes$time_start == 0,]),id_start)
+  ss = dplyr::arrange(as.data.frame(ss), time_start, time)
+  start_ss = ss[,c(8,3:4,6,5)]
+  colnames(start_ss) = c("id","x","y","time","other_time")
+  end_ss = ss[,c(7,1:2,5,6)]
+  colnames(end_ss) = c("id","x","y","time","other_time")
+  nodes = rbind(start_ss,end_ss)
+  nodes$edge = nodes$time == nodes$other_time
+  nodes = (nodes[nodes$time >= nodes$other_time,])
+  nodes = unique(nodes[,c(1:4,6)])
+  nodes = dplyr::arrange(nodes, id)
+  ss2 = ss[,c("id_start", "id", "time","time_start")]
+  colnames(ss2) = c("source","destination" ,"source_time","destination_time")
+  ss2 = as.data.frame(ss2)
+  ss2$edge = ss2$source_time == 0 & ss2$destination_time == 0
+  ss2 = ss2[,c(1,2,5,3,4)]
+  return(list(nodes = nodes, links = ss2))
 }
 
 #' Title
@@ -190,20 +118,19 @@ interpolate_location = function(node_start,
 #'
 #' @examples
 generate_offset_polygon = function(ss, offset) {
-  # browser()
   links = ss$links
   nodes = ss$nodes
   max_time = max(links$destination_time)
   stopifnot(offset < max_time)
-  links = rbind(links,data.frame(source = seq_len(sum(links$edge)),
-                                 destination = c(seq(2,sum(links$edge)),1),
-                                 edge = TRUE,
-                                 source_time = 0,
-                                 destination_time = 0))
+  # links = rbind(links,data.frame(source = seq_len(sum(links$edge)),
+  #                                destination = c(seq(2,sum(links$edge)),1),
+  #                                edge = TRUE,
+  #                                source_time = 0,
+  #                                destination_time = 0))
   links$visited = links$edge
-  first_node = links[1,1]
+  first_node = links[which(!links$edge)[1],1]
   tmp_source = first_node
-  first_dest = links[1,2]
+  first_dest = links[which(!links$edge)[1],2]
   tmp_dest = first_dest
 
   first_vertex = c(Inf, Inf)
@@ -214,10 +141,8 @@ generate_offset_polygon = function(ss, offset) {
   first = TRUE
   new_poly = TRUE
   while(first || !(tmp_source == first_node && tmp_dest == first_dest) || sum(!links$visited) != 0) {
-    # browser()
     # print(c(tmp_source,tmp_dest))
     if(tmp_source == first_node && tmp_dest == first_dest && !first) {
-      # browser()
       new_poly = TRUE
       remaining_links = links[!links$visited,]
       tmp_source = remaining_links[1,1]
@@ -227,11 +152,11 @@ generate_offset_polygon = function(ss, offset) {
       num_polygons = num_polygons + 1
     }
     first = FALSE
-    node1_position = as.numeric(nodes[tmp_source,2:3])
-    node2_position = as.numeric(nodes[tmp_dest,2:3])
-    segments(node1_position[1],node1_position[2],node2_position[1],node2_position[2], col="green")
-    node1_time = nodes[tmp_source,5]
-    node2_time = nodes[tmp_dest,5]
+    node1_position = as.numeric(nodes[nodes$id == tmp_source,2:3])
+    node2_position = as.numeric(nodes[nodes$id == tmp_dest,2:3])
+    # segments(node1_position[1],node1_position[2],node2_position[1],node2_position[2], col="green")
+    node1_time = nodes[nodes$id == tmp_source,4]
+    node2_time = nodes[nodes$id == tmp_dest,4]
     links$visited[(links$source == tmp_source &
                    links$destination == tmp_dest) |
                   (links$destination == tmp_source &
@@ -258,7 +183,7 @@ generate_offset_polygon = function(ss, offset) {
       }
     }
     if((offset <= node1_time && offset >= node2_time) ||
-       nodes$edge[tmp_dest]){
+       nodes$edge[nodes$id == tmp_dest]){
       new_source = tmp_dest
       new_dest = tmp_source
       tmp_source = new_source
@@ -291,8 +216,8 @@ generate_offset_polygon = function(ss, offset) {
       angle = atan2(det_val, dot_val)*180/pi
       if(angle < best_angle) {
         best_angle = angle
-        best_dest = candidate_dest
-        best_source = candidate_source
+        best_dest = nodes$id[candidate_dest]
+        best_source = nodes$id[candidate_source]
       }
     }
     # print(best_angle)

@@ -11,5 +11,5 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     Rcpp
-LinkingTo: Rcpp
+LinkingTo: Rcpp, BH
 RoxygenNote: 7.2.3

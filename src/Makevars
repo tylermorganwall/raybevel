@@ -1,0 +1,1 @@
+PKG_CXXFLAGS = -DCGAL_NO_GMP=1 -I../inst/include
