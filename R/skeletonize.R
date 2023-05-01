@@ -10,7 +10,8 @@
 #'
 #' @examples
 #' #Value
-skeletonize = function(vertices, holes = list(), tol = 1e-10, debug = FALSE) {
+skeletonize = function(vertices, holes = list(), tol = 1e-10, debug = FALSE,
+                       return_raw_ss = FALSE) {
   stopifnot(all(vertices[1,] == vertices[nrow(vertices),]))
   stopifnot(ncol(vertices) == 2)
   vertices_pad = rbind(vertices,vertices[2,])
@@ -52,7 +53,7 @@ skeletonize = function(vertices, holes = list(), tol = 1e-10, debug = FALSE) {
     }
   }
   verts_to_remove = c(1,unlist(remove_verts))
-  vertices = vertices_pad[-verts_to_remove,]
+  vertices = vertices_pad[-c(verts_to_remove,nrow(vertices_pad)),]
   return_data = skeletonize_rcpp(vertices, holes, tol)
   if(length(return_data) == 0) {
     warning("Polygon is not simple--not computing straight skeleton.")
@@ -60,13 +61,17 @@ skeletonize = function(vertices, holes = list(), tol = 1e-10, debug = FALSE) {
   }
   ss = do.call("rbind", return_data$bisectors)
   colnames(ss) = c("end_x","end_y","start_x","start_y","time","time_start", "id", "id_start")
+  if(return_raw_ss) {
+    return(as.data.frame(ss))
+  }
   #De-duplicate half edges
-  ss = ss[ss[,"id_start"] < ss[,"id"],]
+  ss = ss[ss[,"id_start"] < ss[,"id"] | (ss[,"time"] == 0  & ss[,"time_start"] == 0) ,]
   #Re-connect first vertex so everything is CCW
-  stopifnot(ss[1:2,"id_start"] == 0)
-  ss[1,] = ss[1,c(3,4,1,2,5,6,8,7)]
+  # stopifnot(ss[1:2,"id_start"] == 0)
+  # ss[1,] = ss[1,c(3,4,1,2,5,6,8,7)]
   ss = unique(as.data.frame(ss))
   ss$edge = ss$time == 0 & ss$time_start == 0
+  # ss = ss[,c(1:8,9)]
   start_nodes = as.data.frame(ss[,c("id_start", "start_x", "start_y", "time_start")])
   start_nodes = dplyr::arrange(unique(start_nodes[start_nodes$time_start == 0,]),id_start)
   ss = dplyr::arrange(as.data.frame(ss), time_start, time)
@@ -79,12 +84,22 @@ skeletonize = function(vertices, holes = list(), tol = 1e-10, debug = FALSE) {
   nodes = (nodes[nodes$time >= nodes$other_time,])
   nodes = unique(nodes[,c(1:4,6)])
   nodes = dplyr::arrange(nodes, id)
-  ss2 = ss[,c("id_start", "id", "time","time_start")]
-  colnames(ss2) = c("source","destination" ,"source_time","destination_time")
-  ss2 = as.data.frame(ss2)
-  ss2$edge = ss2$source_time == 0 & ss2$destination_time == 0
-  ss2 = ss2[,c(1,2,5,3,4)]
-  return(list(nodes = nodes, links = ss2))
+  links = ss[,c("id_start", "id", "time","time_start")]
+  colnames(links) = c("source","destination" ,"source_time","destination_time")
+  links = as.data.frame(links)
+  links$edge = links$source_time == 0 & links$destination_time == 0
+  links = links[,c(1,2,5,3,4)]
+  id_as_factor = as.factor(nodes$id)
+  id_levels = levels(id_as_factor)
+  nodes$id = as.factor(nodes$id)
+  links$source = as.integer(factor(links$source, levels = id_levels))
+  links$destination = as.integer(factor(links$destination, levels = id_levels))
+  nodes$id = as.integer(id_as_factor)
+  edge_links = links[links$edge,]
+  edge_links = edge_links[rev(seq_len(nrow(edge_links))),c(2,1,3,5,4)]
+  colnames(edge_links) = c("source","destination" ,"edge", "source_time","destination_time")
+  links = rbind(edge_links, links[!links$edge,])
+  return(list(nodes = nodes, links = links))
 }
 
 #' Title
@@ -108,7 +123,7 @@ interpolate_location = function(node_start,
   return(node_start * (1 - t) + node_end * t)
 }
 
-#' Title
+#' Generate Offset Polygon
 #'
 #' @param ss
 #' @param offset
@@ -130,8 +145,6 @@ generate_offset_polygon = function(ss, offset) {
   first_dest = links[which(!links$edge)[1],2]
   tmp_dest = first_dest
 
-  first_vertex = c(Inf, Inf)
-
   offset_polygon_verts = list()
   counter = 1
   num_polygons = 1
@@ -151,7 +164,6 @@ generate_offset_polygon = function(ss, offset) {
     first = FALSE
     node1_position = as.numeric(nodes[nodes$id == tmp_source,2:3])
     node2_position = as.numeric(nodes[nodes$id == tmp_dest,2:3])
-    # segments(node1_position[1],node1_position[2],node2_position[1],node2_position[2], col="green")
     node1_time = nodes[nodes$id == tmp_source,4]
     node2_time = nodes[nodes$id == tmp_dest,4]
     links$visited[(links$source == tmp_source &
@@ -165,12 +177,6 @@ generate_offset_polygon = function(ss, offset) {
       }
       offset_polygon_verts[[counter]] = c(num_polygons,interpolate_location(node1_position,node2_position,
                                                              node1_time,node2_time,offset))
-      # if(length(offset_polygon_verts) > 1 && !new_poly) {
-      #   print("printing")
-      #   val1 = offset_polygon_verts[[counter-1]]
-      #   val2 = offset_polygon_verts[[counter]]
-      #   segments(val1[2],val1[3],val2[2],val2[3], col="red")
-      # }
       new_poly = FALSE
       counter = counter + 1
     } else {
@@ -224,6 +230,102 @@ generate_offset_polygon = function(ss, offset) {
   colnames(final_poly) = c("id","x","y")
   return(split(final_poly,final_poly$id))
 }
+
+
+
+#' Get Face IDs
+#'
+#' @param ss
+#'
+#' @return
+#' @keywords internal
+#'
+#' @examples
+convert_ss_to_polygons = function(ss) {
+  links = ss$links
+  nodes = ss$nodes
+
+  links$visited = FALSE
+
+  first_node = links[1,1]
+  tmp_source = first_node
+
+  first_dest = links[1,2]
+  tmp_dest = first_dest
+
+  first = TRUE
+  polygon_indices = 1
+  total_polygons = 1
+  single_polygon_indices = list()
+  list_all_polygons = list()
+  last_loop = FALSE
+
+  while((sum(!links$visited) > 0) || last_loop) {
+    if(tmp_source == first_node && tmp_dest == first_dest && !first) {
+      remaining_links = links[!links$visited,]
+      tmp_source = remaining_links[1,1]
+      tmp_dest   = remaining_links[1,2]
+      first_node = tmp_source
+      first_dest = tmp_dest
+      list_all_polygons[[total_polygons]] = single_polygon_indices
+      total_polygons = total_polygons + 1
+      single_polygon_indices = list()
+      polygon_indices = 1
+      if(last_loop) {
+        break
+      }
+    }
+    first = FALSE
+    node1_position = as.numeric(nodes[nodes$id == tmp_source,2:3])
+    node2_position = as.numeric(nodes[nodes$id == tmp_dest,2:3])
+    links$visited[(links$source      == tmp_source &
+                   links$destination == tmp_dest) |
+                  (links$destination == tmp_source &
+                   links$source      == tmp_dest)] = TRUE
+    if(sum(!links$visited) == 0) {
+      last_loop = TRUE
+    }
+    v1 = node2_position-node1_position
+
+    no_origin_links = links[!(links$source      == tmp_source &
+                              links$destination == tmp_dest) &
+                            !(links$destination == tmp_source &
+                              links$source      == tmp_dest),]
+
+    next_links = no_origin_links[(no_origin_links$source == tmp_dest |
+                                  no_origin_links$destination == tmp_dest),]
+    best_angle = 180
+    best_dest = NA
+    best_source = NA
+
+    for(i in seq_len(nrow(next_links))) {
+      if(next_links$destination[i] == tmp_dest) {
+        candidate_source = which(next_links$destination[i] == nodes$id)
+        candidate_dest = which(next_links$source[i] == nodes$id)
+      } else {
+        candidate_source = which(next_links$source[i] == nodes$id)
+        candidate_dest = which(next_links$destination[i] == nodes$id)
+      }
+      v2 = as.numeric(nodes[candidate_dest,2:3] - nodes[candidate_source,2:3])
+
+      det_val = determinant2x2(v1,v2)
+      dot_val = dot(v1,v2)
+      angle = atan2(det_val, dot_val)*180/pi
+      if(angle < best_angle) {
+        best_angle = angle
+        best_dest = nodes$id[candidate_dest]
+        best_source = nodes$id[candidate_source]
+      }
+    }
+    tmp_source = best_source
+    tmp_dest = best_dest
+    single_polygon_indices[[polygon_indices]] = best_dest
+    polygon_indices = polygon_indices + 1
+  }
+  final_polygons = lapply(list_all_polygons, unlist, recursive=FALSE)
+  return(final_polygons)
+}
+
 
 #' Title
 #'

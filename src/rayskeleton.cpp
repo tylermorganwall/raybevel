@@ -29,6 +29,13 @@ List skeletonize_rcpp(NumericMatrix vertices,
   for(size_t i = 0; i < vertices.rows(); i++) {
     poly.push_back( Point(vertices(i,0),vertices(i,1)));
   }
+  if(!poly.is_counterclockwise_oriented()) {
+    throw std::runtime_error("rayskeleton: Polygon is not CCW oriented.");
+  }
+  if(!poly.is_simple()) {
+    throw std::runtime_error("rayskeleton: Polygon is not simple.");
+  }
+
   SsPtr ss = CGAL::create_interior_straight_skeleton_2(poly);
   double lOffset = offset ;
 
@@ -37,24 +44,28 @@ List skeletonize_rcpp(NumericMatrix vertices,
 
 
   for (Halfedge_const_iterator i = ss->halfedges_begin(); i != ss->halfedges_end(); ++i ) {
-    bisectors++;
+    if(!i->is_border()) {
+      bisectors++;
+    }
   }
   List bisector_list(bisectors);
   int bis_cntr = 0;
 
   for (Halfedge_const_iterator i = ss->halfedges_begin(); i != ss->halfedges_end(); ++i ) {
-    NumericVector temp = Rcpp::NumericVector::create(
-      i->vertex()->point().x(),
-      i->vertex()->point().y(),
-      i->opposite()->vertex()->point().x(),
-      i->opposite()->vertex()->point().y(),
-      i->vertex()->time(),
-      i->opposite()->vertex()->time(),
-      i->vertex()->id(),
-      i->opposite()->vertex()->id()
-    );
-    bisector_list(bis_cntr) = temp;
-    bis_cntr++;
+    if(!i->is_border()) {
+      NumericVector temp = Rcpp::NumericVector::create(
+        i->vertex()->point().x(),
+        i->vertex()->point().y(),
+        i->opposite()->vertex()->point().x(),
+        i->opposite()->vertex()->point().y(),
+        i->vertex()->time(),
+        i->opposite()->vertex()->time(),
+        i->vertex()->id(),
+        i->opposite()->vertex()->id()
+      );
+      bisector_list(bis_cntr) = temp;
+      bis_cntr++;
+    }
   }
 
   List all_data = List::create(_["bisectors"] = bisector_list);

@@ -4,7 +4,13 @@
 \alias{skeletonize}
 \title{Title}
 \usage{
-skeletonize(vertices, holes = list(), tol = 1e-10, debug = FALSE)
+skeletonize(
+  vertices,
+  holes = list(),
+  tol = 1e-10,
+  debug = FALSE,
+  return_raw_ss = FALSE
+)
 }
 \arguments{
 \item{vertices}{DUM}
