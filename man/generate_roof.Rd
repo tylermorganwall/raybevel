@@ -4,7 +4,7 @@
 \alias{generate_roof}
 \title{Generate Offset Polygon}
 \usage{
-generate_roof(ss, max_height = 1)
+generate_roof(ss, max_height = 1, offset_roof = 0)
 }
 \arguments{
 \item{offset}{}
