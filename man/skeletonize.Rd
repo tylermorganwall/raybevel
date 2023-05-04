@@ -9,7 +9,8 @@ skeletonize(
   holes = list(),
   tol = 1e-10,
   debug = FALSE,
-  return_raw_ss = FALSE
+  return_raw_ss = FALSE,
+  use_cgal = TRUE
 )
 }
 \arguments{
