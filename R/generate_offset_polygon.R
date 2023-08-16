@@ -1,13 +1,13 @@
-
-#' Generate Offset Polygon
+#' Generate an offset polygon
 #'
-#' @param ss
-#' @param offset
+#' This function generates an offset polygon from a straight skeleton.
 #'
-#' @return
+#' @param ss Default `NULL`. A straight skeleton generated from the `skeletonize` function.
+#' @param offset Default `NULL`. The offset of the polygon.
+#'
+#' @return A list of data frames, each representing a polygon offset by the specified amount.
+#'
 #' @export
-#'
-#' @examples
 generate_offset_polygon = function(ss, offset) {
   links = ss$links
   nodes = ss$nodes

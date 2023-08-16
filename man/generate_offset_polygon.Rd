@@ -2,13 +2,18 @@
 % Please edit documentation in R/generate_offset_polygon.R
 \name{generate_offset_polygon}
 \alias{generate_offset_polygon}
-\title{Generate Offset Polygon}
+\title{Generate an offset polygon}
 \usage{
 generate_offset_polygon(ss, offset)
 }
 \arguments{
-\item{offset}{}
+\item{ss}{Default `NULL`. A straight skeleton generated from the `skeletonize` function.}
+
+\item{offset}{Default `NULL`. The offset of the polygon.}
+}
+\value{
+A list of data frames, each representing a polygon offset by the specified amount.
 }
 \description{
-Generate Offset Polygon
+This function generates an offset polygon from a straight skeleton.
 }

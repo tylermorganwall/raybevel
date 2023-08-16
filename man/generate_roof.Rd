@@ -2,13 +2,30 @@
 % Please edit documentation in R/generate_roof.R
 \name{generate_roof}
 \alias{generate_roof}
-\title{Generate Offset Polygon}
+\title{Generate a 3D roof model}
 \usage{
-generate_roof(ss, max_height = 1, offset_roof = 0)
+generate_roof(
+  ss,
+  max_height = 1,
+  offset_roof = 0,
+  base = FALSE,
+  bottom = FALSE
+)
 }
 \arguments{
-\item{offset}{}
+\item{ss}{Default `NULL`. A straight skeleton generated from the `skeletonize` function.}
+
+\item{max_height}{Default `1`. The maximum height of the roof.}
+
+\item{offset_roof}{Default `0`. The offset of the roof.}
+
+\item{base}{Default `FALSE`. A logical flag that controls whether to generate the base of the roof.}
+
+\item{bottom}{Default `FALSE`. A logical flag that controls whether to generate the bottom of the roof.}
+}
+\value{
+A 3D mesh of the roof model.
 }
 \description{
-Generate Offset Polygon
+This function generates a 3D roof model from a straight skeleton.
 }

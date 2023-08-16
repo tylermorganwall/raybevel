@@ -1,15 +1,15 @@
 Package: rayskeleton
 Type: Package
-Title: Generates Polygon Straight Skeletons
+Title: Generates Polygon Straight Skeletons and 3D Bevels
 Version: 0.1.0
 Author: Tyler Morgan-Wall
 Maintainer: Tyler Morgan-Wall <tylermw@gmail.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Generates polygon straight skeletons using the CGAL library. Provides fucntions to create interior polygon offsets, 3D beveled polygons, and 3D roof models.
 License: GPL3
 Encoding: UTF-8
 LazyData: true
-Imports: 
-    Rcpp
-LinkingTo: Rcpp, BH
+Imports: progress,
+    Rcpp,
+    digest
+LinkingTo: Rcpp, BH, RcppCGAL
 RoxygenNote: 7.2.3

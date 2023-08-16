@@ -2,32 +2,40 @@
 % Please edit documentation in R/skeletonize.R
 \name{skeletonize}
 \alias{skeletonize}
-\title{Title}
+\title{Skeletonize a polygon}
 \usage{
 skeletonize(
   vertices,
   holes = list(),
-  tol = 1e-10,
   debug = FALSE,
   return_raw_ss = FALSE,
-  use_cgal = TRUE
+  use_cgal = TRUE,
+  progress = TRUE
 )
 }
 \arguments{
-\item{vertices}{DUM}
+\item{vertices}{Default `NULL`. A matrix of x and y coordinates representing the vertices of the polygon in counter-clockwise (CCW) order.}
 
-\item{holes}{DEE}
+\item{holes}{Default `list()`. A list of matrices, each representing a hole in the polygon with x and y coordinates in clockwise (CW) order.}
 
-\item{tol}{DOO}
+\item{debug}{Default `FALSE`. A logical flag that controls whether debugging information should be printed.}
 
-\item{debug}{}
+\item{return_raw_ss}{Default `FALSE`. A logical flag that controls whether the raw straight skeleton should be returned.}
+
+\item{use_cgal}{Default `TRUE`. A logical flag that controls whether the CGAL library should be used for computation.}
 }
 \value{
-Value
+If `return_raw_ss` is FALSE, a list with two data frames, 'nodes' and 'links', which represent the nodes and edges of the straight skeleton, respectively.
+If `return_raw_ss` is TRUE, a data frame representing the raw straight skeleton is returned.
+If the polygon is not simple, a warning is issued and NULL is returned.
 }
 \description{
-Title
+This function generates a straight skeleton of a polygon, based on a set of vertices and holes.
+It uses the CGAL library to create the straight skeleton using exact arithmetic,
+and then parses that file into a more manageable format.
 }
 \examples{
-#Value
+# vertices representing a simple polygon
+vertices <- matrix(c(0,0, 1,0, 1,1, 0,1, 0,0), ncol = 2, byrow = TRUE)
+skeleton <- skeletonize(vertices)
 }

@@ -11,7 +11,7 @@ generate_offset_links_nodes = function(ss, offset) {
   links = ss$links
   nodes = ss$nodes
   max_time = max(links$destination_time)
-  if(offset >= max_time) {
+  if(all(offset >= max_time)) {
     stop(sprintf("offset (%f) must not be greater than or equal to max time: %f", offset, max_time))
   }
   links$visited = links$edge
@@ -25,19 +25,24 @@ generate_offset_links_nodes = function(ss, offset) {
   tmp_source = first_node
   first_dest = links[which(!links$edge)[1],2]
   # first_dest = links[1,2]
-
+  # x11()
+  # opar = par(no.readonly = TRUE)
+  # on.exit(par(opar))
+  # par(mfrow=c(1,1), mar=c(1,1,1,1), oma=c(0,0,0,0))
+  # plot_skeleton(ss)
   tmp_dest = first_dest
 
   offset_polygon_verts = list()
   counter = 1
   num_polygons = 1
   new_node_start = max(nodes$id) + 1
-  cols = c("green","red","yellow")
+  # cols = c("purple","dodgerblue","darkgreen")
   first = TRUE
   new_poly = TRUE
+  # last_pair = c(-1,-1)
   while(first || !(tmp_source == first_node && tmp_dest == first_dest) ||
         sum(!links$visited) != 0) {
-    # print(c(tmp_source,tmp_dest))
+
     if(tmp_source == first_node && tmp_dest == first_dest && !first) {
       new_poly = TRUE
       remaining_links = links[!links$visited &
@@ -52,6 +57,10 @@ generate_offset_links_nodes = function(ss, offset) {
       first_dest = tmp_dest
       num_polygons = num_polygons + 1
     }
+    # print(c(tmp_source,tmp_dest, sum(!links$visited &
+    #                                    !links$edge &
+    #                                    !links$away_from_offset)))
+
     first = FALSE
     node1_position = as.numeric(nodes[nodes$id == tmp_source,2:3])
     node2_position = as.numeric(nodes[nodes$id == tmp_dest,2:3])
@@ -61,7 +70,8 @@ generate_offset_links_nodes = function(ss, offset) {
                       links$destination == tmp_dest) |
                      (links$destination == tmp_source &
                       links$source == tmp_dest))
-    # segments(node1_position[1],node1_position[2],node2_position[1],node2_position[2], col=cols[num_polygons])
+    # segments(node1_position[1],node1_position[2],node2_position[1],node2_position[2],
+    #          col=cols[num_polygons %% 3 + 1], lwd=3)
     # Sys.sleep(0.1)
 
     stopifnot(length(link_idx) == 1)
@@ -76,15 +86,21 @@ generate_offset_links_nodes = function(ss, offset) {
         first_node = tmp_source
         first_dest = tmp_dest
       }
-      node_position_new = interpolate_location(node1_position,node2_position,
-                                               node1_time,node2_time,offset)
+      if(node1_time == offset) {
+        node_position_new = node1_position
+      } else if (node2_time == offset) {
+        node_position_new = node2_position
+      } else {
+        node_position_new = interpolate_location(node1_position,node2_position,
+                                                 node1_time,node2_time,offset)
+      }
       offset_polygon_verts[[counter]] = c(num_polygons,node_position_new)
       new_node_info[[counter]] = matrix(c(num_polygons, tmp_source, tmp_dest, new_node_start,
-                                          node_position_new, offset), nrow=1,ncol=7)
+                                          node_position_new, offset, node1_position, node2_position), nrow=1,ncol=11)
 
       new_node_start = new_node_start + 1
       colnames(new_node_info[[counter]]) = c("polygon_id", "source", "destination", "new_id",
-                                             "x","y","time")
+                                             "x","y","time","x1","y1","x2","y2")
       new_poly = FALSE
       counter = counter + 1
     } else {
@@ -93,8 +109,9 @@ generate_offset_links_nodes = function(ss, offset) {
         first_dest = tmp_dest
       }
     }
-    if((offset <= node1_time && offset >= node2_time) ||
+    if((offset < node1_time && offset > node2_time) ||
        nodes$edge[nodes$id == tmp_dest]){
+      # last_pair = c(tmp_source, tmp_dest)
       new_source = tmp_dest
       new_dest = tmp_source
       tmp_source = new_source
@@ -131,12 +148,15 @@ generate_offset_links_nodes = function(ss, offset) {
         best_source = nodes$id[candidate_source]
       }
     }
+    # last_pair = c(tmp_source, tmp_dest)
+
     tmp_source = best_source
     tmp_dest = best_dest
+
   }
   all_new_nodes = do.call("rbind",new_node_info)
-  # browser
   new_links_poly = split(as.data.frame(all_new_nodes[,-1]), all_new_nodes[,1])
+  #Need to ensure new_links_poly has doesn't have nodes that start and end on the offset value?
   return(insert_polygon_links_nodes(ss, new_links_poly))
 }
 
@@ -170,13 +190,23 @@ insert_polygon_links_nodes = function(ss, new_links) {
       } else {
         poly_id = single_poly$new_id[1]
       }
-      link_remove_idx = which(links$source == old_source &
-                              links$destination == old_destination)
+      link_remove_idx = which((links$source == old_source &
+                               links$destination == old_destination) |
+                              (links$destination == old_source &
+                               links$source == old_destination))
+      # if(length(link_remove_idx) != 1) {
+      #   browser()
+      # }
+      # plot_skeleton(ss)
       stopifnot(length(link_remove_idx) == 1)
       old_link = links[link_remove_idx,]
       old_source_time = old_link$source_time
       old_destination_time = old_link$destination_time
 
+      #Possibly because just going clockwise  misses exact hits like 23 to 14
+
+      #The issue is you need to keep rotating through until you reach the original node--you can re-hit
+      #contour lines when they lie on the edge
       links_to_remove[[counter]] = link_remove_idx
       new_link_list[[counter]] = data.frame(source = c(old_source,new_id, new_id),
                                         destination = c(new_id,old_destination, poly_id),
@@ -191,5 +221,11 @@ insert_polygon_links_nodes = function(ss, new_links) {
                 do.call("rbind",new_link_list))
   nodes = rbind(nodes,new_nodes)
   rownames(nodes) = NULL
-  return(list(nodes = nodes, links = links))
+  new_ss = list(nodes = nodes, links = links)
+  class(new_ss) = "rayskeleton"
+  attr(new_ss, "original_vertices") = attr(ss, "original_vertices")
+  attr(new_ss, "original_holes") = attr(ss, "original_holes")
+  new_ss = remove_node_duplicates(new_ss)
+
+  return(new_ss)
 }

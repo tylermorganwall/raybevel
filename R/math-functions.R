@@ -59,6 +59,15 @@ interpolate_location = function(node_start,
                                 height_start,
                                 height_end,
                                 height) {
+  if((height_end - height_start) == 0) {
+    return(node_end)
+  }
+  if(height == height_end) {
+    return(node_end)
+  }
+  if(height == height_start) {
+    return(node_start)
+  }
   t = (height - height_start)/(height_end - height_start)
   return(node_start * (1 - t) + node_end * t)
 }
