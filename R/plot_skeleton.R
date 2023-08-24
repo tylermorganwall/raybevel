@@ -21,7 +21,7 @@
 #' hole2 = matrix(c(5,5, 5,6, 6,6, 6,5, 5,5), ncol = 2, byrow = TRUE)
 #' skeleton = skeletonize(vertices, holes = list(hole1, hole2))
 #' plot_skeleton(skeleton)
-plot_skeleton = function(skeleton) {
+plot_skeleton = function(skeleton,use_arrow = TRUE) {
   # Check if skeleton is valid
   if (!inherits(skeleton, "rayskeleton")) {
     stop("Invalid input: The input is not of class 'rayskeleton'")
@@ -37,13 +37,34 @@ plot_skeleton = function(skeleton) {
        ylim=c(min(skeleton$nodes$y) - 1, max(skeleton$nodes$y) + 1), xlab="", ylab="",
        xaxt='n', yaxt='n', frame.plot = FALSE)
   points(x=skeleton$nodes$x, y=skeleton$nodes$y, pch=1, col="black")
+  range_skeleton_x = range(skeleton$nodes$x)
+  range_skeleton_y = range(skeleton$nodes$y)
 
-
+  min_range = min(c(range_skeleton_x[2]-range_skeleton_x[1],range_skeleton_y[2]-range_skeleton_y[1]))
+  arrow_size = min_range/100
   # Plot straight skeleton
   for (i in 1:nrow(skeleton$links)) {
-    lines(c(skeleton$nodes[skeleton$links$source[i], 'x'], skeleton$nodes[skeleton$links$destination[i], 'x']),
-          c(skeleton$nodes[skeleton$links$source[i], 'y'], skeleton$nodes[skeleton$links$destination[i], 'y']),
-          col="red", lwd=2)
+    if(use_arrow) {
+      x0=skeleton$nodes[skeleton$links$source[i], 'x']
+      x1=skeleton$nodes[skeleton$links$destination[i], 'x']
+      y0=skeleton$nodes[skeleton$links$source[i], 'y']
+      y1=skeleton$nodes[skeleton$links$destination[i], 'y']
+      interp_pos = (c(x0,y0) + c(x1,y1))/2
+      arrows(x0=x0,
+             x1=interp_pos[1],
+             y0=y0,
+             y1=interp_pos[2],
+            col="red", lwd=2,length = arrow_size, angle = 20)
+      segments(x1=x1,
+               x0=interp_pos[1],
+               y1=y1,
+               y0=interp_pos[2],
+               col="red", lwd=2)
+    } else {
+      lines(c(skeleton$nodes[skeleton$links$source[i], 'x'], skeleton$nodes[skeleton$links$destination[i], 'x']),
+             c(skeleton$nodes[skeleton$links$source[i], 'y'], skeleton$nodes[skeleton$links$destination[i], 'y']),
+             col="red", lwd=2)
+    }
   }
 
   original_holes = attr(skeleton, "original_holes")

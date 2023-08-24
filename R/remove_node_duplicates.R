@@ -30,12 +30,6 @@ remove_node_duplicates = function(ss) {
   new_ss$links = new_ss$links[new_ss$links$source != new_ss$links$destination,]
 
   new_ss$nodes = new_ss$nodes[!new_ss$nodes$id %in% unlist(replace_node_list),]
-  fac_id = factor(new_ss$nodes$id)
-  levels_id = levels(factor(new_ss$nodes$id))
-  new_ss$nodes$id = as.integer(fac_id)
-
-  new_ss$links$source = as.integer(factor(new_ss$links$source, levels = levels_id))
-  new_ss$links$destination = as.integer(factor(new_ss$links$destination, levels = levels_id))
-
-  return(new_ss)
+  new_ss_inc = make_incremental_nodes(new_ss)
+  return(new_ss_inc)
 }

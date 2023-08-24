@@ -88,16 +88,19 @@ generate_roof = function(ss, max_height = 1, offset_roof = 0, base = FALSE, bott
 #'
 #' @export
 generate_roof_beveled = function(ss,
-                                 bevel_offset,
+                                 bevel_offsets,
+                                 bevel_heights = bevel_offsets,
+                                 set_max_height = FALSE,
                                  max_height = 1,
                                  offset_roof = 0,
                                  base = FALSE, bottom = FALSE,
                                  swap_yz = FALSE) {
+
   if(inherits(ss, "rayskeleton_list")) {
     meshlist = list()
     counter  = 1
     for(j in seq_len(length(ss))) {
-      meshlist[[counter]] = generate_roof_beveled(ss, bevel_offset = bevel_offset,
+      meshlist[[counter]] = generate_roof_beveled(ss, bevel_offsets = bevel_offsets,
                                                   bottom = bottom, offset_roof = offset_roof,
                                                   base = base, max_height = max_height,
                                                   swap_yz=swap_yz)
@@ -108,13 +111,19 @@ generate_roof_beveled = function(ss,
   if(!inherits(ss, "rayskeleton")) {
     stop("`ss` must be of class `rayskeleton`")
   }
-  if(bevel_offset >= max(ss$links$destination_time)) {
-    message(sprintf("`bevel_offset` of %f greater than max offset in polygon of %f, calculating full roof model",
-            bevel_offset,max(ss$nodes[,4])))
+  max_time = max(ss$links$destination_time)
+  if(all(bevel_offsets >= max_time)) {
+    message(sprintf("All `bevel_offset` greater than max offset in polygon of %f, calculating full roof model",
+            max(ss$nodes[,4])))
     return(generate_roof(ss, max_height = max_height, offset_roof = offset_roof,
                          swap_yz=swap_yz))
   }
-  beveled_ss = generate_offset_links_nodes(ss, bevel_offset)
+  valid_bevels = bevel_offsets < max_time & bevel_offsets > 0
+  bevel_offsets = bevel_offsets[valid_bevels]
+  bevel_heights = bevel_heights[valid_bevels]
+  stopifnot(length(bevel_offsets) == length(bevel_heights))
+
+  beveled_ss = generate_offset_links_nodes(ss, bevel_offsets)
   polygon_ind = convert_ss_to_polygons(beveled_ss)
   nodes = beveled_ss$nodes
   index_list = list()
@@ -125,10 +134,19 @@ generate_roof_beveled = function(ss,
   }
   indices_all = do.call("rbind",index_list)
   xyz = nodes[,2:4]
-  flat_areas = xyz[,3] > bevel_offset
-  xyz[flat_areas,3] = bevel_offset
+  new_xyz = xyz
+  bevel_offsets_with_max = c(bevel_offsets, max_time)
+  for(i in seq_len(length(bevel_offsets_with_max)-1)) {
+    flat_areas = xyz[,3] >= bevel_offsets_with_max[i]
+    new_xyz[flat_areas,3] = bevel_heights[i]
+  }
+  xyz = new_xyz
   colnames(xyz) = c("x","y","z")
-  xyz[,3] = xyz[,3]/max(xyz[,3])*max_height + offset_roof
+  if(set_max_height) {
+    xyz[,3] = xyz[,3]/max(xyz[,3])*max_height + offset_roof
+  } else {
+    xyz[,3] = xyz[,3] + offset_roof
+  }
   original_verts = attr(ss,"original_vertices")
   original_holes = attr(ss,"original_holes")
   if(!swap_yz) {

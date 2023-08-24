@@ -46,10 +46,6 @@
 #' # Example 5: Using debug and returning raw straight skeleton
 #' vertices5 = matrix(c(0,0, 3,0, 3,3, 0,3, 0,0), ncol = 2, byrow = TRUE)
 #' raw_skeleton5 = skeletonize(vertices5, debug = TRUE, return_raw_ss = TRUE)
-#'
-#' # Example 6: Using the function without CGAL library
-#' vertices6 = matrix(c(0,0, 2,0, 1,3, 0,0), ncol = 2, byrow = TRUE)
-#' skeleton6 = skeletonize(vertices6, use_cgal = FALSE)
 skeletonize = function(vertices, holes = list(), debug = FALSE,
                        return_raw_ss = FALSE, use_cgal = TRUE,
                        progress = TRUE) {
@@ -246,7 +242,8 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
   nodes = unique(nodes[,c(1:4,6)])
   nodes = dplyr::arrange(nodes, id)
   links = ss[,c("id_start", "id", "time","time_start")]
-  colnames(links) = c("source","destination" ,"source_time","destination_time")
+  colnames(links) = c("source","destination" ,"destination_time","source_time")
+  links = links[,c(1,2,4,3)]
   links = as.data.frame(links)
   links$edge = links$source_time == 0 & links$destination_time == 0
   links = links[,c(1,2,5,3,4)]

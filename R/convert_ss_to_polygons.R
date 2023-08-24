@@ -28,10 +28,7 @@ convert_ss_to_polygons = function(ss) {
   #And then extract the unique nodes at the end by copying the indices, ordering them,
   #hashing them, and then saving only the unique hashes (which should correspond to unique polygons)
   while((sum(!links$visited) > 0)) {
-    # print(c(tmp_source, tmp_dest, sum(!links$visited)))
-    # if(tmp_source == 10 && tmp_dest == 7) {
-    # browser()
-    # }
+    print(c(tmp_source, tmp_dest, sum(!links$visited)))
     # Debug
     # src = nodes[tmp_source,]
     # des = nodes[tmp_dest,]
@@ -45,9 +42,10 @@ convert_ss_to_polygons = function(ss) {
     #          col="red", pch=19,cex=2)
     # points(nodes[first_dest,2],nodes[first_dest,3],
     #        col="pink",pch=19,cex=2)
-    for(j in seq_len(length(list_all_polygons))) {
-      polygon(ss$nodes[unlist(list_all_polygons[[j]]),c("x","y")], col = "#00000088")
-    }
+    # for(j in seq_len(length(list_all_polygons))) {
+    #   polygon(ss$nodes[unlist(list_all_polygons[[j]]),c("x","y")], col = "#00000088")
+    # }
+    # Sys.sleep(0.1)
     if(tmp_source == first_node && tmp_dest == first_dest && !first) {
     # if(tmp_dest == first_node && tmp_dest == first_dest && !first) {
       links$visited[(links$source      == tmp_source &
@@ -97,9 +95,6 @@ convert_ss_to_polygons = function(ss) {
     best_len = Inf
 
     for(i in seq_len(nrow(next_links))) {
-      # if(tmp_source == 20 && tmp_dest == 14 && sum(!links$visited) == 20) {
-      #   browser()
-      # }
       if(next_links$destination[i] == tmp_dest) {
         candidate_source = which(next_links$destination[i] == nodes$id)
         candidate_dest = which(next_links$source[i] == nodes$id)
@@ -145,9 +140,6 @@ convert_ss_to_polygons = function(ss) {
     # segments(source_xy[1],source_xy[2],dest_xy[1],dest_xy[2],
     #          col="green", lwd=10)
     # Sys.sleep(0.1)
-    # if(best_source == 1 && best_dest == 4) {
-    #   browser()
-    # }
     tmp_source = best_source
     tmp_dest = best_dest
     single_polygon_indices[[polygon_indices]] = best_dest

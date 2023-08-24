@@ -9,7 +9,8 @@ generate_roof(
   max_height = 1,
   offset_roof = 0,
   base = FALSE,
-  bottom = FALSE
+  bottom = FALSE,
+  swap_yz = FALSE
 )
 }
 \arguments{

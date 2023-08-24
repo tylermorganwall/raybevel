@@ -4,7 +4,7 @@
 \alias{generate_offset_links_nodes}
 \title{Generate Offset Polygon}
 \usage{
-generate_offset_links_nodes(ss, offset)
+generate_offset_links_nodes(ss, offsets)
 }
 \arguments{
 \item{offset}{}
