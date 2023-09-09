@@ -10,7 +10,8 @@ generate_roof(
   offset_roof = 0,
   base = FALSE,
   bottom = FALSE,
-  swap_yz = FALSE
+  swap_yz = FALSE,
+  progress = TRUE
 )
 }
 \arguments{

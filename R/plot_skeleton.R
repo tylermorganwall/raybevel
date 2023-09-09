@@ -21,7 +21,7 @@
 #' hole2 = matrix(c(5,5, 5,6, 6,6, 6,5, 5,5), ncol = 2, byrow = TRUE)
 #' skeleton = skeletonize(vertices, holes = list(hole1, hole2))
 #' plot_skeleton(skeleton)
-plot_skeleton = function(skeleton,use_arrow = TRUE) {
+plot_skeleton = function(skeleton,use_arrow = TRUE, xlim = c(0,1), ylim = c(0,1)) {
   # Check if skeleton is valid
   if (!inherits(skeleton, "rayskeleton")) {
     stop("Invalid input: The input is not of class 'rayskeleton'")
@@ -33,8 +33,22 @@ plot_skeleton = function(skeleton,use_arrow = TRUE) {
 
   # Plot settings
   par(mfrow=c(1,1), mar=c(1,1,1,1), oma=c(0,0,0,0))
-  plot(0, 0, type="n", xlim=c(min(skeleton$nodes$x) - 1, max(skeleton$nodes$x) + 1),
-       ylim=c(min(skeleton$nodes$y) - 1, max(skeleton$nodes$y) + 1), xlab="", ylab="",
+  stopifnot(length(xlim) == 2 && length(ylim) == 2)
+  stopifnot(xlim[1] < xlim[2] && xlim[1] >= 0 && xlim[2] <= 1)
+  stopifnot(ylim[1] < ylim[2] && ylim[1] >= 0 && ylim[2] <= 1)
+
+  min_x = min(skeleton$nodes$x) - 1
+  min_y = min(skeleton$nodes$y) - 1
+  max_x = max(skeleton$nodes$x) + 1
+  max_y = max(skeleton$nodes$y) + 1
+
+  span_x = max_x - min_x
+  span_y = max_y - min_y
+
+  xlim_vals = c(min_x + span_x * xlim[1], min_x + span_x * xlim[2])
+  ylim_vals = c(min_y + span_y * ylim[1], min_y + span_y * ylim[2])
+
+  plot(0, 0, type="n", xlim=xlim_vals, ylim=ylim_vals, xlab="", ylab="",
        xaxt='n', yaxt='n', frame.plot = FALSE)
   points(x=skeleton$nodes$x, y=skeleton$nodes$y, pch=1, col="black")
   range_skeleton_x = range(skeleton$nodes$x)

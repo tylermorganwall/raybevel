@@ -4,7 +4,7 @@
 \alias{plot_skeleton}
 \title{Plot the Straight Skeleton of a Polygon}
 \usage{
-plot_skeleton(skeleton)
+plot_skeleton(skeleton, use_arrow = TRUE, xlim = c(0, 1), ylim = c(0, 1))
 }
 \arguments{
 \item{skeleton}{A list object of class 'rayskeleton' containing the straight

@@ -65,8 +65,4 @@ plot_skeleton(skeleton4)
 # Example 5: Using debug and returning raw straight skeleton
 vertices5 = matrix(c(0,0, 3,0, 3,3, 0,3, 0,0), ncol = 2, byrow = TRUE)
 raw_skeleton5 = skeletonize(vertices5, debug = TRUE, return_raw_ss = TRUE)
-
-# Example 6: Using the function without CGAL library
-vertices6 = matrix(c(0,0, 2,0, 1,3, 0,0), ncol = 2, byrow = TRUE)
-skeleton6 = skeletonize(vertices6, use_cgal = FALSE)
 }

@@ -47,8 +47,10 @@
 #' vertices5 = matrix(c(0,0, 3,0, 3,3, 0,3, 0,0), ncol = 2, byrow = TRUE)
 #' raw_skeleton5 = skeletonize(vertices5, debug = TRUE, return_raw_ss = TRUE)
 skeletonize = function(vertices, holes = list(), debug = FALSE,
+                       merge_nodes_tolerance = 1e-5,
                        return_raw_ss = FALSE, use_cgal = TRUE,
                        progress = TRUE) {
+  stopifnot(merge_nodes_tolerance >= 0 && merge_nodes_tolerance < 1)
   if(inherits(vertices, "sf")) {
     pb = progress::progress_bar$new(
       format = ":current/:total skeletonizing [:bar] eta: :eta",
@@ -105,7 +107,8 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
           #Skeletonize
           ss_list[[counter]] = skeletonize(as.matrix(verts), debug = debug,
                                            holes = holes,
-                                           return_raw_ss = return_raw_ss, use_cgal = use_cgal)
+                                           return_raw_ss = return_raw_ss, use_cgal = use_cgal,
+                                           merge_nodes_tolerance = merge_nodes_tolerance)
           counter = counter + 1
         }
       } else if (is_multipolygon[i]) {
@@ -146,17 +149,23 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
             #Skeletonize
             ss_list[[counter]] = skeletonize(as.matrix(verts), debug = debug,
                                              holes = holes,
-                                             return_raw_ss = return_raw_ss, use_cgal = use_cgal)
+                                             return_raw_ss = return_raw_ss, use_cgal = use_cgal,
+                                             merge_nodes_tolerance = merge_nodes_tolerance)
             counter = counter + 1
           }
         }
       }
     }
-    class(ss_list) = c("rayskeleton_list", "list")
-    return(ss_list)
+    if(length(ss_list) > 1) {
+      class(ss_list) = c("rayskeleton_list", "list")
+      return(ss_list)
+    } else {
+      return(ss_list[[1]])
+    }
   }
   stopifnot(ncol(vertices) == 2)
   if(!use_cgal) {
+    browser()
     vertices_pad = rbind(vertices,vertices[2,])
 
     remove_verts = list()
@@ -198,6 +207,12 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
     }
     verts_to_remove = c(1,unlist(remove_verts))
     vertices = vertices_pad[-c(verts_to_remove,nrow(vertices_pad)),]
+    if(all(vertices[1,] != vertices[nrow(vertices),])) {
+      vertices = rbind(vertices,vertices[1,])
+    }
+    holes = list()
+    #Okay, here's where code goes
+    return_data = skeletonize_custom_rcpp(vertices, holes, 1e-10)
   } else {
     if(all(vertices[1,] == vertices[nrow(vertices),])) {
       vertices = vertices[-nrow(vertices),]
@@ -210,8 +225,8 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
         holes[[i]] = hole
       }
     }
+    return_data = skeletonize_rcpp(vertices, holes, 0)
   }
-  return_data = skeletonize_rcpp(vertices, holes, 0)
   if(length(return_data) == 0) {
     warning("Polygon is not simple--not computing straight skeleton.")
     return()
@@ -238,7 +253,14 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
   colnames(end_ss) = c("id","x","y","time","other_time")
   nodes = rbind(start_ss,end_ss)
   nodes$edge = nodes$time == 0 & nodes$other_time == 0
+  rev_nodes = (nodes[nodes$time < nodes$other_time,])
   nodes = (nodes[nodes$time >= nodes$other_time,])
+  if(any(!rev_nodes$id %in% nodes$id)) {
+    cut_nodes = unique(rev_nodes$id[which(!rev_nodes$id %in% nodes$id)])
+    new_nodes = rev_nodes[rev_nodes$id %in% cut_nodes,]
+    nodes = rbind(nodes,new_nodes)
+  }
+
   nodes = unique(nodes[,c(1:4,6)])
   nodes = dplyr::arrange(nodes, id)
   links = ss[,c("id_start", "id", "time","time_start")]
@@ -261,6 +283,10 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
   class(ss) = "rayskeleton"
   attr(ss,"original_vertices") = vertices
   attr(ss,"original_holes") = holes
+  if(merge_nodes_tolerance > 0) {
+    ss = discretize_and_merge_nodes(ss, merge_nodes_tolerance)
+  }
+  ss = remove_reversed_links(ss)
   return(ss)
 }
 
