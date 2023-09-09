@@ -28,13 +28,29 @@ convert_ss_to_polygons = function(ss) {
   #And then extract the unique nodes at the end by copying the indices, ordering them,
   #hashing them, and then saving only the unique hashes (which should correspond to unique polygons)
   while((sum(!links$visited) > 0)) {
-    print(c(tmp_source, tmp_dest, sum(!links$visited)))
+    # print(c(tmp_source, tmp_dest, sum(!links$visited)))
+    # if(tmp_source %in% c(128,129,124,123 ) &&sum(!links$visited) == 121 ) {
+    #   browser()
+    #   plot_skeleton(ss)
+    #   segments(nodes[tmp_source,2],nodes[tmp_source,3],
+    #            nodes[tmp_dest,2],nodes[tmp_dest,3],
+    #            col="yellow", lwd=10)
+    #   points(nodes[first_node,2],nodes[first_node,3],
+    #            col="red", pch=19,cex=2)
+    #   points(nodes[first_dest,2],nodes[first_dest,3],
+    #          col="pink",pch=19,cex=2)
+    #   for(j in seq_len(length(list_all_polygons))) {
+    #     polygon(ss$nodes[unlist(list_all_polygons[[j]]),c("x","y")], col = "#00000088")
+    #   }
+    # }
     # Debug
     # src = nodes[tmp_source,]
     # des = nodes[tmp_dest,]
     # segments(src[1,2], src[1,3], des[1,2], des[1,3], col = "green")
     #end debug
+    # plot_skeleton(ss,xlim=c(0.79,0.80)+0.001,ylim=c(0.2,0.25)-0.05)
     # plot_skeleton(ss)
+
     # segments(nodes[tmp_source,2],nodes[tmp_source,3],
     #          nodes[tmp_dest,2],nodes[tmp_dest,3],
     #          col="yellow", lwd=10)
@@ -72,27 +88,29 @@ convert_ss_to_polygons = function(ss) {
       # }
     }
     first = FALSE
+
+    #Get current node direction vector
     node1_position = as.numeric(nodes[nodes$id == tmp_source,2:3])
     node2_position = as.numeric(nodes[nodes$id == tmp_dest,2:3])
-    # links$visited[(links$source      == tmp_source &
-    #                links$destination == tmp_dest) |
-    #               (links$destination == tmp_source &
-    #                links$source      == tmp_dest)] = TRUE
     v1 = node2_position-node1_position
 
+    #Remove potential links that are the current tmp_source and dest
     no_origin_links = links[!(links$source      == tmp_source &
                               links$destination == tmp_dest) &
                             !(links$destination == tmp_source &
                               links$source      == tmp_dest),]
 
+
     next_links = no_origin_links[(no_origin_links$source == tmp_dest |
                                   no_origin_links$destination == tmp_dest),]
-    # print(next_links)
 
     best_angle = 180
     best_dest = NA
     best_source = NA
     best_len = Inf
+    # if(nrow(next_links) == 0) {
+    #   browser()
+    # }
 
     for(i in seq_len(nrow(next_links))) {
       if(next_links$destination[i] == tmp_dest) {
