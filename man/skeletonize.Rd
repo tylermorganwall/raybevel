@@ -8,6 +8,7 @@ skeletonize(
   vertices,
   holes = list(),
   debug = FALSE,
+  merge_nodes_tolerance = 1e-05,
   return_raw_ss = FALSE,
   use_cgal = TRUE,
   progress = TRUE

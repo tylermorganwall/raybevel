@@ -207,7 +207,7 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
     }
     verts_to_remove = c(1,unlist(remove_verts))
     vertices = vertices_pad[-c(verts_to_remove,nrow(vertices_pad)),]
-    if(all(vertices[1,] != vertices[nrow(vertices),])) {
+    if(any(vertices[1,] != vertices[nrow(vertices),])) {
       vertices = rbind(vertices,vertices[1,])
     }
     holes = list()
