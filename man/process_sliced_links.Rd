@@ -6,9 +6,6 @@
 \usage{
 process_sliced_links(link_group)
 }
-\arguments{
-\item{offset}{}
-}
 \description{
 Process sliced links
 }

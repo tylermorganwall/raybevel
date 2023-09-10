@@ -2,10 +2,7 @@
 #'
 #' @param ss
 #'
-#' @return
 #' @keywords internal
-#'
-#' @examples
 discretize_and_merge_nodes = function(skeleton, tolerance = 1e-5) {
   # Calculate bounding box of the nodes
   x_range = range(skeleton$nodes$x)

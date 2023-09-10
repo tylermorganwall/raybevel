@@ -6,9 +6,6 @@
 \usage{
 make_incremental_nodes(ss)
 }
-\arguments{
-\item{offset}{}
-}
 \description{
 Make incremental nodes
 }

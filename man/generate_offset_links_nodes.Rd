@@ -6,9 +6,7 @@
 \usage{
 generate_offset_links_nodes(ss, offsets)
 }
-\arguments{
-\item{offset}{}
-}
 \description{
 Generate Offset Polygon
 }
+\keyword{internal}

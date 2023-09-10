@@ -13,7 +13,3 @@ skeletonize_rcpp <- function(vertices, holes, offset) {
     .Call(`_rayskeleton_skeletonize_rcpp`, vertices, holes, offset)
 }
 
-skeletonize_custom_rcpp <- function(vertices, holes, dtolerance) {
-    .Call(`_rayskeleton_skeletonize_custom_rcpp`, vertices, holes, dtolerance)
-}
-

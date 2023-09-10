@@ -2,13 +2,11 @@
 % Please edit documentation in R/math-functions.R
 \name{interpolate_location}
 \alias{interpolate_location}
-\title{Title}
+\title{Interpolate Location}
 \usage{
 interpolate_location(node_start, node_end, height_start, height_end, height)
 }
-\arguments{
-\item{height}{}
-}
 \description{
-Title
+Interpolate Location
 }
+\keyword{internal}

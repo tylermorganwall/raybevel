@@ -6,9 +6,6 @@
 \usage{
 insert_polygon_links_nodes(ss, new_links_all)
 }
-\arguments{
-\item{offset}{}
-}
 \description{
 Insert Polygon Links/Nodes
 }

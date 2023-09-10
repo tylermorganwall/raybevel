@@ -2,10 +2,7 @@
 #'
 #' @param ss
 #'
-#' @return
 #' @keywords internal
-#'
-#' @examples
 remove_reversed_links = function(skeleton) {
   # Create two new columns: min_id and max_id
   skeleton$links$min_id = pmin(skeleton$links$source, skeleton$links$destination)

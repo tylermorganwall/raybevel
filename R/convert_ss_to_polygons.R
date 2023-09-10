@@ -2,10 +2,7 @@
 #'
 #' @param ss
 #'
-#' @return
 #' @keywords internal
-#'
-#' @examples
 convert_ss_to_polygons = function(ss) {
   links = ss$links
   nodes = ss$nodes

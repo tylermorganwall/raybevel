@@ -8,7 +8,6 @@
 #' @param holes Default `list()`. A list of matrices, each representing a hole in the polygon with x and y coordinates in clockwise (CW) order.
 #' @param debug Default `FALSE`. A logical flag that controls whether debugging information should be printed.
 #' @param return_raw_ss Default `FALSE`. A logical flag that controls whether the raw straight skeleton should be returned.
-#' @param use_cgal Default `TRUE`. A logical flag that controls whether the CGAL library should be used for computation.
 #'
 #' @return If `return_raw_ss` is FALSE, a list with two data frames, 'nodes' and 'links', which represent the nodes and edges of the straight skeleton, respectively.
 #' If `return_raw_ss` is TRUE, a data frame representing the raw straight skeleton is returned.
@@ -48,7 +47,7 @@
 #' raw_skeleton5 = skeletonize(vertices5, debug = TRUE, return_raw_ss = TRUE)
 skeletonize = function(vertices, holes = list(), debug = FALSE,
                        merge_nodes_tolerance = 1e-5,
-                       return_raw_ss = FALSE, use_cgal = TRUE,
+                       return_raw_ss = FALSE,
                        progress = TRUE) {
   stopifnot(merge_nodes_tolerance >= 0 && merge_nodes_tolerance < 1)
   if(inherits(vertices, "sf")) {
@@ -164,69 +163,19 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
     }
   }
   stopifnot(ncol(vertices) == 2)
-  if(!use_cgal) {
-    browser()
-    vertices_pad = rbind(vertices,vertices[2,])
-
-    remove_verts = list()
-
-    total_sum_det = 0
-    #Remove vertices that come in straight lines
-    for(i in seq_len(nrow(vertices_pad)-1)[-1]) {
-      v1 = vertices_pad[i,]-vertices_pad[i-1,]
-      v2 = vertices_pad[i+1,]-vertices_pad[i,]
-      tmp_det = determinant2x2(v1,v2)
-      if(abs(tmp_det) == 0) {
-        remove_verts[[i]] = i
-      }
-    }
-    for(i in seq_len(nrow(vertices_pad)-1)[-1]) {
-      v1 = vertices_pad[i,]
-      v2 = vertices_pad[i+1,]
-      tmp_det = determinant2x2(v1,v2)
-      total_sum_det = total_sum_det + tmp_det
-    }
-    if(total_sum_det < 0) {
-      stop("`vertices` is not CCW polygon")
-    }
-    if(length(holes) > 0) {
-      for(i in seq_len(length(holes))) {
-        holes_pad = rbind(holes[[i]][nrow(holes[[i]])-1,], holes[[i]])
-
-        total_sum_det_holes = 0
-        for(j in seq_len(nrow(vertices_pad)-1)[-1]) {
-          v1 = holes_pad[j,]
-          v2 = holes_pad[j+1,]
-          tmp_det = determinant2x2(v1,v2)
-          total_sum_det_holes = total_sum_det_holes + tmp_det
-        }
-        if(total_sum_det_holes > 0) {
-          stop(sprintf("`holes[[%i]]` is not CW polygon",i))
-        }
-      }
-    }
-    verts_to_remove = c(1,unlist(remove_verts))
-    vertices = vertices_pad[-c(verts_to_remove,nrow(vertices_pad)),]
-    if(any(vertices[1,] != vertices[nrow(vertices),])) {
-      vertices = rbind(vertices,vertices[1,])
-    }
-    holes = list()
-    #Okay, here's where code goes
-    return_data = skeletonize_custom_rcpp(vertices, holes, 1e-10)
-  } else {
-    if(all(vertices[1,] == vertices[nrow(vertices),])) {
-      vertices = vertices[-nrow(vertices),]
-    }
-    for(i in seq_len(length(holes))) {
-      hole = as.matrix(holes[[i]])
-      if(all(hole[1,] == hole[nrow(hole),])) {
-        holes[[i]] = hole[-nrow(hole),]
-      } else {
-        holes[[i]] = hole
-      }
-    }
-    return_data = skeletonize_rcpp(vertices, holes, 0)
+  if(all(vertices[1,] == vertices[nrow(vertices),])) {
+    vertices = vertices[-nrow(vertices),]
   }
+  for(i in seq_len(length(holes))) {
+    hole = as.matrix(holes[[i]])
+    if(all(hole[1,] == hole[nrow(hole),])) {
+      holes[[i]] = hole[-nrow(hole),]
+    } else {
+      holes[[i]] = hole
+    }
+  }
+  return_data = skeletonize_rcpp(vertices, holes, 0)
+
   if(length(return_data) == 0) {
     warning("Polygon is not simple--not computing straight skeleton.")
     return()

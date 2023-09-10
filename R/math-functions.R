@@ -42,18 +42,9 @@ unit_vector = function(v) {
 }
 
 
-#' Title
+#' Interpolate Location
 #'
-#' @param node_start
-#' @param node_end
-#' @param height_start
-#' @param height_end
-#' @param height
-#'
-#' @return
-#' @export
-#'
-#' @examples
+#' @keywords internal
 interpolate_location = function(node_start,
                                 node_end,
                                 height_start,

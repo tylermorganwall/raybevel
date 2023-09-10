@@ -4,10 +4,7 @@
 #'
 #' @param ss
 #'
-#' @return
 #' @keywords internal
-#'
-#' @examples
 remove_node_duplicates = function(ss) {
   row_hashes = apply(ss$nodes[,-1], 1, digest::digest)
   unique_row_hashes = unique(row_hashes)

@@ -45,25 +45,11 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// skeletonize_custom_rcpp
-List skeletonize_custom_rcpp(NumericMatrix vertices, List holes, double dtolerance);
-RcppExport SEXP _rayskeleton_skeletonize_custom_rcpp(SEXP verticesSEXP, SEXP holesSEXP, SEXP dtoleranceSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type vertices(verticesSEXP);
-    Rcpp::traits::input_parameter< List >::type holes(holesSEXP);
-    Rcpp::traits::input_parameter< double >::type dtolerance(dtoleranceSEXP);
-    rcpp_result_gen = Rcpp::wrap(skeletonize_custom_rcpp(vertices, holes, dtolerance));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rayskeleton_is_ccw_polygon", (DL_FUNC) &_rayskeleton_is_ccw_polygon, 1},
     {"_rayskeleton_is_simple_polygon", (DL_FUNC) &_rayskeleton_is_simple_polygon, 1},
     {"_rayskeleton_skeletonize_rcpp", (DL_FUNC) &_rayskeleton_skeletonize_rcpp, 3},
-    {"_rayskeleton_skeletonize_custom_rcpp", (DL_FUNC) &_rayskeleton_skeletonize_custom_rcpp, 3},
     {NULL, NULL, 0}
 };
 

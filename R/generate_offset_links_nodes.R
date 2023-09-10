@@ -1,12 +1,6 @@
 #' Generate Offset Polygon
 #'
-#' @param ss
-#' @param offset
-#'
-#' @return
-#' @export
-#'
-#' @examples
+#' @keywords internal
 generate_offset_links_nodes = function(ss, offsets) {
   links = ss$links
   nodes = ss$nodes
@@ -170,10 +164,6 @@ generate_offset_links_nodes = function(ss, offsets) {
 
 #' Insert Polygon Links/Nodes
 #'
-#' @param ss
-#' @param offset
-#'
-#' @return
 #' @keywords internal
 insert_polygon_links_nodes = function(ss, new_links_all) {
   links = ss$links
@@ -251,10 +241,6 @@ insert_polygon_links_nodes = function(ss, new_links_all) {
 
 #' Process sliced links
 #'
-#' @param ss
-#' @param offset
-#'
-#' @return
 #' @keywords internal
 process_sliced_links = function(link_group) {
   n_new_nodes = nrow(link_group)/2
@@ -301,10 +287,6 @@ process_sliced_links = function(link_group) {
 
 #' Make incremental nodes
 #'
-#' @param ss
-#' @param offset
-#'
-#' @return
 #' @keywords internal
 make_incremental_nodes = function(ss) {
   fac_id = factor(ss$nodes$id)

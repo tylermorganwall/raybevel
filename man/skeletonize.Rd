@@ -10,7 +10,6 @@ skeletonize(
   debug = FALSE,
   merge_nodes_tolerance = 1e-05,
   return_raw_ss = FALSE,
-  use_cgal = TRUE,
   progress = TRUE
 )
 }
@@ -22,8 +21,6 @@ skeletonize(
 \item{debug}{Default `FALSE`. A logical flag that controls whether debugging information should be printed.}
 
 \item{return_raw_ss}{Default `FALSE`. A logical flag that controls whether the raw straight skeleton should be returned.}
-
-\item{use_cgal}{Default `TRUE`. A logical flag that controls whether the CGAL library should be used for computation.}
 }
 \value{
 If `return_raw_ss` is FALSE, a list with two data frames, 'nodes' and 'links', which represent the nodes and edges of the straight skeleton, respectively.

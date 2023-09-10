@@ -13,3 +13,4 @@ Imports: progress,
     digest
 LinkingTo: Rcpp, BH, RcppCGAL
 RoxygenNote: 7.2.3
+Remotes: tylermorganwall/RcppCGAL

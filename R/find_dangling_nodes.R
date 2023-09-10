@@ -2,10 +2,7 @@
 #'
 #' @param ss
 #'
-#' @return
 #' @keywords internal
-#'
-#' @examples
 find_dangling_nodes = function(skeleton) {
   # Extract node IDs from links dataframe
   source_nodes = unique(skeleton$links$source)

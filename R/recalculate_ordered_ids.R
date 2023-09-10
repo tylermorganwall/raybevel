@@ -2,10 +2,7 @@
 #'
 #' @param ss
 #'
-#' @return
 #' @keywords internal
-#'
-#' @examples
 recalculate_ordered_ids = function(skeleton) {
   nodes = skeleton$nodes
   links = skeleton$links
