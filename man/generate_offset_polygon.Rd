@@ -4,16 +4,32 @@
 \alias{generate_offset_polygon}
 \title{Generate an offset polygon}
 \usage{
-generate_offset_polygon(ss, offset)
+generate_offset_polygon(skeleton, offset)
 }
 \arguments{
-\item{ss}{Default `NULL`. A straight skeleton generated from the `skeletonize` function.}
+\item{skeleton}{Default `NULL`. A straight skeleton generated from the `skeletonize` function.}
 
-\item{offset}{Default `NULL`. The offset of the polygon.}
+\item{offset}{Default `NULL`. The offset(s) of the polygon.}
 }
 \value{
 A list of data frames, each representing a polygon offset by the specified amount.
 }
 \description{
-This function generates an offset polygon from a straight skeleton.
+This function generates an interior offset polygon from a straight skeleton.
+}
+\examples{
+# Simple polygon example
+simple_poly = matrix(c(0,0, 3,0, 3,3, 0,3, 0,0), ncol=2, byrow=TRUE)
+skeleton = skeletonize(simple_poly)
+offset_polys = generate_offset_polygon(skeleton, c(0.25, 0.5))
+print(offset_polys)
+
+# Polygon with hole example
+vertices4 = matrix(c(0,0, 7,0, 7,7, 0,7, 0,0), ncol = 2, byrow = TRUE)
+# Holes inside the polygon
+hole4_1 = matrix(c(1,1, 2,1, 2,2, 1,2, 1,1), ncol = 2, byrow = TRUE)[5:1,]
+hole4_2 = matrix(c(5,5, 6,5, 6,6, 5,6, 5,5), ncol = 2, byrow = TRUE)[5:1,]
+skeleton4 = skeletonize(vertices4, holes = list(hole4_1, hole4_2))
+plot_skeleton(skeleton4)
+plot_offset_polygon(generate_offset_polygon(skeleton4, c(0.25, 0.5)))
 }

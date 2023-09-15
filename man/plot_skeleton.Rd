@@ -4,11 +4,43 @@
 \alias{plot_skeleton}
 \title{Plot the Straight Skeleton of a Polygon}
 \usage{
-plot_skeleton(skeleton, use_arrow = TRUE, xlim = c(0, 1), ylim = c(0, 1))
+plot_skeleton(
+  skeleton,
+  use_arrow = TRUE,
+  xlim = c(0, 1),
+  ylim = c(0, 1),
+  add = FALSE,
+  arrow_color = "red",
+  polygon_color = "black",
+  size = 1,
+  arrow_size = 1
+)
 }
 \arguments{
 \item{skeleton}{A list object of class 'rayskeleton' containing the straight
 skeleton details. It should have 'nodes' and 'links' as its primary components.}
+
+\item{use_arrow}{Default `TRUE`. A logical value indicating whether or not to use arrows
+to represent the links of the straight skeleton. Default is TRUE.}
+
+\item{xlim}{Default`c(0,1)`. A numeric vector of length 2 specifying the x-limits of the
+plot in the form `c(min, max)`. These are proportional limits relative
+to the bounding box around the skeleton.}
+
+\item{ylim}{Default `c(0,1)`. A numeric vector of length 2 specifying the y-limits of the
+plot in the form c(min, max). These are proportional limits relative
+to the bounding box around the skeleton.}
+
+\item{add}{Default `FALSE`. A logical indicating whether to add the straight skeleton to
+an existing plot (`TRUE`) or create a new one (`FALSE`).}
+
+\item{arrow_color}{Default `"red"`. Color of the arrows.}
+
+\item{polygon_color}{Default `"black"`. Color of the polygon.}
+
+\item{size}{Default `1`. Size of the vertex points.}
+
+\item{arrow_size}{Default `1`. Scales the arrow size.}
 }
 \value{
 A plot visualizing the straight skeleton and the original polygon.
@@ -32,4 +64,11 @@ hole1 = matrix(c(1,1, 1,2, 2,2, 2,1, 1,1), ncol = 2, byrow = TRUE)
 hole2 = matrix(c(5,5, 5,6, 6,6, 6,5, 5,5), ncol = 2, byrow = TRUE)
 skeleton = skeletonize(vertices, holes = list(hole1, hole2))
 plot_skeleton(skeleton)
+
+# Skeletonize and plot an {sf} object
+if(length(find.package("spData",quiet = TRUE)) > 0) {
+  us_states = spData::us_states
+  texas = us_states[us_states$NAME == "Texas",]
+  plot_skeleton(skeletonize(texas), arrow_size=0.5)
+}
 }

@@ -8,7 +8,6 @@ generate_roof(
   ss,
   max_height = 1,
   offset_roof = 0,
-  base = FALSE,
   bottom = FALSE,
   swap_yz = FALSE,
   progress = TRUE
@@ -21,9 +20,12 @@ generate_roof(
 
 \item{offset_roof}{Default `0`. The offset of the roof.}
 
-\item{base}{Default `FALSE`. A logical flag that controls whether to generate the base of the roof.}
-
 \item{bottom}{Default `FALSE`. A logical flag that controls whether to generate the bottom of the roof.}
+
+\item{swap_yz}{Default `FALSE`. A logical flag that controls whether to swap the y and z coordinates in the resulting mesh.
+If `TRUE`, the y and z coordinates will be swapped.}
+
+\item{progress}{Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.}
 }
 \value{
 A 3D mesh of the roof model.

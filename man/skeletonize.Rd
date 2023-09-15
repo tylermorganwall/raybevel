@@ -20,7 +20,12 @@ skeletonize(
 
 \item{debug}{Default `FALSE`. A logical flag that controls whether debugging information should be printed.}
 
+\item{merge_nodes_tolerance}{Default `1e-5`. A numeric value specifying the tolerance level for merging nodes. It should be a value between 0 and 1.
+This value species the size of the grid that the nodes are snapped to determining identical nodes.}
+
 \item{return_raw_ss}{Default `FALSE`. A logical flag that controls whether the raw straight skeleton should be returned.}
+
+\item{progress}{Default `TRUE`. A logical flag that controls whether a progress bar should be displayed while skeletonizing.}
 }
 \value{
 If `return_raw_ss` is FALSE, a list with two data frames, 'nodes' and 'links', which represent the nodes and edges of the straight skeleton, respectively.
@@ -63,4 +68,11 @@ plot_skeleton(skeleton4)
 # Example 5: Using debug and returning raw straight skeleton
 vertices5 = matrix(c(0,0, 3,0, 3,3, 0,3, 0,0), ncol = 2, byrow = TRUE)
 raw_skeleton5 = skeletonize(vertices5, debug = TRUE, return_raw_ss = TRUE)
+
+# Skeletonize and plot an {sf} object
+if(length(find.package("spData",quiet = TRUE)) > 0) {
+  us_states = spData::us_states
+  texas = us_states[us_states$NAME == "Texas",]
+  plot_skeleton(skeletonize(texas), arrow_size=0.5)
+}
 }

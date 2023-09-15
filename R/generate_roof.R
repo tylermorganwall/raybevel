@@ -5,13 +5,15 @@
 #' @param ss Default `NULL`. A straight skeleton generated from the `skeletonize` function.
 #' @param max_height Default `1`. The maximum height of the roof.
 #' @param offset_roof Default `0`. The offset of the roof.
-#' @param base Default `FALSE`. A logical flag that controls whether to generate the base of the roof.
 #' @param bottom Default `FALSE`. A logical flag that controls whether to generate the bottom of the roof.
+#' @param swap_yz Default `FALSE`. A logical flag that controls whether to swap the y and z coordinates in the resulting mesh.
+#' If `TRUE`, the y and z coordinates will be swapped.
+#' @param progress Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.
 #'
 #' @return A 3D mesh of the roof model.
 #'
 #' @export
-generate_roof = function(ss, max_height = 1, offset_roof = 0, base = FALSE, bottom = FALSE,
+generate_roof = function(ss, max_height = 1, offset_roof = 0, bottom = FALSE,
                          swap_yz = FALSE, progress = TRUE) {
   if(inherits(ss, "rayskeleton_list")) {
     pb = progress::progress_bar$new(
@@ -34,7 +36,7 @@ generate_roof = function(ss, max_height = 1, offset_roof = 0, base = FALSE, bott
         pb$tick()
       }
       meshlist[[counter]] = generate_roof(ss[[j]], bottom = bottom,
-                                          base = base, max_height = max_height[j],
+                                          max_height = max_height[j],
                                           offset_roof = offset_roof[j],
                                           swap_yz=swap_yz)
       counter = counter + 1
@@ -63,7 +65,7 @@ generate_roof = function(ss, max_height = 1, offset_roof = 0, base = FALSE, bott
     ind_order = 1:3
   } else {
     col_order = c(1,3,2)
-    ind_order = 1:3
+    ind_order = 3:1
   }
   if(bottom) {
     if(length(original_holes) > 0) {
@@ -85,7 +87,9 @@ generate_roof = function(ss, max_height = 1, offset_roof = 0, base = FALSE, bott
     mesh = rayvertex::construct_mesh(vertices = as.matrix(xyz)[,col_order],
                                      indices = as.matrix(indices_all)[,ind_order]-1)
     max_z = rayvertex::get_mesh_bbox(mesh)[2,3]
-    offset_roof_full = c(-0.5,-0.5,offset_roof)[col_order]
+    # offset_roof_full = c(-0.5,-0.5,offset_roof)[col_order]
+    offset_roof_full = c(0,0,offset_roof)[col_order]
+
     scale_max = c(1,1,max_height/max_z)[col_order]
 
     mesh = rayvertex::scale_mesh(mesh, scale = scale_max)
@@ -94,7 +98,9 @@ generate_roof = function(ss, max_height = 1, offset_roof = 0, base = FALSE, bott
     mesh = rayvertex::construct_mesh(vertices = as.matrix(xyz)[,col_order],
                                      indices = as.matrix(indices_all)[,ind_order]-1)
     max_z = rayvertex::get_mesh_bbox(mesh)[2,3]
-    offset_roof_full = c(-0.5,0.5,offset_roof)[col_order]
+    offset_roof_full = c(0,0,offset_roof)[col_order]
+    # offset_roof_full = c(-0.5,0.5,offset_roof)[col_order]
+
     scale_max = c(1,1,max_height/max_z)[col_order]
 
     mesh = rayvertex::scale_mesh(mesh, scale = scale_max)
@@ -107,10 +113,14 @@ generate_roof = function(ss, max_height = 1, offset_roof = 0, base = FALSE, bott
 #' This function generates a beveled 3D roof model from a straight skeleton.
 #'
 #' @param ss Default `NULL`. A straight skeleton generated from the `skeletonize` function.
-#' @param bevel_offset Default `NULL`. The offset of the bevel.
+#' @param bevel_offsets Default `NULL`. The offset(s) of the bevel.
 #' @param max_height Default `1`. The maximum height of the roof.
+#' @param bevel_heights Default is set to `bevel_offsets`. Numeric vector specifying the heights of the bevels. Must be of the same length as `bevel_offsets`.
+#' @param set_max_height Default `FALSE`. A logical flag that controls whether to set the max height of the roof based on the `max_height` argument.
+#' @param swap_yz Default `FALSE`. A logical flag that controls whether to swap the y and z coordinates in the resulting mesh.
+#' If `TRUE`, the y and z coordinates will be swapped.
+#' @param progress Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.
 #' @param offset_roof Default `0`. The offset of the roof.
-#' @param base Default `FALSE`. A logical flag that controls whether to generate the base of the roof.
 #' @param bottom Default `FALSE`. A logical flag that controls whether to generate the bottom of the roof.
 #'
 #' @return A 3D mesh of the beveled roof model.
@@ -122,7 +132,7 @@ generate_roof_beveled = function(ss,
                                  set_max_height = FALSE,
                                  max_height = 1,
                                  offset_roof = 0,
-                                 base = FALSE, bottom = FALSE,
+                                 bottom = FALSE,
                                  swap_yz = FALSE,
                                  progress = TRUE) {
 
@@ -144,7 +154,7 @@ generate_roof_beveled = function(ss,
       }
       meshlist[[counter]] = generate_roof_beveled(ss[[j]], bevel_offsets = bevel_offsets,
                                                   bottom = bottom, offset_roof = offset_roof[j],
-                                                  base = base, max_height = max_height[j],
+                                                  max_height = max_height[j],
                                                   swap_yz=swap_yz)
       counter = counter + 1
     }

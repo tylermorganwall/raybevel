@@ -6,10 +6,25 @@
 #'
 #' @param skeleton A list object of class 'rayskeleton' containing the straight
 #'        skeleton details. It should have 'nodes' and 'links' as its primary components.
+#' @param use_arrow Default `TRUE`. A logical value indicating whether or not to use arrows
+#'        to represent the links of the straight skeleton. Default is TRUE.
+#' @param xlim Default`c(0,1)`. A numeric vector of length 2 specifying the x-limits of the
+#'        plot in the form `c(min, max)`. These are proportional limits relative
+#'        to the bounding box around the skeleton.
+#' @param ylim  Default `c(0,1)`. A numeric vector of length 2 specifying the y-limits of the
+#'        plot in the form c(min, max). These are proportional limits relative
+#'        to the bounding box around the skeleton.
+#' @param add Default `FALSE`. A logical indicating whether to add the straight skeleton to
+#'        an existing plot (`TRUE`) or create a new one (`FALSE`).
+#' @param arrow_color Default `"red"`. Color of the arrows.
+#' @param polygon_color Default `"black"`. Color of the polygon.
+#' @param size Default `1`. Size of the vertex points.
+#' @param arrow_size Default `1`. Scales the arrow size.
 #'
 #' @details The function uses base R plotting capabilities. The original graphics
 #'          parameters (`par`) are restored after plotting to ensure no unintended
 #'          side-effects.
+#'
 #' @return A plot visualizing the straight skeleton and the original polygon.
 #' @export
 #' @examples
@@ -21,18 +36,26 @@
 #' hole2 = matrix(c(5,5, 5,6, 6,6, 6,5, 5,5), ncol = 2, byrow = TRUE)
 #' skeleton = skeletonize(vertices, holes = list(hole1, hole2))
 #' plot_skeleton(skeleton)
-plot_skeleton = function(skeleton,use_arrow = TRUE, xlim = c(0,1), ylim = c(0,1)) {
+#'
+#' # Skeletonize and plot an {sf} object
+#' if(length(find.package("spData",quiet = TRUE)) > 0) {
+#'   us_states = spData::us_states
+#'   texas = us_states[us_states$NAME == "Texas",]
+#'   plot_skeleton(skeletonize(texas), arrow_size=0.5)
+#' }
+plot_skeleton = function(skeleton, use_arrow = TRUE, xlim = c(0,1), ylim = c(0,1), add = FALSE,
+                         arrow_color = "red", polygon_color = "black", size = 1, arrow_size = 1) {
   # Check if skeleton is valid
   if (!inherits(skeleton, "rayskeleton")) {
     stop("Invalid input: The input is not of class 'rayskeleton'")
   }
 
   # Save current par settings
-  # opar = par(no.readonly = TRUE)
-  # on.exit(par(opar))
+  # opar = graphics::par(no.readonly = TRUE)
+  # on.exit(graphics::par(opar))
 
   # Plot settings
-  par(mfrow=c(1,1), mar=c(1,1,1,1), oma=c(0,0,0,0))
+  graphics::par(mfrow=c(1,1), mar=c(1,1,1,1), oma=c(0,0,0,0))
   stopifnot(length(xlim) == 2 && length(ylim) == 2)
   stopifnot(xlim[1] < xlim[2] && xlim[1] >= 0 && xlim[2] <= 1)
   stopifnot(ylim[1] < ylim[2] && ylim[1] >= 0 && ylim[2] <= 1)
@@ -48,14 +71,17 @@ plot_skeleton = function(skeleton,use_arrow = TRUE, xlim = c(0,1), ylim = c(0,1)
   xlim_vals = c(min_x + span_x * xlim[1], min_x + span_x * xlim[2])
   ylim_vals = c(min_y + span_y * ylim[1], min_y + span_y * ylim[2])
 
-  plot(0, 0, type="n", xlim=xlim_vals, ylim=ylim_vals, xlab="", ylab="",
-       xaxt='n', yaxt='n', frame.plot = FALSE)
-  points(x=skeleton$nodes$x, y=skeleton$nodes$y, pch=1, col="black")
+  if (!add) {
+    graphics::plot(0, 0, type="n", xlim=xlim_vals, ylim=ylim_vals, xlab="", ylab="",
+                   xaxt='n', yaxt='n', frame.plot = FALSE, asp = 1)
+  }
+  graphics::points(x=skeleton$nodes$x, y=skeleton$nodes$y, pch=16, col=polygon_color,
+                   cex = size)
   range_skeleton_x = range(skeleton$nodes$x)
   range_skeleton_y = range(skeleton$nodes$y)
 
   min_range = min(c(range_skeleton_x[2]-range_skeleton_x[1],range_skeleton_y[2]-range_skeleton_y[1]))
-  arrow_size = min_range/100
+  arrow_size_full = min_range/100 * arrow_size
   # Plot straight skeleton
   for (i in 1:nrow(skeleton$links)) {
     if(use_arrow) {
@@ -64,20 +90,20 @@ plot_skeleton = function(skeleton,use_arrow = TRUE, xlim = c(0,1), ylim = c(0,1)
       y0=skeleton$nodes[skeleton$links$source[i], 'y']
       y1=skeleton$nodes[skeleton$links$destination[i], 'y']
       interp_pos = (c(x0,y0) + c(x1,y1))/2
-      arrows(x0=x0,
-             x1=interp_pos[1],
-             y0=y0,
-             y1=interp_pos[2],
-            col="red", lwd=2,length = arrow_size, angle = 20)
-      segments(x1=x1,
-               x0=interp_pos[1],
-               y1=y1,
-               y0=interp_pos[2],
-               col="red", lwd=2)
+      graphics::arrows(x0 = x0,
+                       x1 = interp_pos[1],
+                       y0 = y0,
+                       y1 = interp_pos[2],
+                       col = arrow_color, lwd=2, length = arrow_size_full, angle = 20)
+      graphics::segments(x1 = x1,
+                         x0 = interp_pos[1],
+                         y1 = y1,
+                         y0 = interp_pos[2],
+                         col = arrow_color, lwd = 2)
     } else {
-      lines(c(skeleton$nodes[skeleton$links$source[i], 'x'], skeleton$nodes[skeleton$links$destination[i], 'x']),
-             c(skeleton$nodes[skeleton$links$source[i], 'y'], skeleton$nodes[skeleton$links$destination[i], 'y']),
-             col="red", lwd=2)
+      graphics::lines(c(skeleton$nodes[skeleton$links$source[i], 'x'], skeleton$nodes[skeleton$links$destination[i], 'x']),
+                      c(skeleton$nodes[skeleton$links$source[i], 'y'], skeleton$nodes[skeleton$links$destination[i], 'y']),
+                      col=arrow_color, lwd=2)
     }
   }
 
@@ -86,12 +112,12 @@ plot_skeleton = function(skeleton,use_arrow = TRUE, xlim = c(0,1), ylim = c(0,1)
   # Plot holes if any
   if (length(original_holes) > 0) {
     for (hole in original_holes) {
-      polygon(hole[, 1], hole[, 2], col=NA, lwd=2, border="black")
+      graphics::polygon(hole[, 1], hole[, 2], col=NA, lwd=2, border=polygon_color)
     }
   }
 
   original_vertices = attr(skeleton, "original_vertices")
 
   # Plot original polygon
-  polygon(original_vertices[, 1], original_vertices[, 2], border="black", lwd=2, col=NA)
+  graphics::polygon(original_vertices[, 1], original_vertices[, 2], border=polygon_color, lwd=2, col=NA)
 }

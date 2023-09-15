@@ -8,6 +8,9 @@
 #' @param holes Default `list()`. A list of matrices, each representing a hole in the polygon with x and y coordinates in clockwise (CW) order.
 #' @param debug Default `FALSE`. A logical flag that controls whether debugging information should be printed.
 #' @param return_raw_ss Default `FALSE`. A logical flag that controls whether the raw straight skeleton should be returned.
+#' @param merge_nodes_tolerance Default `1e-5`. A numeric value specifying the tolerance level for merging nodes. It should be a value between 0 and 1.
+#' This value species the size of the grid that the nodes are snapped to determining identical nodes.
+#' @param progress Default `TRUE`. A logical flag that controls whether a progress bar should be displayed while skeletonizing.
 #'
 #' @return If `return_raw_ss` is FALSE, a list with two data frames, 'nodes' and 'links', which represent the nodes and edges of the straight skeleton, respectively.
 #' If `return_raw_ss` is TRUE, a data frame representing the raw straight skeleton is returned.
@@ -45,10 +48,20 @@
 #' # Example 5: Using debug and returning raw straight skeleton
 #' vertices5 = matrix(c(0,0, 3,0, 3,3, 0,3, 0,0), ncol = 2, byrow = TRUE)
 #' raw_skeleton5 = skeletonize(vertices5, debug = TRUE, return_raw_ss = TRUE)
+#'
+#' # Skeletonize and plot an {sf} object
+#' if(length(find.package("spData",quiet = TRUE)) > 0) {
+#'   us_states = spData::us_states
+#'   texas = us_states[us_states$NAME == "Texas",]
+#'   plot_skeleton(skeletonize(texas), arrow_size=0.5)
+#' }
 skeletonize = function(vertices, holes = list(), debug = FALSE,
                        merge_nodes_tolerance = 1e-5,
                        return_raw_ss = FALSE,
                        progress = TRUE) {
+  if(inherits(vertices,"data.frame") && !inherits(vertices,"sf")) {
+    vertices = as.matrix(vertices)
+  }
   stopifnot(merge_nodes_tolerance >= 0 && merge_nodes_tolerance < 1)
   if(inherits(vertices, "sf")) {
     pb = progress::progress_bar$new(
@@ -106,7 +119,7 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
           #Skeletonize
           ss_list[[counter]] = skeletonize(as.matrix(verts), debug = debug,
                                            holes = holes,
-                                           return_raw_ss = return_raw_ss, use_cgal = use_cgal,
+                                           return_raw_ss = return_raw_ss,
                                            merge_nodes_tolerance = merge_nodes_tolerance)
           counter = counter + 1
         }
@@ -148,7 +161,7 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
             #Skeletonize
             ss_list[[counter]] = skeletonize(as.matrix(verts), debug = debug,
                                              holes = holes,
-                                             return_raw_ss = return_raw_ss, use_cgal = use_cgal,
+                                             return_raw_ss = return_raw_ss,
                                              merge_nodes_tolerance = merge_nodes_tolerance)
             counter = counter + 1
           }
@@ -194,8 +207,8 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
   ss$edge = ss$time == 0 & ss$time_start == 0
   # ss = ss[,c(1:8,9)]
   start_nodes = as.data.frame(ss[,c("id_start", "start_x", "start_y", "time_start")])
-  start_nodes = dplyr::arrange(unique(start_nodes[start_nodes$time_start == 0,]),id_start)
-  ss = dplyr::arrange(as.data.frame(ss), time_start, time)
+  start_nodes = arrange_base(unique(start_nodes[start_nodes$time_start == 0,]),"id_start")
+  ss = arrange_base(as.data.frame(ss), "time_start", "time")
   start_ss = ss[,c(8,3:4,6,5)]
   colnames(start_ss) = c("id","x","y","time","other_time")
   end_ss = ss[,c(7,1:2,5,6)]
@@ -211,7 +224,7 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
   }
 
   nodes = unique(nodes[,c(1:4,6)])
-  nodes = dplyr::arrange(nodes, id)
+  nodes = arrange_base(nodes, "id")
   links = ss[,c("id_start", "id", "time","time_start")]
   colnames(links) = c("source","destination" ,"destination_time","source_time")
   links = links[,c(1,2,4,3)]

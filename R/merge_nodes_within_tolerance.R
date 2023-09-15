@@ -20,7 +20,7 @@ discretize_and_merge_nodes = function(skeleton, tolerance = 1e-5) {
   nodes_to_keep = which(!nodes_to_remove)
 
   # Map all nodes to their corresponding kept node
-  id_map = setNames(nodes_to_keep, skeleton$nodes$id[nodes_to_keep])
+  id_map = stats::setNames(nodes_to_keep, skeleton$nodes$id[nodes_to_keep])
   for(node_id in skeleton$nodes$id) {
     grid_id = skeleton$nodes$grid_id[skeleton$nodes$id == node_id]
     id_map[as.character(node_id)] = skeleton$nodes$id[skeleton$nodes$grid_id == grid_id][1]
