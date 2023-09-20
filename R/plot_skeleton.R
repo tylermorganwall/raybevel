@@ -77,11 +77,9 @@ plot_skeleton = function(skeleton, use_arrow = TRUE, xlim = c(0,1), ylim = c(0,1
   }
   graphics::points(x=skeleton$nodes$x, y=skeleton$nodes$y, pch=16, col=polygon_color,
                    cex = size)
-  range_skeleton_x = range(skeleton$nodes$x)
-  range_skeleton_y = range(skeleton$nodes$y)
 
-  min_range = min(c(range_skeleton_x[2]-range_skeleton_x[1],range_skeleton_y[2]-range_skeleton_y[1]))
-  arrow_size_full = min_range/100 * arrow_size
+  min_dev_size = min(grDevices::dev.size())
+  arrow_size_full = min_dev_size/50 * arrow_size
   # Plot straight skeleton
   for (i in 1:nrow(skeleton$links)) {
     if(use_arrow) {

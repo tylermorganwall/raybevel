@@ -5,27 +5,27 @@
 \title{Generate a 3D roof model}
 \usage{
 generate_roof(
-  ss,
-  max_height = 1,
+  skeleton,
+  max_height = NA,
   offset_roof = 0,
   bottom = FALSE,
-  swap_yz = FALSE,
-  progress = TRUE
+  swap_yz = TRUE,
+  verbose = TRUE
 )
 }
 \arguments{
-\item{ss}{Default `NULL`. A straight skeleton generated from the `skeletonize` function.}
+\item{skeleton}{Default `NULL`. A straight skeleton generated from the `skeletonize` function.}
 
-\item{max_height}{Default `1`. The maximum height of the roof.}
+\item{max_height}{Default `NA`. The maximum height of the roof.}
 
 \item{offset_roof}{Default `0`. The offset of the roof.}
 
 \item{bottom}{Default `FALSE`. A logical flag that controls whether to generate the bottom of the roof.}
 
-\item{swap_yz}{Default `FALSE`. A logical flag that controls whether to swap the y and z coordinates in the resulting mesh.
+\item{swap_yz}{Default `TRUE`. A logical flag that controls whether to swap the y and z coordinates in the resulting mesh.
 If `TRUE`, the y and z coordinates will be swapped.}
 
-\item{progress}{Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.}
+\item{verbose}{Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.}
 }
 \value{
 A 3D mesh of the roof model.

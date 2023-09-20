@@ -4,7 +4,12 @@
 \alias{generate_offset_links_nodes}
 \title{Generate Offset Polygon}
 \usage{
-generate_offset_links_nodes(ss, offsets, return_polys = FALSE)
+generate_offset_links_nodes(
+  ss,
+  offsets,
+  return_polys = FALSE,
+  progress = FALSE
+)
 }
 \description{
 Generate Offset Polygon

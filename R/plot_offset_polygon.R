@@ -14,6 +14,7 @@
 #' @param palette_col Default `NULL`. A function to generate the color palette for the polygons' interiors. This function should accept the number of polygons as input and return a vector of colors. If provided, it overrides the `col` argument.
 #' @param palette_border Default `NULL`. A function to generate the color palette for the polygons' borders . This function should accept the number of polygons as input and return a vector of colors. If provided, it overrides the `border` argument.
 #' @param linewidth Default `1`. The linewidth of the polygon.
+#' @param plot_original_polygon Default `TRUE`. If `skeleton` passed as well, plots the original polygon.
 #'
 #' @return A plot showing the offset polygons.
 #' @export
@@ -101,7 +102,7 @@ plot_offset_polygon = function(offset_polygons, skeleton = NULL, main="Offset Po
     original_holes = attr(skeleton, "original_holes")
     if (!is.null(original_holes)) {
       for (hole in original_holes) {
-        polygon(hole[,1], hole[,2], col=NA, border="black", lwd=linewidth)
+        graphics::polygon(hole[,1], hole[,2], col=NA, border="black", lwd=linewidth)
       }
     }
   }

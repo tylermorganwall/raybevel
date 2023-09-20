@@ -6,6 +6,7 @@
 #'
 #' @keywords internal
 remove_node_duplicates = function(ss) {
+  ss$nodes = ss$nodes[!duplicated(ss$nodes),]
   row_hashes = apply(ss$nodes[,-1], 1, digest::digest)
   unique_row_hashes = unique(row_hashes)
   id_val = rep(0, length(unique_row_hashes))

@@ -4,7 +4,7 @@
 \alias{convert_ss_to_polygons}
 \title{Get Face IDs}
 \usage{
-convert_ss_to_polygons(ss)
+convert_ss_to_polygons(ss, progress = FALSE)
 }
 \arguments{
 \item{ss}{}

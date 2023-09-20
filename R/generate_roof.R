@@ -2,40 +2,40 @@
 #'
 #' This function generates a 3D roof model from a straight skeleton.
 #'
-#' @param ss Default `NULL`. A straight skeleton generated from the `skeletonize` function.
-#' @param max_height Default `1`. The maximum height of the roof.
+#' @param skeleton Default `NULL`. A straight skeleton generated from the `skeletonize` function.
+#' @param max_height Default `NA`. The maximum height of the roof.
 #' @param offset_roof Default `0`. The offset of the roof.
 #' @param bottom Default `FALSE`. A logical flag that controls whether to generate the bottom of the roof.
-#' @param swap_yz Default `FALSE`. A logical flag that controls whether to swap the y and z coordinates in the resulting mesh.
+#' @param swap_yz Default `TRUE`. A logical flag that controls whether to swap the y and z coordinates in the resulting mesh.
 #' If `TRUE`, the y and z coordinates will be swapped.
-#' @param progress Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.
+#' @param verbose Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.
 #'
 #' @return A 3D mesh of the roof model.
 #'
 #' @export
-generate_roof = function(ss, max_height = 1, offset_roof = 0, bottom = FALSE,
-                         swap_yz = FALSE, progress = TRUE) {
-  if(inherits(ss, "rayskeleton_list")) {
+generate_roof = function(skeleton, max_height = NA, offset_roof = 0, bottom = FALSE,
+                         swap_yz = TRUE, verbose = TRUE) {
+  if(inherits(skeleton, "rayskeleton_list")) {
     pb = progress::progress_bar$new(
       format = ":current/:total generating roof [:bar] eta: :eta",
-      total = length(ss), clear = TRUE, width = 60)
+      total = length(skeleton), clear = TRUE, width = 60)
     meshlist = list()
     counter  = 1
     if(length(offset_roof) == 1) {
-      offset_roof = rep(offset_roof,length(ss))
+      offset_roof = rep(offset_roof,length(skeleton))
     } else {
-      stopifnot(length(offset_roof) == length(ss))
+      stopifnot(length(offset_roof) == length(skeleton))
     }
     if(length(max_height) == 1) {
-      max_height = rep(max_height,length(ss))
+      max_height = rep(max_height,length(skeleton))
     } else {
-      stopifnot(length(max_height) == length(ss))
+      stopifnot(length(max_height) == length(skeleton))
     }
-    for(j in seq_len(length(ss))) {
-      if(progress) {
+    for(j in seq_len(length(skeleton))) {
+      if(verbose) {
         pb$tick()
       }
-      meshlist[[counter]] = generate_roof(ss[[j]], bottom = bottom,
+      meshlist[[counter]] = generate_roof(skeleton[[j]], bottom = bottom,
                                           max_height = max_height[j],
                                           offset_roof = offset_roof[j],
                                           swap_yz=swap_yz)
@@ -43,11 +43,11 @@ generate_roof = function(ss, max_height = 1, offset_roof = 0, bottom = FALSE,
     }
     return(rayvertex::scene_from_list(meshlist))
   }
-  if(!inherits(ss, "rayskeleton")) {
-    stop("`ss` must be of class `rayskeleton`")
+  if(!inherits(skeleton, "rayskeleton")) {
+    stop("`skeleton` must be of class `rayskeleton`")
   }
-  polygon_ind = convert_ss_to_polygons(ss)
-  nodes = ss$nodes
+  polygon_ind = convert_ss_to_polygons(skeleton, progress = verbose)
+  nodes = skeleton$nodes
   index_list = list()
   for(i in seq_len(length(polygon_ind))) {
     tmp_ind = polygon_ind[[i]]
@@ -58,15 +58,8 @@ generate_roof = function(ss, max_height = 1, offset_roof = 0, bottom = FALSE,
   xyz = nodes[,2:4]
   colnames(xyz) = c("x","y","z")
   # xyz[,3] = xyz[,3]/max(xyz[,3])*max_height + offset_roof
-  original_verts = attr(ss,"original_vertices")
-  original_holes = attr(ss,"original_holes")
-  if(!swap_yz) {
-    col_order = 1:3
-    ind_order = 1:3
-  } else {
-    col_order = c(1,3,2)
-    ind_order = 3:1
-  }
+  original_verts = attr(skeleton,"original_vertices")
+  original_holes = attr(skeleton,"original_holes")
   if(bottom) {
     if(length(original_holes) > 0) {
       holes = unlist(lapply(original_holes,nrow)) + nrow(original_verts) - nrow(original_holes[[1]])
@@ -84,27 +77,55 @@ generate_roof = function(ss, max_height = 1, offset_roof = 0, bottom = FALSE,
     colnames(original_verts) = c("x","y","z")
     xyz = rbind(xyz, original_verts)
     indices_all = rbind(indices_all,base_indices)
-    mesh = rayvertex::construct_mesh(vertices = as.matrix(xyz)[,col_order],
-                                     indices = as.matrix(indices_all)[,ind_order]-1)
-    max_z = rayvertex::get_mesh_bbox(mesh)[2,3]
+    mesh = rayvertex::construct_mesh(vertices = as.matrix(xyz),
+                                     indices = as.matrix(indices_all)-1) |>
+      rayvertex::rotate_mesh(c(0,0,180))
+    if(is.na(max_height)) {
+      scale_val = c(1,1,1)
+    } else {
+      max_z = rayvertex::get_mesh_bbox(mesh)[2,3]
+      scale_val = c(1,1,max_height/max_z)
+    }
+    if(swap_yz) {
+      mesh = rayvertex::scale_mesh(mesh, scale_val) |>
+        rayvertex::translate_mesh(c(0,0,offset_roof)) |>
+        rayvertex::rotate_mesh(angle=c(90,0,0))
+    } else {
+      mesh = rayvertex::scale_mesh(mesh, scale_val) |>
+        rayvertex::translate_mesh(c(0,0,offset_roof))
+    }
     # offset_roof_full = c(-0.5,-0.5,offset_roof)[col_order]
-    offset_roof_full = c(0,0,offset_roof)[col_order]
+    # offset_roof_full = c(0,0,offset_roof)[col_order]
+    return(mesh)
 
-    scale_max = c(1,1,max_height/max_z)[col_order]
 
-    mesh = rayvertex::scale_mesh(mesh, scale = scale_max)
-    return(rayvertex::translate_mesh(mesh, offset_roof_full))
+    # return(rayvertex::translate_mesh(mesh, offset_roof_full))
   } else {
-    mesh = rayvertex::construct_mesh(vertices = as.matrix(xyz)[,col_order],
-                                     indices = as.matrix(indices_all)[,ind_order]-1)
-    max_z = rayvertex::get_mesh_bbox(mesh)[2,3]
-    offset_roof_full = c(0,0,offset_roof)[col_order]
+    mesh = rayvertex::construct_mesh(vertices = as.matrix(xyz),
+                                     indices = as.matrix(indices_all)-1) |>
+      rayvertex::rotate_mesh(c(0,0,180))
+    if(is.na(max_height)) {
+      scale_val = c(1,1,1)
+    } else {
+      max_z = rayvertex::get_mesh_bbox(mesh)[2,3]
+      scale_val = c(1,1,max_height/max_z)
+    }
+    if(swap_yz) {
+      mesh = rayvertex::scale_mesh(mesh, scale_val) |>
+        rayvertex::translate_mesh(c(0,0,offset_roof)) |>
+        rayvertex::rotate_mesh(angle=c(90,0,0))
+    } else {
+      mesh = rayvertex::scale_mesh(mesh, scale_val) |>
+        rayvertex::translate_mesh(c(0,0,offset_roof))
+    }
+    # offset_roof_full = c(0,0,offset_roof)[col_order]
     # offset_roof_full = c(-0.5,0.5,offset_roof)[col_order]
 
-    scale_max = c(1,1,max_height/max_z)[col_order]
+    # scale_max = c(1,1,max_height/max_z)[col_order]
 
-    mesh = rayvertex::scale_mesh(mesh, scale = scale_max)
-    return(rayvertex::translate_mesh(mesh, offset_roof_full))
+    # mesh = rayvertex::scale_mesh(mesh, scale = scale_max)
+    # return(rayvertex::translate_mesh(mesh, offset_roof_full))
+    return(mesh)
   }
 }
 
@@ -112,73 +133,104 @@ generate_roof = function(ss, max_height = 1, offset_roof = 0, bottom = FALSE,
 #'
 #' This function generates a beveled 3D roof model from a straight skeleton.
 #'
-#' @param ss Default `NULL`. A straight skeleton generated from the `skeletonize` function.
+#' @param skeleton Default `NULL`. A straight skeleton generated from the `skeletonize` function.
 #' @param bevel_offsets Default `NULL`. The offset(s) of the bevel.
 #' @param max_height Default `1`. The maximum height of the roof.
 #' @param bevel_heights Default is set to `bevel_offsets`. Numeric vector specifying the heights of the bevels. Must be of the same length as `bevel_offsets`.
 #' @param set_max_height Default `FALSE`. A logical flag that controls whether to set the max height of the roof based on the `max_height` argument.
-#' @param swap_yz Default `FALSE`. A logical flag that controls whether to swap the y and z coordinates in the resulting mesh.
+#' @param swap_yz Default `TRUE`. A logical flag that controls whether to swap the y and z coordinates in the resulting mesh.
 #' If `TRUE`, the y and z coordinates will be swapped.
-#' @param progress Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.
+#' @param verbose Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.
 #' @param offset_roof Default `0`. The offset of the roof.
 #' @param bottom Default `FALSE`. A logical flag that controls whether to generate the bottom of the roof.
 #'
 #' @return A 3D mesh of the beveled roof model.
 #'
 #' @export
-generate_roof_beveled = function(ss,
+generate_roof_beveled = function(skeleton,
                                  bevel_offsets,
-                                 bevel_heights = bevel_offsets,
+                                 bevel_heights = NULL,
                                  set_max_height = FALSE,
                                  max_height = 1,
                                  offset_roof = 0,
                                  bottom = FALSE,
-                                 swap_yz = FALSE,
-                                 progress = TRUE) {
-
-  if(inherits(ss, "rayskeleton_list")) {
+                                 raw_offsets = FALSE,
+                                 raw_heights = FALSE,
+                                 swap_yz = TRUE,
+                                 verbose = TRUE) {
+  if(inherits(skeleton, "rayskeleton_list")) {
     pb = progress::progress_bar$new(
       format = ":current/:total generating roof [:bar] eta: :eta",
-      total = length(ss), clear = TRUE, width = 60)
+      total = length(skeleton), clear = TRUE, width = 60)
     meshlist = list()
     counter  = 1
     if(length(offset_roof) == 1) {
-      offset_roof = rep(offset_roof,length(ss))
+      offset_roof = rep(offset_roof,length(skeleton))
     }
     if(length(max_height) == 1) {
-      max_height = rep(max_height,length(ss))
+      max_height = rep(max_height,length(skeleton))
     }
-    for(j in seq_len(length(ss))) {
-      if(progress) {
+    for(j in seq_len(length(skeleton))) {
+      if(verbose) {
         pb$tick()
       }
-      meshlist[[counter]] = generate_roof_beveled(ss[[j]], bevel_offsets = bevel_offsets,
+      meshlist[[counter]] = generate_roof_beveled(skeleton[[j]], bevel_offsets = bevel_offsets,
                                                   bottom = bottom, offset_roof = offset_roof[j],
                                                   max_height = max_height[j],
-                                                  swap_yz=swap_yz)
+                                                  raw_offsets = raw_offsets,
+                                                  swap_yz = swap_yz, verbose = verbose)
       counter = counter + 1
     }
     return(rayvertex::scene_from_list(meshlist))
   }
-  if(!inherits(ss, "rayskeleton")) {
-    stop("`ss` must be of class `rayskeleton`")
+  if(!inherits(skeleton, "rayskeleton")) {
+    stop("`skeleton` must be of class `rayskeleton`")
   }
-  max_time = max(ss$links$destination_time)
-  if(all(bevel_offsets >= max_time)) {
-    message(sprintf("All `bevel_offset` greater than max offset in polygon of %f, calculating full roof model",
-            max(ss$nodes[,4])))
-    return(generate_roof(ss, max_height = max_height, offset_roof = offset_roof,
-                         swap_yz=swap_yz))
+  max_time = max(skeleton$links$destination_time)
+  if(is.list(bevel_offsets) &&
+     !is.null(bevel_offsets$x) &&
+     !is.null(bevel_offsets$y)) {
+    bevel_heights = bevel_offsets$y
+    bevel_offsets = bevel_offsets$x
+    if(set_max_height) {
+      warning("`set_max_height` is ignored when passing in bevel curve--set the max height when generating the bevel.")
+      set_max_height = FALSE
+    }
   }
+
+  if(!raw_offsets) {
+    if(any(bevel_offsets > 1 | bevel_offsets < 0)) {
+      stop("If using percentage offsets, all `bevel_offsets` must be between 0 and 1.")
+    }
+    bevel_offsets = bevel_offsets * max_time
+  } else {
+    if(all(bevel_offsets >= max_time)) {
+      message(sprintf("All `bevel_offset` greater than max offset in polygon of %f, calculating full roof model",
+              max(skeleton$nodes[,4])))
+      return(generate_roof(skeleton, max_height = max_height, offset_roof = offset_roof,
+                           swap_yz=swap_yz, verbose = verbose))
+    }
+  }
+  if(!raw_heights) {
+    bevel_heights = bevel_heights * max_time
+  }
+  bevel_offsets_inserted = modify_bevel_with_skeleton(bevel_offsets, bevel_heights, skeleton)
+  bevel_offsets = bevel_offsets_inserted$x
+  bevel_heights = bevel_offsets_inserted$y
+
   stopifnot(length(offset_roof) == 1)
 
   valid_bevels = bevel_offsets < max_time & bevel_offsets > 0
-  bevel_offsets = bevel_offsets[valid_bevels]
-  bevel_heights = bevel_heights[valid_bevels]
+  bevel_offsets_polys = bevel_offsets[valid_bevels]
+  # bevel_heights = bevel_heights[valid_bevels]
   stopifnot(length(bevel_offsets) == length(bevel_heights))
 
-  beveled_ss = generate_offset_links_nodes(ss, bevel_offsets)
-  polygon_ind = convert_ss_to_polygons(beveled_ss)
+  beveled_ss = generate_offset_links_nodes(skeleton, bevel_offsets_polys, progress = verbose)
+  cleaned_new_ss = remove_node_duplicates(beveled_ss)
+  reordered_new_ss = recalculate_ordered_ids(cleaned_new_ss)
+  # browser()
+  polygon_ind = convert_ss_to_polygons(reordered_new_ss, progress = verbose)
+
   nodes = beveled_ss$nodes
   index_list = list()
   for(i in seq_len(length(polygon_ind))) {
@@ -194,6 +246,12 @@ generate_roof_beveled = function(ss,
     flat_areas = xyz[,3] >= bevel_offsets_with_max[i]
     new_xyz[flat_areas,3] = bevel_heights[i]
   }
+  # browser()
+  # plot(nodes[,2:3])
+  # for(i in seq_len(length(polygon_ind))) {
+  #   polygon(nodes[polygon_ind[[i]],2:3], col = rainbow(length(polygon_ind))[i])
+  #   points(nodes[polygon_ind[[i]],2:3], col = "black", pch=16)
+  # }
   xyz = new_xyz
   colnames(xyz) = c("x","y","z")
   if(set_max_height) {
@@ -201,15 +259,8 @@ generate_roof_beveled = function(ss,
   } else {
     xyz[,3] = xyz[,3] + offset_roof
   }
-  original_verts = attr(ss,"original_vertices")
-  original_holes = attr(ss,"original_holes")
-  if(!swap_yz) {
-    col_order = 1:3
-    ind_order = 1:3
-  } else {
-    col_order = c(1,3,2)
-    ind_order = 3:1
-  }
+  original_verts = attr(skeleton,"original_vertices")
+  original_holes = attr(skeleton,"original_holes")
   if(bottom) {
     if(length(original_holes) > 0) {
       holes = unlist(lapply(original_holes,nrow)) + nrow(original_verts)
@@ -227,11 +278,43 @@ generate_roof_beveled = function(ss,
     colnames(original_verts) = c("x","y","z")
     xyz = rbind(xyz, original_verts)
     indices_all = rbind(indices_all,base_indices)
-    return(rayvertex::construct_mesh(vertices = as.matrix(xyz)[,col_order],
-                                     indices = as.matrix(indices_all)[,ind_order]-1))
+    mesh = rayvertex::construct_mesh(vertices = as.matrix(xyz),
+                                     indices = as.matrix(indices_all)-1) |>
+      rayvertex::rotate_mesh(c(0,0,180))
+    if(!set_max_height) {
+      scale_val = c(1,1,1)
+    } else {
+      max_z = rayvertex::get_mesh_bbox(mesh)[2,3]
+      scale_val = c(1,1,max_height/max_z)
+    }
+    if(swap_yz) {
+      mesh = rayvertex::scale_mesh(mesh, scale_val) |>
+        rayvertex::translate_mesh(c(0,0,offset_roof)) |>
+        rayvertex::rotate_mesh(angle=c(90,0,0))
+    } else {
+      mesh = rayvertex::scale_mesh(mesh, scale_val) |>
+        rayvertex::translate_mesh(c(0,0,offset_roof))
+    }
+    return(mesh)
   } else {
-    return(rayvertex::construct_mesh(vertices = as.matrix(xyz)[,col_order],
-                                     indices = as.matrix(indices_all)[,ind_order]-1))
+    mesh = rayvertex::construct_mesh(vertices = as.matrix(xyz),
+                                     indices = as.matrix(indices_all)-1) |>
+      rayvertex::rotate_mesh(c(0,0,180))
+    if(!set_max_height) {
+      scale_val = c(1,1,1)
+    } else {
+      max_z = rayvertex::get_mesh_bbox(mesh)[2,3]
+      scale_val = c(1,1,max_height/max_z)
+    }
+    if(swap_yz) {
+      mesh = rayvertex::scale_mesh(mesh, scale_val) |>
+        rayvertex::translate_mesh(c(0,0,offset_roof)) |>
+        rayvertex::rotate_mesh(angle=c(90,0,0))
+    } else {
+      mesh = rayvertex::scale_mesh(mesh, scale_val) |>
+        rayvertex::translate_mesh(c(0,0,offset_roof))
+    }
+    return(mesh)
   }
 }
 

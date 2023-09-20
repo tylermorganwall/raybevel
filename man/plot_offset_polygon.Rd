@@ -27,6 +27,8 @@ range to encompass the entire original polygon.}
 
 \item{main}{Default "Offset Polygons". The main title for the plot.}
 
+\item{plot_original_polygon}{Default `TRUE`. If `skeleton` passed as well, plots the original polygon.}
+
 \item{col}{Default "lightblue". The fill color for the polygons. This argument is ignored if `palette_col` is provided.}
 
 \item{border}{Default "blue". The border color for the polygons. This argument is ignored if `palette_border` is provided.}
