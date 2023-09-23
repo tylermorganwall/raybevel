@@ -1,14 +1,15 @@
 #' Generate 2D Bevel Profile for 3D Polygons
 #'
-#' @param bevel_type Character `NULL`. Type of the bevel, one of the following options:
+#' @param bevel_type Character `angled`. Type of the bevel, one of the following options:
 #'   - "circular": Creates a rounded bevel resembling a quarter-circle.
 #'   - "exp": Creates an exponential curve, starting slow and accelerating.
 #'   - "bump": Creates a bump-like profile, rising and falling within the coverage.
 #'   - "step": Generates a step-like bevel with a flat top.
 #'   - "block": Generates a block-like bevel, jumping straight to the max_height and back to the base.
 #'   - "angled": Generates a straight angled bevel. You can optionally set the 'angle' parameter for this bevel.
-#' @param percent_coverage Numeric `0.1`. Percentage of the curve to be covered by the bevel.
-#' @param max_height Numeric `0.1`. The maximum height of the bevel, as a percentage of the final height.
+#' @param bevel_start Numeric `0`. The starting point of the bevel along the curve, ranges between 0 and 1.
+#' @param bevel_end Numeric `1`. The ending point of the bevel along the curve, ranges between 0 and 1.
+#' @param max_height Numeric `0.1`. The maximum height of the bevel.
 #' @param angle Numeric `NULL`. Optional angle parameter in degrees for angular bevels.
 #' @param curve_points Numeric `50`. Number of points to plot for curve-based bevels.
 #' @param reverse Logical `FALSE`. If TRUE, the curve is reversed.
@@ -18,120 +19,149 @@
 #'
 #' @export
 #' @examples
-#' #Generate a single bevel profile and plot it
-#' coords = generate_bevel("circular", 0.2, 0.2)
+#' # Generate a single bevel profile and plot it
+#' coords = generate_bevel("circular", 0.2, 0.8, 0.2)
 #' plot(coords$x, coords$y, type = 'l', axes = FALSE, mar = c(0, 0, 0, 0))
 #' title(main = "Bevel Type: Circular")
 #' box()
 #'
 #' # Plot all bevel profiles in a grid
-#' par(mfrow = c(4, 3),mai = c(0.2, 0.2, 0.5, 0.2))
-#' types = rep(c("circular", "exp", "bump", "step", "block", "angled"), 2)
-#' rev = c(rep(FALSE, 6), rep(TRUE, 6))
+#' par(mfrow = c(4, 3), mai = c(0.2, 0.2, 0.5, 0.2))
+#' max_height = c(1,1,1,1)
+#' types = rep(c("circular", "exp", "bump", "step", "block", "angled"),2)
+#' reverses = c(rep(FALSE,6),rep(TRUE,6))
 #' for(i in seq_len(length(types))) {
-#'   coords = generate_bevel(types[i], 0.5, 0.5, 45, reverse = rev[i])
+#'   coords = generate_bevel(types[i], 0.2, 0.8, 1, angle = ifelse(types[i] == "angled", 45, NULL),
+#'                           reverse = reverses[i])
 #'   plot(coords$x, coords$y, type = 'l', main = paste("Bevel Type:", types[i]), axes = FALSE,
-#'        xlim = c(-0.1, 1.1), ylim = c(-0.2, 0.8), mar = c(0, 0, 0, 0),xlab = "", ylab = "")
+#'        xlim = c(-0.1, 1.1), ylim = c(-0.2, 1.2), mar = c(0, 0, 0, 0), xlab = "", ylab = "")
 #'   box()
 #' }
-generate_bevel = function(bevel_type = "angled", percent_coverage = 0.1,
-                          max_height = 0.1, angle = 45, curve_points = 50,
-                          reverse = FALSE, initial_height = 0) {
+generate_bevel = function(bevel_type = "angled", bevel_start = 0, bevel_end = 1,
+                          max_height = 0.1, angle = NULL, curve_points = 50,
+                          reverse = FALSE, initial_height = 0, add_end_points = TRUE,
+                          step_epsilon = 1e-5) {
+  # Check angle constraint if bevel_type is angled
   if(bevel_type == "angled") {
-    stopifnot(angle < 90 && angle > 0)
-    angle = angle * pi / 180  # Convert to radians
-    max_height = tan(angle) * percent_coverage
+    if(!is.null(angle)) {
+      stopifnot(angle < 90 && angle > 0)
+      max_height = tan(angle) * (bevel_end - bevel_start)
+    }
   }
 
-  if (bevel_type == "step") {
-    x = c(0, percent_coverage - 0.0001, percent_coverage, 1)
-    y = c(0, 0, max_height, max_height)
-  } else if (bevel_type == "block") {
-    x = c(0, 0.0001, percent_coverage - 0.0001, percent_coverage, 1)
-    y = c(0, max_height, max_height, 0, 0)
+  # Initialize empty vectors for x and y
+  x = c()
+  y = c()
+  # Define curve points based on bevel_type
+  if(bevel_type == "step") {
+    x = c(bevel_start, bevel_start + step_epsilon)
+    y = c(0, max_height)
+  } else if(bevel_type == "block") {
+    x = c(bevel_start, bevel_start + step_epsilon, bevel_end - step_epsilon, bevel_end)
+    y = c(0,max_height, max_height, 0)
   } else if(bevel_type == "angled") {
-    x = c(0, percent_coverage, 1)
-    y = c(0, tan(angle) * percent_coverage, tan(angle) * percent_coverage)
+    x = c(bevel_start, bevel_end)
+    y = c(0, max_height)
   } else {
-    x_curve = seq(0, percent_coverage, length.out = curve_points)
+    x_curve = seq(bevel_start, bevel_end, length.out = curve_points)
     if(bevel_type == "circular") {
-      y_curve = c(sqrt(1 - (x_curve / percent_coverage - 1)^2),1)
+      y_curve = sqrt(1 - ((x_curve - bevel_start) / (bevel_end - bevel_start) - 1)^2)
     } else if(bevel_type == "exp") {
-      y_curve = c(1 - exp(-5 * x_curve / percent_coverage),1)
+      y_curve = 1 - exp(-5 * (x_curve - bevel_start) / (bevel_end - bevel_start))
     } else if(bevel_type == "bump") {
-      y_curve = c(sqrt(1 - (2 * x_curve / percent_coverage - 1)^2),0)
+      y_curve = sqrt(1 - (2 * (x_curve - bevel_start) / (bevel_end - bevel_start) - 1)^2)
     } else {
       stop(sprintf("bevel_type `%s` not recognized.", bevel_type))
     }
     y_curve = y_curve * max_height
-    x = c(x_curve, 1)
-    y = y_curve
+    x = c(x, x_curve)
+    y = c(y, y_curve)
   }
+  if(add_end_points) {
+    if(x[1] != 0) {
+      x = c(0,x)
+      y = c(y[1],y)
+    }
+    if(x[length(x)] != 1) {
+      x = c(x,1)
+      last_val = y[length(y)]
+      y = c(y,last_val)
+    }
+  }
+  # Reverse the bevel if specified
   if(reverse) {
     y = max_height - y
   }
-  y = initial_height + (y - min(y)) * (max_height - initial_height) / (max(y) - min(y))
+
+  # Adjust heights based on initial_height
+  diff_height = y[1]-initial_height
+  y = y - diff_height
 
   return(list(x = x, y = y))
 }
 
 #' Generate Complex 2D Bevel Profile for 3D Polygons
 #'
-#' @param bevel_types Vector of character. Types of the bevels. Options are: "circular", "exp", "bump", "step", "block", "angled".
-#' @param percent_coverages Vector of numeric. Percentages of the curve to be covered by each bevel.
-#' @param max_heights Vector of numeric. The maximum heights of each bevel as a percentage of the final height.
-#' @param angles Vector of numeric `NULL`. Optional angle parameter in degrees for angular bevels.
-#' @param curve_points Vector of numeric `50`. Number of points for each curve.
-#' @param reverses Vector of logical `FALSE`. Whether to reverse each bevel.
+#' @param bevel_type Vector of bevel types. Options are: "circular", "exp", "bump", "step", "block", "angled".
+#' @param bevel_start Numeric vector of values between `0` and `1`.
+#' Percentage distance in the interior the polygon at which to begin the corresponding `bevel_type`.
+#' @param bevel_end Numeric vector of values between `0` and `1`.
+#' Percentage distance in the interior the polygon at which to end the corresponding `bevel_type`.
+#' @param max_height Numeric vector. The maximum heights of each bevel.
+#' @param angle Default `NULL`. Numeric vector. Optional angle parameter in degrees for angular bevels (overrides values in `max_height`).
+#' @param curve_points Default `50`. Integer vector of number of points for each curve.
+#' @param reverse Default `FALSE`. Whether to reverse each bevel.
 #'
 #' @return List containing 'x' and 'y', which are the coordinates of the complex 2D bevel profile
 #' @export
 #' @examples
 #' # Generate a complex bevel profile and plot it
 #' complex_coords = generate_complex_bevel(
-#'   c("circular", "exp", "step"),
-#'   c(0.2, 0.5, 0.8),
-#'   c(0.1, 0.2, 0.3),
-#'   angles = c(NULL, NULL, NULL),
+#'   bevel_type = c("circular", "exp", "step"),
+#'   bevel_start = c(0.1, 0.2, 0.6),
+#'   bevel_end = c(0.2, 0.5, 0.8),
+#'   max_height = c(0.1, 0.2, 0.3),
+#'   angle = c(NULL, NULL, NULL),
 #'   curve_points = c(50, 50, 50),
-#'   reverses = c(TRUE, FALSE, FALSE)
+#'   reverse = c(FALSE, FALSE, FALSE)
 #' )
 #' plot(complex_coords$x, complex_coords$y, type = 'l', axes = FALSE,
 #'      main = "Complex Bevel")
 #' box()
-generate_complex_bevel = function(bevel_types, percent_coverages,
-                                  max_heights = NULL,
-                                  angles = NULL, curve_points = rep(50, length(bevel_types)),
-                                  reverses = rep(FALSE, length(bevel_types))) {
-  if(length(bevel_types) != length(percent_coverages) ||
-     # length(bevel_types) != length(max_heights) ||
-     length(bevel_types) != length(curve_points) ||
-     length(bevel_types) != length(reverses)) {
-    stop("All vectors must have the same length.")
-  }
-
-  # Sort all vectors based on percent_coverages
-  order_indices = order(percent_coverages)
-  bevel_types = bevel_types[order_indices]
-  percent_coverages = percent_coverages[order_indices]
-  max_heights = max_heights[order_indices]
-  curve_points = curve_points[order_indices]
-  reverses = reverses[order_indices]
-  if (!is.null(angles)) angles = angles[order_indices]
+generate_complex_bevel = function(bevel_type,
+                                  bevel_start = 0,
+                                  bevel_end = 1,
+                                  max_height = 1,
+                                  angle = 45,
+                                  curve_points = 30,
+                                  reverse = FALSE,
+                                  add_end_points = TRUE) {
+  completed_vals = data.frame(bevel_type = bevel_type,
+                              bevel_start = bevel_start,
+                              bevel_end = bevel_end,
+                              max_height = max_height,
+                              angle = angle,
+                              curve_points = curve_points,
+                              reverse = reverse)
+  # Sort by bevel_start for sequential generation
+  completed_vals = completed_vals[order(completed_vals$bevel_start), ]
 
   x = c()
   y = c()
   y_prev_end = 0
 
-  for(i in seq_along(bevel_types)) {
+  for(i in seq_len(nrow(completed_vals))) {
+    row = completed_vals[i, ]
     bevel_segment = generate_bevel(
-      bevel_type = bevel_types[i],
-      percent_coverage = percent_coverages[i],
-      max_height = max_heights[i],
-      angle = if (!is.null(angles)) angles[i] else NULL,
-      curve_points = curve_points[i],
-      reverse = reverses[i],
-      initial_height = y_prev_end  # Pass the last height of the previous bevel as the initial height
+      bevel_type = row$bevel_type,
+      bevel_start = row$bevel_start,
+      bevel_end = row$bevel_end,
+      max_height = row$max_height,
+      angle = if (!is.null(row$angle)) row$angle else NULL,
+      curve_points = row$curve_points,
+      reverse = row$reverse,
+      initial_height = y_prev_end,  # Pass the last height of the previous bevel as the initial height
+      add_end_points = FALSE
     )
 
     y_prev_end = tail(bevel_segment$y, n = 1)  # Update y_prev_end for the next iteration
@@ -140,11 +170,26 @@ generate_complex_bevel = function(bevel_types, percent_coverages,
       x = bevel_segment$x
       y = bevel_segment$y
     } else {
-      x = c(x, tail(bevel_segment$x, n = -1) + tail(x, n = 1))
-      y = c(y, tail(bevel_segment$y, n = -1))
+      x = c(x, bevel_segment$x)
+      y = c(y, bevel_segment$y)
     }
   }
-  x = x / max(x)
+
+  if(add_end_points) {
+    if(x[1] != 0) {
+      x = c(0,x)
+      y = c(y[1],y)
+    }
+    if(x[length(x)] != 1) {
+      x = c(x,1)
+      last_val = y[length(y)]
+      y = c(y,last_val)
+    }
+  }
+
+  duplicated_x = duplicated(x)
+  x = x[!duplicated_x]
+  y = y[!duplicated_x]
 
   return(list(x = x, y = y))
 }

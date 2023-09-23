@@ -6,16 +6,19 @@
 \usage{
 generate_bevel(
   bevel_type = "angled",
-  percent_coverage = 0.1,
+  bevel_start = 0,
+  bevel_end = 1,
   max_height = 0.1,
-  angle = 45,
+  angle = NULL,
   curve_points = 50,
   reverse = FALSE,
-  initial_height = 0
+  initial_height = 0,
+  add_end_points = TRUE,
+  step_epsilon = 1e-05
 )
 }
 \arguments{
-\item{bevel_type}{Character `NULL`. Type of the bevel, one of the following options:
+\item{bevel_type}{Character `angled`. Type of the bevel, one of the following options:
 - "circular": Creates a rounded bevel resembling a quarter-circle.
 - "exp": Creates an exponential curve, starting slow and accelerating.
 - "bump": Creates a bump-like profile, rising and falling within the coverage.
@@ -23,9 +26,11 @@ generate_bevel(
 - "block": Generates a block-like bevel, jumping straight to the max_height and back to the base.
 - "angled": Generates a straight angled bevel. You can optionally set the 'angle' parameter for this bevel.}
 
-\item{percent_coverage}{Numeric `0.1`. Percentage of the curve to be covered by the bevel.}
+\item{bevel_start}{Numeric `0`. The starting point of the bevel along the curve, ranges between 0 and 1.}
 
-\item{max_height}{Numeric `0.1`. The maximum height of the bevel, as a percentage of the final height.}
+\item{bevel_end}{Numeric `1`. The ending point of the bevel along the curve, ranges between 0 and 1.}
+
+\item{max_height}{Numeric `0.1`. The maximum height of the bevel.}
 
 \item{angle}{Numeric `NULL`. Optional angle parameter in degrees for angular bevels.}
 
@@ -42,20 +47,22 @@ List containing 'x' and 'y', which are the coordinates of the 2D bevel profile.
 Generate 2D Bevel Profile for 3D Polygons
 }
 \examples{
-#Generate a single bevel profile and plot it
-coords = generate_bevel("circular", 0.2, 0.2)
+# Generate a single bevel profile and plot it
+coords = generate_bevel("circular", 0.2, 0.8, 0.2)
 plot(coords$x, coords$y, type = 'l', axes = FALSE, mar = c(0, 0, 0, 0))
 title(main = "Bevel Type: Circular")
 box()
 
 # Plot all bevel profiles in a grid
-par(mfrow = c(4, 3),mai = c(0.2, 0.2, 0.5, 0.2))
-types = rep(c("circular", "exp", "bump", "step", "block", "angled"), 2)
-rev = c(rep(FALSE, 6), rep(TRUE, 6))
+par(mfrow = c(4, 3), mai = c(0.2, 0.2, 0.5, 0.2))
+max_height = c(1,1,1,1)
+types = rep(c("circular", "exp", "bump", "step", "block", "angled"),2)
+reverses = c(rep(FALSE,6),rep(TRUE,6))
 for(i in seq_len(length(types))) {
-  coords = generate_bevel(types[i], 0.5, 0.5, 45, reverse = rev[i])
+  coords = generate_bevel(types[i], 0.2, 0.8, 1, angle = ifelse(types[i] == "angled", 45, NULL),
+                          reverse = reverses[i])
   plot(coords$x, coords$y, type = 'l', main = paste("Bevel Type:", types[i]), axes = FALSE,
-       xlim = c(-0.1, 1.1), ylim = c(-0.2, 0.8), mar = c(0, 0, 0, 0),xlab = "", ylab = "")
+       xlim = c(-0.1, 1.1), ylim = c(-0.2, 1.2), mar = c(0, 0, 0, 0), xlab = "", ylab = "")
   box()
 }
 }

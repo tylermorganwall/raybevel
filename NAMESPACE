@@ -2,6 +2,7 @@
 
 export(generate_bevel)
 export(generate_complex_bevel)
+export(generate_new_polygon_heights)
 export(generate_offset_polygon)
 export(generate_roof)
 export(generate_roof_beveled)

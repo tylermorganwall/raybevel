@@ -5,26 +5,32 @@
 \title{Generate Complex 2D Bevel Profile for 3D Polygons}
 \usage{
 generate_complex_bevel(
-  bevel_types,
-  percent_coverages,
-  max_heights,
-  angles = NULL,
-  curve_points = rep(50, length(bevel_types)),
-  reverses = rep(FALSE, length(bevel_types))
+  bevel_type,
+  bevel_start,
+  bevel_end,
+  max_height,
+  angle = NULL,
+  curve_points = 30,
+  reverse = FALSE,
+  add_end_points = TRUE
 )
 }
 \arguments{
-\item{bevel_types}{Vector of character. Types of the bevels. Options are: "circular", "exp", "bump", "step", "block", "angled".}
+\item{bevel_type}{Vector of bevel types. Options are: "circular", "exp", "bump", "step", "block", "angled".}
 
-\item{percent_coverages}{Vector of numeric. Percentages of the curve to be covered by each bevel.}
+\item{bevel_start}{Numeric vector of values between `0` and `1`.
+Percentage distance in the interior the polygon at which to begin the corresponding `bevel_type`.}
 
-\item{max_heights}{Vector of numeric. The maximum heights of each bevel as a percentage of the final height.}
+\item{bevel_end}{Numeric vector of values between `0` and `1`.
+Percentage distance in the interior the polygon at which to end the corresponding `bevel_type`.}
 
-\item{angles}{Vector of numeric `NULL`. Optional angle parameter in degrees for angular bevels.}
+\item{max_height}{Numeric vector. The maximum heights of each bevel.}
 
-\item{curve_points}{Vector of numeric `50`. Number of points for each curve.}
+\item{angle}{Default `NULL`. Numeric vector. Optional angle parameter in degrees for angular bevels (overrides values in `max_height`).}
 
-\item{reverses}{Vector of logical `FALSE`. Whether to reverse each bevel.}
+\item{curve_points}{Default `50`. Integer vector of number of points for each curve.}
+
+\item{reverse}{Default `FALSE`. Whether to reverse each bevel.}
 }
 \value{
 List containing 'x' and 'y', which are the coordinates of the complex 2D bevel profile
@@ -35,12 +41,13 @@ Generate Complex 2D Bevel Profile for 3D Polygons
 \examples{
 # Generate a complex bevel profile and plot it
 complex_coords = generate_complex_bevel(
-  c("circular", "exp", "step"),
-  c(0.2, 0.5, 0.8),
-  c(0.1, 0.2, 0.3),
-  angles = c(NULL, NULL, NULL),
+  bevel_type = c("circular", "exp", "step"),
+  bevel_start = c(0.1, 0.2, 0.6),
+  bevel_end = c(0.2, 0.5, 0.8),
+  max_height = c(0.1, 0.2, 0.3),
+  angle = c(NULL, NULL, NULL),
   curve_points = c(50, 50, 50),
-  reverses = c(TRUE, FALSE, FALSE)
+  reverse = c(FALSE, FALSE, FALSE)
 )
 plot(complex_coords$x, complex_coords$y, type = 'l', axes = FALSE,
      main = "Complex Bevel")

@@ -3,9 +3,7 @@
 #' @keywords internal
 generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progress = FALSE) {
   links = ss$links
-  # links$hashes = apply(matrix(c(links$source,links$destination),ncol=2),1,digest::digest)
   nodes = ss$nodes
-  # browser()
 
   node_maxima_ids = identify_maxima_nodes(ss)
   nodes$local_maxima = nodes$id %in% node_maxima_ids
@@ -14,13 +12,14 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
 
   max_time = max(links$destination_time)
   if(all(offsets >= max_time)) {
-    stop(sprintf("offset (%f) must not be greater than or equal to max time: %f", offset, max_time))
+    stop(sprintf("offsets `c(%s)` must not be greater than or equal to max time: %0.4f",
+                 paste0(sprintf("%0.4f", offsets), collapse = ", "), max_time))
   }
   new_links_offset = list()
   offsets = offsets[order(offsets)]
   new_node_start = max(nodes$id) + 1
   pb = progress::progress_bar$new(
-        format = ":current/:total generating internal links [:bar] eta: :eta",
+        format = ":current/:total Generating internal links [:bar] eta: :eta",
         total = length(offsets), clear = TRUE, width = 60)
   for(ii in seq_len(length(offsets))) {
     if(progress) {
@@ -38,9 +37,9 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
     # first_dest = links[which(!links$edge)[1],2]
     # tmp_dest = first_dest
 
-    first_node = links[which(links$local_maxima_destination & links$destination_time > offset)[1],1]
+    first_node = links[which(links$local_maxima_destination & links$destination_time >= offset)[1],1]
     tmp_source = first_node
-    first_dest = links[which(links$local_maxima_destination & links$destination_time > offset)[1],2]
+    first_dest = links[which(links$local_maxima_destination & links$destination_time >= offset)[1],2]
     tmp_dest = first_dest
     num_polygons = 1
     counter = 1
@@ -50,10 +49,6 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
     sub_polygons = list()
     sub_polygon_counter = 1
 
-    #This hashes new nodes to detect sub-polygons
-    hashed_visited_nodes_single_poly = list()
-    hash_ctr = 1
-    links$split_poly = FALSE
     any_picked = FALSE
 
     original_first_source = first_node
@@ -61,12 +56,6 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
     changed_first = FALSE
     while(first || !(tmp_source == first_node && tmp_dest == first_dest) ||
           sum(!links$visited) != 0) {
-      # if(is.na(tmp_source) || is.na(tmp_dest)) {
-      #   browser()
-      # }
-      # if(ii == 74) {
-      #   browser()
-      # }
       # print(c(first_node, first_dest, tmp_source, tmp_dest, sum(!links$visited),
       #         offset, nodes[tmp_source,"time"], nodes[tmp_dest,"time"], ii, num_polygons, sub_polygon_counter ))
       if(!first || any_picked) {
@@ -75,12 +64,10 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
           browser()
         }
         if(tmp_source == first_node && tmp_dest == first_dest) {
-          # print("new poly")
           new_poly = TRUE
           remaining_links = links[!links$visited &
                                   !links$edge &
                                   !links$away_from_offset,]
-                                  # !links$split_poly, ]
           if(nrow(remaining_links) == 0) {
             break
           }
@@ -89,43 +76,9 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
           first_node = tmp_source
           first_dest = tmp_dest
           num_polygons = max(num_polygons) + 1
-          hash_ctr = 1
-          hashed_visited_nodes_single_poly = list()
         }
       }
 
-      # Here is where we detect if we've encountered a new polygon when visiting these nodes (which
-      # will appear as a loop). If so, we'll split off that polygon separately and mark those nodes as visited,
-      # and increment num_polygons.
-      # hash_link = digest::digest(c(tmp_source, tmp_dest))
-      # if(hash_link %in% hashed_visited_nodes_single_poly) {
-      #   #Extract nodes that correspond to loop: should equal the list of nodes backtracking from this one
-      #   sub_polygon_indices = seq(which(hash_link == hashed_visited_nodes_single_poly),length(hashed_visited_nodes_single_poly))
-      #   sub_polygons[[sub_polygon_counter]] =  do.call("rbind", new_node_info[sub_polygon_indices])
-      #
-      #   new_node_info = new_node_info[-sub_polygon_indices]
-      #   sub_poly_hashes = hashed_visited_nodes_single_poly[sub_polygon_indices]
-      #
-      #   hashed_visited_nodes_single_poly = hashed_visited_nodes_single_poly[-sub_polygon_indices]
-      #   hash_ctr = length(hashed_visited_nodes_single_poly)
-      #   links$split_poly = links$split_poly | links$hash %in% sub_poly_hashes
-      #   # Get next link
-      #   tmp_source = new_node_info[[length(new_node_info)]][1,2]
-      #   tmp_dest = new_node_info[[length(new_node_info)]][1,3]
-      #   # remaining_links = links[!links$visited &
-      #   #                         !links$edge &
-      #   #                         !links$away_from_offset &
-      #   #                         !links$split_poly,]
-      #   # if(nrow(remaining_links) == 0) {
-      #   #   break
-      #   # }
-      #   sub_polygon_counter = sub_polygon_counter + 1
-      #
-      # }
-      # browser()
-      # browser()
-      # equal_time_maxima_node = (links$local_maxima_destination & links$destination_time == offset) |
-      #   (links$local_maxima_source & links$source_time == offset)
       first = FALSE
       node1_position = as.numeric(nodes[nodes$id == tmp_source,2:3])
       node2_position = as.numeric(nodes[nodes$id == tmp_dest,2:3])
@@ -135,7 +88,6 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
                         links$destination == tmp_dest) |
                        (links$destination == tmp_source &
                         links$source == tmp_dest))
-      # if(ii == 74) {
       #   # browser()
       #   plot_skeleton(ss)
       #   # cols = c("red","green","blue")
@@ -145,19 +97,7 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
       #   segments(node1_position[1],node1_position[2],node2_position[1],node2_position[2],
       #            col="green", lwd=3)
       #   Sys.sleep(0.1)
-      # }
 
-      #Need to see if all nodes heading away from single node are lower when equal--then no polygons left and mark as such
-      #Otherwise, that node can be included in another polygon.
-      # if(node1_time == offset) {
-      #   links_from_source = which(links$source == tmp_source)
-      #   links_to_source = which(links$destination == tmp_source)
-      #   destination_times = links[links_from_source,"destination_time"]
-      #   source_times = links[links_to_source,"source_time"]
-      #   if(all(c(destination_times,source_times) < offset)) {
-      #     links$visited[c(links_from_source,links_to_source)] = TRUE
-      #   }
-      # }
       stopifnot(length(link_idx) == 1)
       links$visited[link_idx] = TRUE
       if(offset >= node1_time && offset < node2_time) { ### Sep 19th, changed from <= to < to stop looping when loop ends on node exactly equal to offset
@@ -181,17 +121,15 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
         }
         new_node_info[[counter]] = matrix(c(num_polygons, tmp_source, tmp_dest, node_val,
                                             node_position_new, offset, node1_position, node2_position,
-                                            hash_ctr, make_new_node),
-                                          nrow=1,ncol=13)
-        hashed_visited_nodes_single_poly[[hash_ctr]] = digest::digest(c(tmp_source, tmp_dest))
-        hash_ctr = hash_ctr + 1
+                                            make_new_node),
+                                          nrow=1,ncol=12)
 
         if(make_new_node) {
           new_node_start = new_node_start + 1
         }
 
         colnames(new_node_info[[counter]]) = c("polygon_id", "source", "destination", "new_id",
-                                               "x","y","time","x1","y1","x2","y2", "hash_ctr", "new_node")
+                                               "x","y","time","x1","y1","x2","y2", "new_node")
         new_poly = FALSE
         counter = counter + 1
       } else {
@@ -212,7 +150,6 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
       v1 = node2_position-node1_position
 
       # Remove all invalid links (links equal to the current link)
-      # browser()
       no_origin_bool = with(links,
            !(source == tmp_source &
              destination == tmp_dest) &
@@ -224,9 +161,7 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
                             destination == tmp_dest | source == tmp_dest)
       only_connected = no_origin_links[connected_bool,]
       no_edges = only_connected[!only_connected$edge,]
-      # if(ii == 3.0 && num_polygons == 2) {
-      #   browser()
-      # }
+
       if(node2_time == offset) {
         bool_remove_lower_when_equal = with(no_edges,
             (tmp_dest == source & destination_time >= offset) |
@@ -236,19 +171,9 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
       } else {
         next_links = no_edges
       }
-      # If node at the offset, don't go downhill
-      # if(ii == 3.0 && num_polygons == 2) {
-      #   browser()
-      # }
 
-      # with(no_edges,
-      #      time == offset)
-      next_links = no_edges
+      # next_links = no_edges
 
-      # connected_current_node = with(no_origin_links)
-                          # (links$destination[i] == tmp_dest | links$source[i] == tmp_dest |
-                          #  links$destination[i] == tmp_source | links$source[i] == tmp_source) &
-                         # !links$edge,]
       best_angle = 180
       best_dest = NA
       best_source = NA

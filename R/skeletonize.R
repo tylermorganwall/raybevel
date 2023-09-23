@@ -67,9 +67,17 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
     pb = progress::progress_bar$new(
       format = ":current/:total skeletonizing [:bar] eta: :eta",
       total = nrow(vertices), clear = TRUE, width = 60)
-    all_coords = lapply(vertices$geometry, sf::st_coordinates)
-    is_multipolygon = unlist(lapply(vertices$geometry, (function(x) inherits(x,"MULTIPOLYGON"))))
-    is_polygon = unlist(lapply(vertices$geometry, (function(x) inherits(x,"POLYGON"))))
+    non_empty_geometry = list()
+    cntr = 1
+    for(i in rev(seq_len(length(vertices$geometry)))) {
+      if(length(vertices$geometry[[i]]) > 0) {
+        non_empty_geometry[[cntr]]  = vertices$geometry[[i]]
+        cntr = cntr + 1
+      }
+    }
+    all_coords = lapply(non_empty_geometry, sf::st_coordinates)
+    is_multipolygon = unlist(lapply(non_empty_geometry, (function(x) inherits(x,"MULTIPOLYGON"))))
+    is_polygon = unlist(lapply(non_empty_geometry, (function(x) inherits(x,"POLYGON"))))
 
     ss_list = list()
     counter = 1
@@ -148,6 +156,9 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
             if(!is_ccw_polygon(verts)) {
               verts = verts[rev(seq_len(nrow(verts))),]
             }
+            vert_hashes = apply(verts,1,digest::digest)
+            cleaned_holes = list()
+            cntr = 1
             for(k in seq_len(length(holes))) {
               if(!is_simple_polygon(as.matrix(holes[[k]]))) {
                 warning(sprintf("Hole in row %i in `sf` object not simple polygon, skipping", i))
@@ -156,11 +167,17 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
               if(is_ccw_polygon(holes[[k]])) {
                 holes[[k]] = holes[[k]][rev(seq_len(nrow(holes[[k]]))),]
               }
-              holes[[k]] = as.matrix(holes[[k]])
+              hole_hashes = apply(holes,1,digest::digest)
+              if(any(hole_hashes %in% vert_hashes)) {
+                warning(sprintf("Hole has shared node with vertex exterior which can cause problems with CGAL's underlying straight skeleton algorithm--skipping hole."))
+                next
+              }
+              cleaned_holes[[cntr]] = as.matrix(holes[[k]])
+              cntr = cntr + 1
             }
             #Skeletonize
             ss_list[[counter]] = skeletonize(as.matrix(verts), debug = debug,
-                                             holes = holes,
+                                             holes = cleaned_holes,
                                              return_raw_ss = return_raw_ss,
                                              merge_nodes_tolerance = merge_nodes_tolerance)
             counter = counter + 1
