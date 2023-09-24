@@ -7,7 +7,7 @@
 generate_roof(
   skeleton,
   max_height = NA,
-  offset_roof = 0,
+  offset = 0,
   bottom = FALSE,
   swap_yz = TRUE,
   verbose = TRUE
@@ -18,7 +18,7 @@ generate_roof(
 
 \item{max_height}{Default `NA`. The maximum height of the roof.}
 
-\item{offset_roof}{Default `0`. The offset of the roof.}
+\item{offset}{Default `0`. The vertical offset of the roof.}
 
 \item{bottom}{Default `FALSE`. A logical flag that controls whether to generate the bottom of the roof.}
 

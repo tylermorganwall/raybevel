@@ -40,6 +40,7 @@
 generate_bevel = function(bevel_type = "angled", bevel_start = 0, bevel_end = 1,
                           max_height = 0.1, angle = NULL, curve_points = 50,
                           reverse = FALSE, initial_height = 0, add_end_points = TRUE,
+                          manual_offsets = NULL,
                           step_epsilon = 1e-5) {
   # Check angle constraint if bevel_type is angled
   if(bevel_type == "angled") {
@@ -88,6 +89,15 @@ generate_bevel = function(bevel_type = "angled", bevel_start = 0, bevel_end = 1,
       y = c(y,last_val)
     }
   }
+  if(!is.null(manual_offsets)) {
+    stopifnot(all(manual_offsets < 1 & manual_offsets > 0))
+    manual_vals = stats::approx(x=x,y=y, xout = manual_offsets)$y
+    x = c(x,manual_offsets)
+    x_order = order(x)
+    x = x[x_order]
+    y = c(y,manual_vals)
+    y = y[x_order]
+  }
   # Reverse the bevel if specified
   if(reverse) {
     y = max_height - y
@@ -135,6 +145,7 @@ generate_complex_bevel = function(bevel_type,
                                   angle = 45,
                                   curve_points = 30,
                                   reverse = FALSE,
+                                  manual_offsets = NULL,
                                   add_end_points = TRUE) {
   completed_vals = data.frame(bevel_type = bevel_type,
                               bevel_start = bevel_start,
@@ -152,6 +163,11 @@ generate_complex_bevel = function(bevel_type,
 
   for(i in seq_len(nrow(completed_vals))) {
     row = completed_vals[i, ]
+    manual_offset_segment = manual_offsets[manual_offsets >= bevel_start &
+                                           manual_offsets <= bevel_end]
+    if(length(manual_offset_segment) == 0) {
+      manual_offset_segment = NULL
+    }
     bevel_segment = generate_bevel(
       bevel_type = row$bevel_type,
       bevel_start = row$bevel_start,
@@ -160,6 +176,7 @@ generate_complex_bevel = function(bevel_type,
       angle = if (!is.null(row$angle)) row$angle else NULL,
       curve_points = row$curve_points,
       reverse = row$reverse,
+      manual_offsets = manual_offset_segment,
       initial_height = y_prev_end,  # Pass the last height of the previous bevel as the initial height
       add_end_points = FALSE
     )

@@ -6,10 +6,10 @@
 \usage{
 generate_complex_bevel(
   bevel_type,
-  bevel_start,
-  bevel_end,
-  max_height,
-  angle = NULL,
+  bevel_start = 0,
+  bevel_end = 1,
+  max_height = 1,
+  angle = 45,
   curve_points = 30,
   reverse = FALSE,
   add_end_points = TRUE

@@ -61,7 +61,6 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
       if(!first || any_picked) {
         if(is.na(tmp_source) || is.na(tmp_dest)) {
           break
-          browser()
         }
         if(tmp_source == first_node && tmp_dest == first_dest) {
           new_poly = TRUE
