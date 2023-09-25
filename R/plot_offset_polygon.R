@@ -96,7 +96,7 @@ plot_offset_polygon = function(offset_polygons, skeleton = NULL, main="Offset Po
   if (!is.null(skeleton) && plot_original_polygon) {
     # Plot the main outer polygon
     original_vertices = attr(skeleton, "original_vertices")
-    polygon(original_vertices[,1], original_vertices[,2], col=NA, border="black", lwd=linewidth)
+    graphics::polygon(original_vertices[,1], original_vertices[,2], col=NA, border="black", lwd=linewidth)
 
     # Plot holes, if they exist
     original_holes = attr(skeleton, "original_holes")
@@ -110,6 +110,6 @@ plot_offset_polygon = function(offset_polygons, skeleton = NULL, main="Offset Po
   # Plot each offset polygon
   for(i in seq_len(n_polygons)) {
     poly = offset_polygons[[i]]
-    polygon(poly$x, poly$y, col=col[i], border=border[i], lwd = linewidth)
+    graphics::polygon(poly$x, poly$y, col=col[i], border=border[i], lwd = linewidth)
   }
 }

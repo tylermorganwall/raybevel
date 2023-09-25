@@ -8,9 +8,10 @@ generate_roof(
   skeleton,
   max_height = NA,
   offset = 0,
-  bottom = FALSE,
+  base = FALSE,
   swap_yz = TRUE,
-  verbose = TRUE
+  verbose = TRUE,
+  material = material_list()
 )
 }
 \arguments{
@@ -20,16 +21,77 @@ generate_roof(
 
 \item{offset}{Default `0`. The vertical offset of the roof.}
 
-\item{bottom}{Default `FALSE`. A logical flag that controls whether to generate the bottom of the roof.}
+\item{base}{Default `FALSE`. A logical flag that controls whether to generate the bottom of the roof.}
 
 \item{swap_yz}{Default `TRUE`. A logical flag that controls whether to swap the y and z coordinates in the resulting mesh.
 If `TRUE`, the y and z coordinates will be swapped.}
 
 \item{verbose}{Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.}
+
+\item{material}{Default `material_list()`. Interface to set the color/appearance/material options for the resulting `ray_mesh` mesh.}
 }
 \value{
 A 3D mesh of the roof model.
 }
 \description{
 This function generates a 3D roof model from a straight skeleton.
+}
+\examples{
+#Generate vertices and holes
+vertices = matrix(c(0,0, 7,0, 7,7, 0,7, 0,0), ncol = 2, byrow = TRUE)-3.5
+hole_1 = matrix(c(1,1, 2,1, 2,2, 1,2, 1,1), ncol = 2, byrow = TRUE)[5:1,]-3.5
+hole_2 = matrix(c(5,5, 6,5, 6,6, 5,6, 5,5), ncol = 2, byrow = TRUE)[5:1,]-3.5
+skeleton = skeletonize(vertices, holes = list(hole_1, hole_2))
+plot_skeleton(skeleton)
+
+#Generate a roof model and specify the material
+if(run_documentation()) {
+  library(rayrender)
+  roof_model = generate_roof(skeleton, material = material_list(diffuse="purple"))
+  scene_base = xz_rect(xwidth=100,zwidth=100,material=diffuse(color="grey20", checkercolor="white")) |>
+    add_object(sphere(y=8,z=10,x=-3,material=light(intensity=100))) |>
+    add_object(sphere(y=800,z=10,x=-3,radius=100,material=light(intensity=5)))
+
+  raymesh_model(roof_model, override_material = FALSE) |>
+    add_object(scene_base) |>
+    render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue",
+                 width=800,height=800,fov=0,ortho_dimensions=c(10,10))
+}
+
+# Change the maximum height of the roof
+if(run_documentation()) {
+  roof_model = generate_roof(skeleton, max_height=5)
+  raymesh_model(roof_model, material = diffuse(color="darkred")) |>
+    add_object(scene_base) |>
+    render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue",
+                 width=800,height=800,fov=0,ortho_dimensions=c(10,10))
+}
+
+#Add an offset to the roof
+if(run_documentation()) {
+  roof_model = generate_roof(skeleton, offset = 2, base = F)
+  raymesh_model(roof_model, material = diffuse(color="darkred")) |>
+    add_object(scene_base) |>
+    render_scene(lookfrom=c(10,10,20), lookat=c(0,2,0), sample_method = "sobol_blue",
+                 width=800,height=800,fov=0,ortho_dimensions=c(10,10))
+}
+
+
+# Skeletonize and turn an {sf} object into a roof
+if(run_documentation()) {
+  us_states = spData::us_states
+  texas = us_states[us_states$NAME == "Texas",]
+  texas_skeleton = skeletonize(texas)
+  plot_skeleton(texas_skeleton, arrow_size=0.5)
+  roof_model_texas = generate_roof(texas_skeleton, max_height = 5) |>
+    center_mesh() |>
+    translate_mesh(c(0,2.5,0))
+
+  raymesh_model(roof_model_texas, material = diffuse(color="purple")) |>
+    add_object(scene_base) |>
+    add_object(sphere(x=-10,z=-10,y=5,material=light(color="red", intensity=40))) |>
+    add_object(sphere(x=10,z=-10,y=5,material=light(color="orange", intensity=40))) |>
+    render_scene(lookfrom=c(0,10,-1), sample_method = "sobol_blue",
+                 width=800,height=800,fov=0, ortho_dimensions=c(15,15))
+}
 }

@@ -4,6 +4,7 @@
 #' @param bevel_offset numeric vector. The existing offsets for the bevel.
 #' @param straight_skeleton list. Straight skeleton data structure.
 #'
+#' @keywords internal
 #' @return list. Modified bevel_height and bevel_offset vectors.
 modify_bevel_with_skeleton = function(bevel_offsets, bevel_heights, straight_skeleton) {
   if(is.list(bevel_offsets) &&

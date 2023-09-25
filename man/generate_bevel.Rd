@@ -8,13 +8,16 @@ generate_bevel(
   bevel_type = "angled",
   bevel_start = 0,
   bevel_end = 1,
-  max_height = 0.1,
+  max_height = 1,
   angle = NULL,
   curve_points = 50,
   reverse = FALSE,
+  flip = FALSE,
   initial_height = 0,
   add_end_points = TRUE,
-  step_epsilon = 1e-05
+  manual_offsets = NULL,
+  step_epsilon = 1e-05,
+  plot_bevel = FALSE
 )
 }
 \arguments{
@@ -26,19 +29,30 @@ generate_bevel(
 - "block": Generates a block-like bevel, jumping straight to the max_height and back to the base.
 - "angled": Generates a straight angled bevel. You can optionally set the 'angle' parameter for this bevel.}
 
-\item{bevel_start}{Numeric `0`. The starting point of the bevel along the curve, ranges between 0 and 1.}
+\item{bevel_start}{Default `0`. The starting point of the bevel along the curve, ranges between 0 and 1.}
 
-\item{bevel_end}{Numeric `1`. The ending point of the bevel along the curve, ranges between 0 and 1.}
+\item{bevel_end}{Default `1`. The ending point of the bevel along the curve, ranges between 0 and 1.}
 
-\item{max_height}{Numeric `0.1`. The maximum height of the bevel.}
+\item{max_height}{Default `1`. The maximum height of the bevel, as measured from the initial height.}
 
-\item{angle}{Numeric `NULL`. Optional angle parameter in degrees for angular bevels.}
+\item{angle}{Default `NULL`. Optional angle parameter in degrees for angular bevels.}
 
-\item{curve_points}{Numeric `50`. Number of points to plot for curve-based bevels.}
+\item{curve_points}{Default `50`. Number of points to plot for curve-based bevels.}
 
-\item{reverse}{Logical `FALSE`. If TRUE, the curve is reversed.}
+\item{reverse}{Default `FALSE`. If `TRUE`, the curve is reversed vertically.}
 
-\item{initial_height}{Numeric `0`. The initial height from which the bevel starts. The bevel is rescaled to fit within the range from initial_height to max_height.}
+\item{flip}{Default `FALSE`. If `TRUE`, the curve is flipped horizontally.}
+
+\item{initial_height}{Default `0`. The initial height from which the bevel starts. The bevel is rescaled to fit within the range from initial_height to max_height.}
+
+\item{add_end_points}{Default `TRUE`. Whether to ensure there is a point at zero and a point at one.}
+
+\item{manual_offsets}{Default `NULL`, none. This will force the bevel to add a point (interpolating between the two nearest points)
+at the specified offsets. This is useful when you want to add points at specific distances along the curve.}
+
+\item{step_epsilon}{Default `1e-5`. The size for the small percentage step when using a step bevel.}
+
+\item{plot_bevel}{Default `FALSE`. Whether to plot the bevel.}
 }
 \value{
 List containing 'x' and 'y', which are the coordinates of the 2D bevel profile.
@@ -48,10 +62,7 @@ Generate 2D Bevel Profile for 3D Polygons
 }
 \examples{
 # Generate a single bevel profile and plot it
-coords = generate_bevel("circular", 0.2, 0.8, 0.2)
-plot(coords$x, coords$y, type = 'l', axes = FALSE, mar = c(0, 0, 0, 0))
-title(main = "Bevel Type: Circular")
-box()
+coords = generate_bevel("circular", 0.2, 0.8, 0.2, plot_bevel = TRUE)
 
 # Plot all bevel profiles in a grid
 par(mfrow = c(4, 3), mai = c(0.2, 0.2, 0.5, 0.2))
@@ -59,10 +70,7 @@ max_height = c(1,1,1,1)
 types = rep(c("circular", "exp", "bump", "step", "block", "angled"),2)
 reverses = c(rep(FALSE,6),rep(TRUE,6))
 for(i in seq_len(length(types))) {
-  coords = generate_bevel(types[i], 0.2, 0.8, 1, angle = ifelse(types[i] == "angled", 45, NULL),
-                          reverse = reverses[i])
-  plot(coords$x, coords$y, type = 'l', main = paste("Bevel Type:", types[i]), axes = FALSE,
-       xlim = c(-0.1, 1.1), ylim = c(-0.2, 1.2), mar = c(0, 0, 0, 0), xlab = "", ylab = "")
-  box()
+  coords = generate_bevel(types[i], 0.2, 0.8, 1, flip = TRUE,
+                          angle = 45, reverse = reverses[i], plot_bevel = TRUE)
 }
 }

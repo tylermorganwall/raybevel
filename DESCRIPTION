@@ -9,12 +9,12 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports: progress,
-    Rcpp,
-    digest,
-    decido,
-    rayvertex,
-    sf
+         Rcpp,
+         digest,
+         decido,
+         rayvertex,
+         sf
 LinkingTo: Rcpp, BH, RcppCGAL
-Suggests: spData
+Suggests: spData, rayrender
 RoxygenNote: 7.2.3
 Remotes: tylermorganwall/RcppCGAL

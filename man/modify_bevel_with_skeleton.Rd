@@ -19,3 +19,4 @@ list. Modified bevel_height and bevel_offset vectors.
 \description{
 Modify bevel data using straight skeleton
 }
+\keyword{internal}
