@@ -8,14 +8,15 @@ generate_complex_bevel(
   bevel_type,
   bevel_start = 0,
   bevel_end = 1,
-  max_height = 1,
+  segment_height = 1,
   angle = 45,
   curve_points = 30,
   reverse = FALSE,
   flip = FALSE,
   manual_offsets = NULL,
   add_end_points = TRUE,
-  plot_bevel = FALSE
+  plot_bevel = FALSE,
+  overall_height = NA
 )
 }
 \arguments{
@@ -28,7 +29,7 @@ Percentage distance in the interior the polygon at which to begin the correspond
 \item{bevel_end}{Numeric vector of values between `0` and `1`.
 Percentage distance in the interior the polygon at which to end the corresponding `bevel_type`.}
 
-\item{max_height}{Numeric vector. The maximum heights of each bevel, as measured from the initial height at the end of the previous bevel.}
+\item{segment_height}{Numeric vector. The maximum heights of each bevel, as measured from the initial height at the end of the previous bevel.}
 
 \item{angle}{Default `NULL`. Numeric vector. Optional angle parameter in degrees for angular bevels (overrides values in `max_height`).}
 
@@ -44,6 +45,8 @@ at the specified offsets. This is useful when you want to add points at specific
 \item{add_end_points}{Default `TRUE`. Whether to ensure there is a point at zero and a point at one.}
 
 \item{plot_bevel}{Default `FALSE`. Whether to plot the resulting bevel.}
+
+\item{overall_height}{Default `NA`. Numeric value specifying the overall height of the curve.}
 }
 \value{
 List containing 'x' and 'y', which are the coordinates of the complex 2D bevel profile
@@ -58,7 +61,7 @@ complex_coords = generate_complex_bevel(
   bevel_type  = c("circular", "bump", "step", "block", "angled"),
   bevel_start = c(0,   0.2, 0.6, 0.7, 0.9),
   bevel_end   = c(0.2, 0.5, 0.7, 0.8, 1.0),
-  max_height  = c(0.1, 0.2, 0.2, 0.2, 0.4),
+  segment_height  = c(0.1, 0.2, 0.2, 0.2, 0.4),
   angle = 45,
   curve_points = c(50, 50, 50, 1, 1),
   reverse = c(FALSE, TRUE, FALSE, FALSE, FALSE),
@@ -69,18 +72,18 @@ complex_coords = generate_complex_bevel(
   bevel_type  = "step",
   bevel_start = head(seq(0,1,by=0.05),-1),
   bevel_end   = 1,
-  max_height  = 0.1,
+  segment_height  = 0.1,
   angle = 45,
   reverse = c(FALSE, TRUE),
   plot_bevel = TRUE
 )
-#Generate a sawtooth pattern
+#Generate an increasing sawtooth pattern with angles
 complex_coords = generate_complex_bevel(
   bevel_type  = "angled",
   bevel_start = head(seq(0,1,by=0.05),-1),
   bevel_end   = tail(seq(0,1,by=0.05),-1),
-  max_height  = 0.1,
-  angle = c(45,45),
+  segment_height  = 0.1,
+  angle = c(45,30),
   reverse = c(FALSE, TRUE),
   plot_bevel = TRUE
 )
@@ -89,7 +92,7 @@ complex_coords = generate_complex_bevel(
   bevel_type  = "step",
   bevel_start = head(seq(0,1,by=0.05),-1),
   bevel_end   = 1,
-  max_height  = 0.1,
+  segment_height  = 0.1,
   reverse = FALSE,
   plot_bevel = TRUE
 )

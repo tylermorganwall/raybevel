@@ -6,17 +6,19 @@
 \usage{
 generate_beveled_polygon(
   skeleton,
-  bevel_offsets,
+  bevel_offsets = generate_bevel(),
   bevel_heights = NULL,
   set_max_height = FALSE,
   max_height = 1,
   offset = 0,
-  base = FALSE,
+  base = TRUE,
+  base_height = NA,
   raw_offsets = FALSE,
   raw_heights = FALSE,
   swap_yz = TRUE,
   verbose = TRUE,
   double_sided = FALSE,
+  sides = FALSE,
   return_skeleton_polygons = FALSE,
   material = material_list()
 )
@@ -36,6 +38,8 @@ generate_beveled_polygon(
 
 \item{base}{Default `FALSE`. A logical flag that controls whether to generate the bottom of the polygon.}
 
+\item{base_height}{Default `NA`. Height of the base, defaulting to the minimum value of `bevel_heights`.}
+
 \item{raw_offsets}{Default `FALSE`. A logical flag indicating whether the `bevel_offsets` are already in raw format and do not need to be multiplied by the maximum time of the skeleton.}
 
 \item{raw_heights}{Default `FALSE`. A logical flag indicating whether the `bevel_heights` are already in raw format and do not need to be multiplied by the maximum time of the skeleton.}
@@ -45,6 +49,9 @@ generate_beveled_polygon(
 \item{verbose}{Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.}
 
 \item{double_sided}{Default `FALSE`. A logical flag that controls whether the polygon should be double-sided.}
+
+\item{sides}{Default `FALSE`. A logical flag on whether to draw the sides. This will automatically be set to `TRUE`
+if `base = TRUE` and the `base_height` is less than `offset`.}
 
 \item{return_skeleton_polygons}{Default `FALSE`. A logical flag that controls whether to return the skeleton polygons along with the 3D mesh.}
 

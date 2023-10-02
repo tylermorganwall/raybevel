@@ -6,6 +6,10 @@
 #' @param max_height Default `NA`. The maximum height of the roof.
 #' @param offset Default `0`. The vertical offset of the roof.
 #' @param base Default `FALSE`. A logical flag that controls whether to generate the bottom of the roof.
+#' @param base_height Default `0`. Height of the base.
+#' @param sides Default `FALSE`. A logical flag on whether to draw the sides. This will automatically be set to `TRUE`
+#' if `base = TRUE` and the `base_height` is less than `offset`.
+#' @param double_sided Default `FALSE`. A logical flag that controls whether the polygon should be double-sided.
 #' @param swap_yz Default `TRUE`. A logical flag that controls whether to swap the y and z coordinates in the resulting mesh.
 #' If `TRUE`, the y and z coordinates will be swapped.
 #' @param verbose Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.
@@ -74,7 +78,9 @@
 #'     render_scene(lookfrom=c(0,10,-1), sample_method = "sobol_blue",
 #'                  width=800,height=800,fov=0, ortho_dimensions=c(15,15))
 #' }
-generate_roof = function(skeleton, max_height = NA, offset = 0, base = FALSE,
+generate_roof = function(skeleton, max_height = NA, offset = 0,
+                         base = FALSE, base_height = 0,
+                         sides = FALSE, double_sided = FALSE,
                          swap_yz = TRUE, verbose = TRUE, material = material_list()) {
   if(inherits(skeleton, "rayskeleton_list")) {
     pb = progress::progress_bar$new(
@@ -98,6 +104,9 @@ generate_roof = function(skeleton, max_height = NA, offset = 0, base = FALSE,
       }
       meshlist[[counter]] = generate_roof(skeleton[[j]], base = base,
                                           max_height = max_height[j],
+                                          sides = sides,
+                                          double_sided = double_sided,
+                                          base_height = base_height,
                                           offset = offset[j],
                                           swap_yz=swap_yz)
       counter = counter + 1
@@ -120,62 +129,64 @@ generate_roof = function(skeleton, max_height = NA, offset = 0, base = FALSE,
   colnames(xyz) = c("x","y","z")
   original_verts = attr(skeleton,"original_vertices")
   original_holes = attr(skeleton,"original_holes")
-  if(base) {
+
+  mesh = construct_mesh(vertices = as.matrix(xyz),
+                                   indices = as.matrix(indices_all)-1)
+  if(is.na(max_height)) {
+    scale_val = c(1,1,1)
+  } else {
+    max_z = get_mesh_bbox(mesh)[2,3]
+    scale_val = c(1,1,max_height/max_z)
+  }
+
+  if(double_sided) {
+    xyzflip = xyz
+    xyzflip[,3] = -xyzflip[,3]
+    indices_flip = indices_all[,3:1]
+    double_mesh = construct_mesh(vertices = as.matrix(xyzflip),
+                                 indices = as.matrix(indices_flip)-1) |>
+      scale_mesh(scale_val) |>
+      translate_mesh(c(0, 0, base_height))
+  }
+  if(base && !double_sided) {
     if(length(original_holes) > 0) {
       holes = cumsum((unlist(lapply(original_holes,nrow)) + nrow(original_verts)) - nrow(original_holes[[1]])) + 1
       hole_mat = do.call("rbind", original_holes)
-      original_verts = rbind(original_verts,hole_mat)
+      original_verts_holes = rbind(original_verts, hole_mat)
     } else {
       holes = 0
+      original_verts_holes = original_verts
     }
-    base_indices = matrix(decido::earcut(original_verts, holes = holes), byrow=TRUE, ncol=3)
-    base_indices = base_indices[,3:1]
-    original_verts = cbind(original_verts,rep(0,nrow(original_verts)))
-    base_indices = base_indices + nrow(xyz)
-    original_verts = as.data.frame(original_verts)
-    colnames(original_verts) = c("x","y","z")
-    xyz = rbind(xyz, original_verts)
-    indices_all = rbind(indices_all,base_indices)
-    mesh = construct_mesh(vertices = as.matrix(xyz),
-                                     indices = as.matrix(indices_all)-1) |>
-      rotate_mesh(c(0,0,180))
-    if(is.na(max_height)) {
-      scale_val = c(1,1,1)
-    } else {
-      max_z = get_mesh_bbox(mesh)[2,3]
-      scale_val = c(1,1,max_height/max_z)
-    }
-    if(swap_yz) {
-      mesh = scale_mesh(mesh, scale_val) |>
-        translate_mesh(c(0,0,offset)) |>
-        rotate_mesh(angle=c(90,0,0))
-    } else {
-      mesh = scale_mesh(mesh, scale_val) |>
-        translate_mesh(c(0,0,offset))
-    }
-    mesh = set_material(mesh, material)
-    return(mesh)
+    base_indices = matrix(decido::earcut(original_verts_holes, holes = holes), byrow = TRUE, ncol=3)
+    base_indices = base_indices[,3:1,drop=FALSE]
+    original_verts_base = cbind(original_verts_holes, rep(base_height, nrow(original_verts_holes)))
+    base_mesh = construct_mesh(vertices = as.matrix(original_verts_base),
+                               indices = as.matrix(base_indices)-1)
+    mesh = scale_mesh(mesh, scale_val) |>
+      translate_mesh(c(0,0,offset)) |>
+      add_shape(base_mesh)
   } else {
-    mesh = construct_mesh(vertices = as.matrix(xyz),
-                                     indices = as.matrix(indices_all)-1) |>
-      rotate_mesh(c(0,0,180))
-    if(is.na(max_height)) {
-      scale_val = c(1,1,1)
-    } else {
-      max_z = get_mesh_bbox(mesh)[2,3]
-      scale_val = c(1,1,max_height/max_z)
-    }
-    if(swap_yz) {
+    if(double_sided) {
       mesh = scale_mesh(mesh, scale_val) |>
         translate_mesh(c(0,0,offset)) |>
-        rotate_mesh(angle=c(90,0,0))
-    } else {
-      mesh = scale_mesh(mesh, scale_val) |>
-        translate_mesh(c(0,0,offset))
+        add_shape(double_mesh)
     }
-    mesh = set_material(mesh, material)
-    return(mesh)
   }
+  if(double_sided) {
+    mesh = add_shape(mesh, double_mesh)
+  }
+  if(swap_yz) {
+    mesh = rotate_mesh(mesh, angle=c(90,0,0))
+  }
+  if(sides || (base && base_height < offset)) {
+    side_mesh = extrude_sides(original_verts, original_holes, bottom = base_height, top = offset)
+    if(swap_yz) {
+      side_mesh = rotate_mesh(side_mesh, angle=c(90,0,0))
+    }
+    mesh = add_shape(mesh, side_mesh)
+  }
+  mesh = set_material(mesh, material)
+  return(mesh)
 }
 
 #' Generate a beveled 3D polygon
@@ -191,6 +202,9 @@ generate_roof = function(skeleton, max_height = NA, offset = 0, base = FALSE,
 #' @param verbose Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.
 #' @param offset Default `0`. The vertical offset of the polygon.
 #' @param base Default `FALSE`. A logical flag that controls whether to generate the bottom of the polygon.
+#' @param base_height Default `NA`. Height of the base, defaulting to the minimum value of `bevel_heights`.
+#' @param sides Default `FALSE`. A logical flag on whether to draw the sides. This will automatically be set to `TRUE`
+#' if `base = TRUE` and the `base_height` is less than `offset`.
 #' @param raw_offsets Default `FALSE`. A logical flag indicating whether the `bevel_offsets` are already in raw format and do not need to be multiplied by the maximum time of the skeleton.
 #' @param raw_heights Default `FALSE`. A logical flag indicating whether the `bevel_heights` are already in raw format and do not need to be multiplied by the maximum time of the skeleton.
 #' @param double_sided Default `FALSE`. A logical flag that controls whether the polygon should be double-sided.
@@ -329,17 +343,19 @@ generate_roof = function(skeleton, max_height = NA, offset = 0, base = FALSE,
 #'                  width=800,height=800,fov=0, ortho_dimensions=c(15,15))
 #' }
 generate_beveled_polygon = function(skeleton,
-                                    bevel_offsets,
+                                    bevel_offsets = generate_bevel(),
                                     bevel_heights = NULL,
                                     set_max_height = FALSE,
                                     max_height = 1,
                                     offset = 0,
-                                    base = FALSE,
+                                    base = TRUE,
+                                    base_height = NA,
                                     raw_offsets = FALSE,
                                     raw_heights = FALSE,
                                     swap_yz = TRUE,
                                     verbose = TRUE,
                                     double_sided = FALSE,
+                                    sides = FALSE,
                                     return_skeleton_polygons = FALSE,
                                     material = material_list()) {
   if(inherits(skeleton, "rayskeleton_list")) {
@@ -366,6 +382,9 @@ generate_beveled_polygon = function(skeleton,
                                                      max_height = max_height[j],
                                                      raw_offsets = raw_offsets,
                                                      raw_heights = raw_heights,
+                                                     sides = sides,
+                                                     double_sided = double_sided,
+                                                     base_height = base_height,
                                                      return_skeleton_polygons = return_skeleton_polygons,
                                                      swap_yz = swap_yz,
                                                      verbose = verbose,
@@ -415,8 +434,13 @@ generate_beveled_polygon = function(skeleton,
   }
   bevel_offsets_inserted = modify_bevel_with_skeleton(bevel_offsets, bevel_heights, skeleton)
   bevel_offsets = bevel_offsets_inserted$x
-  bevel_heights = bevel_offsets_inserted$y
-  if(double_sided && min(bevel_heights) <= 0) {
+  bevel_heights = bevel_offsets_inserted$y[order(bevel_offsets)]
+  bevel_offsets = bevel_offsets[order(bevel_offsets)]
+
+  if(is.na(base_height)) {
+    base_height = min(bevel_heights)
+  }
+  if(double_sided && min(bevel_heights + base_height + offset) <= 0) {
     warning("Double-sided polygons with a minimum height at or equal to zero will intersect with each other, leading to visual artifacts.")
   }
 
@@ -424,8 +448,22 @@ generate_beveled_polygon = function(skeleton,
 
   valid_bevels = bevel_offsets <= max_time & bevel_offsets > 0
   bevel_offsets_polys = bevel_offsets[valid_bevels]
-  stopifnot(length(bevel_offsets) == length(bevel_heights))
+  bevel_heights_polys = bevel_heights[valid_bevels]
 
+  stopifnot(length(bevel_offsets_polys) == length(bevel_heights_polys))
+
+  #Remove extremely close offsets (usually arising from floating point error)
+  for(i in rev(seq_len(length(bevel_offsets_polys)))) {
+    all_other_offsets = bevel_offsets_polys[-i]
+    if(any(abs(bevel_offsets_polys[i] - all_other_offsets) < 1e-14, na.rm = TRUE)) {
+      bevel_offsets_polys[i] = NA
+    }
+  }
+  remove_close_vals = !is.na(bevel_offsets_polys)
+  bevel_offsets_polys = bevel_offsets_polys[remove_close_vals]
+  bevel_heights_polys = bevel_heights_polys[remove_close_vals]
+
+  #Generate new nodes
   beveled_ss = generate_offset_links_nodes(skeleton, bevel_offsets_polys, progress = verbose)
   cleaned_new_ss = remove_node_duplicates(beveled_ss)
   reordered_new_ss = recalculate_ordered_ids(cleaned_new_ss)
@@ -438,13 +476,19 @@ generate_beveled_polygon = function(skeleton,
     tmp_poly = nodes[tmp_ind,2:3]
     index_list[[i]] = matrix(tmp_ind[decido::earcut(tmp_poly)],byrow=TRUE,ncol=3)
   }
-  indices_all = do.call("rbind",index_list)
+  if(length(index_list) == 1) {
+    indices_all = matrix(unlist(index_list),ncol=3, byrow = TRUE)
+  } else {
+    indices_all = do.call("rbind",index_list)
+  }
   xyz = nodes[,2:4]
   new_xyz = xyz
-  if(bevel_offsets[length(bevel_offsets)] != max_time) {
-    bevel_offsets_with_max = c(bevel_offsets, max_time)
+  if(bevel_offsets_polys[length(bevel_offsets_polys)] != max_time) {
+    bevel_offsets_with_max = c(bevel_offsets_polys, max_time)
+    bevel_heights_with_max = c(bevel_heights_polys, max(bevel_heights_polys))
   } else {
-    bevel_offsets_with_max = bevel_offsets
+    bevel_offsets_with_max = bevel_offsets_polys
+    bevel_heights_with_max = bevel_heights_polys
   }
 
   if(return_skeleton_polygons) {
@@ -458,86 +502,77 @@ generate_beveled_polygon = function(skeleton,
 
   for(i in seq_len(length(bevel_offsets_with_max))) {
     flat_areas = xyz[,3] >= bevel_offsets_with_max[i]
-    new_xyz[flat_areas,3] = bevel_heights[i]
+    new_xyz[flat_areas,3] = bevel_heights_with_max[i]
   }
   xyz = new_xyz
   colnames(xyz) = c("x","y","z")
+  original_verts = attr(skeleton,"original_vertices")
+  original_holes = attr(skeleton,"original_holes")
+  mesh = construct_mesh(vertices = as.matrix(xyz),
+                        indices = as.matrix(indices_all)-1)
+  if(!set_max_height) {
+    scale_val = c(1,1,1)
+  } else {
+    max_z = get_mesh_bbox(mesh)[2,3]
+    scale_val = c(1,1,max_height/max_z)
+  }
+
   if(double_sided) {
     xyzflip = xyz
     xyzflip[,3] = -xyzflip[,3]
-    indices_flip = indices_all + nrow(xyz)
-    indices_flip = indices_flip[,3:1]
-    xyz = rbind(xyz,xyzflip)
-    indices_all = rbind(indices_all, indices_flip)
+    indices_flip = indices_all[,3:1,drop=FALSE]
+    double_mesh = construct_mesh(vertices = as.matrix(xyzflip),
+                                 indices = as.matrix(indices_flip)-1) |>
+      scale_mesh(scale_val) |>
+      translate_mesh(c(0, 0, base_height))
   }
-  if(set_max_height) {
-    xyz[,3] = xyz[,3]/max(xyz[,3])*max_height + offset
-  } else {
-    xyz[,3] = xyz[,3] + offset
-  }
-  original_verts = attr(skeleton,"original_vertices")
-  original_holes = attr(skeleton,"original_holes")
-  if(base) {
+  if(base && !double_sided) {
     if(length(original_holes) > 0) {
       holes = cumsum((unlist(lapply(original_holes,nrow)) + nrow(original_verts)) - nrow(original_holes[[1]])) + 1
       hole_mat = do.call("rbind", original_holes)
-      original_verts = rbind(original_verts,hole_mat)
+      original_verts_holes = rbind(original_verts, hole_mat)
     } else {
       holes = 0
+      original_verts_holes = original_verts
     }
-    base_indices = matrix(decido::earcut(original_verts, holes = holes),byrow=TRUE, ncol=3)
-    base_indices = base_indices[,3:1]
-    original_verts = cbind(original_verts,rep(0,nrow(original_verts)))
-    base_indices = base_indices + nrow(xyz)
-    original_verts = as.data.frame(original_verts)
-    colnames(original_verts) = c("x","y","z")
-    xyz = rbind(xyz, original_verts)
-    indices_all = rbind(indices_all,base_indices)
-    mesh = construct_mesh(vertices = as.matrix(xyz),
-                          indices = as.matrix(indices_all)-1) |>
-      rotate_mesh(c(0,0,180))
-    if(!set_max_height) {
-      scale_val = c(1,1,1)
-    } else {
-      max_z = get_mesh_bbox(mesh)[2,3]
-      scale_val = c(1,1,max_height/max_z)
-    }
-    if(swap_yz) {
-      mesh = scale_mesh(mesh, scale_val) |>
-        translate_mesh(c(0,0,offset)) |>
-        rotate_mesh(angle=c(90,0,0))
-    } else {
-      mesh = scale_mesh(mesh, scale_val) |>
-        translate_mesh(c(0,0,offset))
-    }
-    mesh = set_material(mesh, material)
-    return(mesh)
+    base_indices = matrix(decido::earcut(original_verts_holes, holes = holes), byrow = TRUE, ncol=3)
+    base_indices = base_indices[,3:1,drop = FALSE]
+    original_verts_base = cbind(original_verts_holes, rep(base_height, nrow(original_verts_holes)))
+    base_mesh = construct_mesh(vertices = as.matrix(original_verts_base),
+                               indices = as.matrix(base_indices)-1)
+    mesh = scale_mesh(mesh, scale_val) |>
+      translate_mesh(c(0, 0, offset)) |>
+      add_shape(base_mesh)
   } else {
-    mesh = construct_mesh(vertices = as.matrix(xyz),
-                                     indices = as.matrix(indices_all)-1) |>
-      rotate_mesh(c(0,0,180))
-    if(!set_max_height) {
-      scale_val = c(1,1,1)
-    } else {
-      max_z = get_mesh_bbox(mesh)[2,3]
-      scale_val = c(1,1,max_height/max_z)
-    }
-    if(swap_yz) {
+    if(double_sided) {
       mesh = scale_mesh(mesh, scale_val) |>
         translate_mesh(c(0,0,offset)) |>
-        rotate_mesh(angle=c(90,0,0))
-    } else {
-      mesh = scale_mesh(mesh, scale_val) |>
-        translate_mesh(c(0,0,offset))
+        add_shape(double_mesh)
     }
-    mesh = set_material(mesh, material)
-    return(mesh)
   }
+  if(double_sided) {
+    mesh = add_shape(mesh, double_mesh)
+  }
+  if(swap_yz) {
+    mesh = rotate_mesh(mesh, angle=c(90,0,0))
+  }
+
+  if(sides || (base && base_height < offset)) {
+    side_mesh = extrude_sides(original_verts, original_holes, bottom = base_height, top = offset)
+    if(swap_yz) {
+      side_mesh = rotate_mesh(side_mesh, angle=c(90,0,0))
+    }
+    mesh = add_shape(mesh, side_mesh)
+  }
+  mesh = set_material(mesh, material)
+  return(mesh)
 }
 
 #' Change an existing polygon bevel's bevel profile.
 #'
-#' This function generates a beveled 3D polygon model from a straight skeleton.
+#' This function generates a beveled 3D polygon model from the modified straight skeleton with
+#' pre-existing polygons generated from the `generate_beveled_polygon` function when
+#' `return_skeleton_polygons = TRUE`.
 #'
 #' @param skeleton_polygons Default `NULL`. A straight skeleton generated from the `generate_beveled_polygon` function when
 #' `return_skeleton_polygons = TRUE`.
@@ -548,8 +583,11 @@ generate_beveled_polygon = function(skeleton,
 #' @param swap_yz Default `TRUE`. A logical flag that controls whether to swap the y and z coordinates in the resulting mesh.
 #' If `TRUE`, the y and z coordinates will be swapped.
 #' @param verbose Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.
+#' @param sides Default `FALSE`. A logical flag on whether to draw the sides. This will automatically be set to `TRUE`
+#' if `base = TRUE` and the `base_height` is less than `offset`.
 #' @param offset Default `0`. The vertical offset of the polygon.
 #' @param base Default `FALSE`. A logical flag that controls whether to generate the bottom of the polygon.
+#' @param base_height Default `NA`. Height of the base, defaulting to the minimum value of `bevel_heights`.
 #' @param raw_offsets Default `FALSE`. A logical flag indicating whether the `bevel_offsets` are already in raw format and do not need to be multiplied by the maximum time of the skeleton.
 #' @param raw_heights Default `FALSE`. A logical flag indicating whether the `bevel_heights` are already in raw format and do not need to be multiplied by the maximum time of the skeleton.
 #' @param double_sided Default `FALSE`. A logical flag that controls whether the polygon should be double-sided.
@@ -570,10 +608,12 @@ change_polygon_bevel = function(skeleton_polygons,
                                 max_height = 1,
                                 offset = 0,
                                 base = FALSE,
+                                base_height = 0,
                                 raw_offsets = FALSE,
                                 raw_heights = FALSE,
                                 swap_yz = TRUE,
                                 verbose = TRUE,
+                                sides = FALSE,
                                 double_sided = FALSE,
                                 material = material_list()) {
   if(inherits(skeleton_polygons, "rayskeleton_list_polygons")) {
@@ -600,6 +640,9 @@ change_polygon_bevel = function(skeleton_polygons,
                                                  max_height = max_height[j],
                                                  raw_offsets = raw_offsets,
                                                  raw_heights = raw_heights,
+                                                 sides = sides,
+                                                 double_sided = double_sided,
+                                                 base_height = base_height,
                                                  swap_yz = swap_yz, verbose = verbose)
       counter = counter + 1
     }
@@ -643,7 +686,10 @@ change_polygon_bevel = function(skeleton_polygons,
   if(!raw_heights) {
     bevel_heights = bevel_heights * max_time
   }
-  if(double_sided && min(bevel_heights) <= 0) {
+  if(is.na(base_height)) {
+    base_height = min(bevel_heights)
+  }
+  if(double_sided && min(bevel_heights + base_height + offset) <= 0) {
     warning("Double-sided polygons with a minimum height at or equal to zero will intersect with each other, leading to visual artifacts.")
   }
 
@@ -666,9 +712,20 @@ change_polygon_bevel = function(skeleton_polygons,
   bevel_heights = bevel_heights[order(bevel_offsets)]
 
   valid_bevels = bevel_offsets <= max_time & bevel_offsets > 0
-  bevel_offsets = bevel_offsets[valid_bevels]
-  bevel_heights = bevel_heights[valid_bevels]
-  stopifnot(length(bevel_offsets) == length(bevel_heights))
+  bevel_offsets_valid = bevel_offsets[valid_bevels]
+  bevel_heights_valid = bevel_heights[valid_bevels]
+  stopifnot(length(bevel_offsets_valid) == length(bevel_heights_valid))
+
+  #Remove extremely close offsets (usually arising from floating point error)
+  for(i in rev(seq_len(length(bevel_offsets_valid)))) {
+    all_other_offsets = bevel_offsets_valid[-i]
+    if(any(abs(bevel_offsets_valid[i] - all_other_offsets) < 1e-14, na.rm = TRUE)) {
+      bevel_offsets_valid[i] = NA
+    }
+  }
+  remove_close_vals = !is.na(bevel_offsets_valid)
+  bevel_offsets_valid = bevel_offsets_valid[remove_close_vals]
+  bevel_heights_valid = bevel_heights_valid[remove_close_vals]
 
   nodes = reordered_new_ss$nodes
   index_list = list()
@@ -681,9 +738,9 @@ change_polygon_bevel = function(skeleton_polygons,
   xyz = nodes[,2:4]
 
   new_xyz = xyz
-  bevel_offsets_with_max = c(0, bevel_offsets)
-  bevel_heights_with_max = c(bevel_heights[1], bevel_heights)
-  for(i in seq_len(length(bevel_offsets_with_max)-1)) {
+  bevel_offsets_with_max = c(0, bevel_offsets_valid)
+  bevel_heights_with_max = c(bevel_heights[1], bevel_heights_valid)
+  for(i in seq_len(length(bevel_offsets_with_max))) {
     #Need to also include a tolerance due to approx() introducing some small floating point error
     flat_areas = xyz[,3] >= bevel_offsets_with_max[i] | abs(xyz[,3] - bevel_offsets_with_max[i]) < 1e-15
     new_xyz[flat_areas,3] = bevel_heights_with_max[i]
@@ -691,75 +748,64 @@ change_polygon_bevel = function(skeleton_polygons,
   xyz = new_xyz
   if(any(is.na(xyz))) {}
   colnames(xyz) = c("x","y","z")
+
+  original_verts = attr(reordered_new_ss,"original_vertices")
+  original_holes = attr(reordered_new_ss,"original_holes")
+
+  mesh = construct_mesh(vertices = as.matrix(xyz),
+                                   indices = as.matrix(indices_all)-1)
+  if(!set_max_height) {
+    scale_val = c(1,1,1)
+  } else {
+    max_z = get_mesh_bbox(mesh)[2,3]
+    scale_val = c(1,1,max_height/max_z)
+  }
   if(double_sided) {
     xyzflip = xyz
     xyzflip[,3] = -xyzflip[,3]
-    indices_flip = indices_all + nrow(xyz)
-    indices_flip = indices_flip[,3:1]
-    xyz = rbind(xyz,xyzflip)
-    indices_all = rbind(indices_all, indices_flip)
+    indices_flip = indices_all[,3:1]
+    double_mesh = construct_mesh(vertices = as.matrix(xyzflip),
+                                 indices = as.matrix(indices_flip)-1) |>
+      scale_mesh(scale_val) |>
+      translate_mesh(c(0, 0, base_height))
   }
-  if(set_max_height) {
-    xyz[,3] = xyz[,3]/max(xyz[,3])*max_height + offset
-  } else {
-    xyz[,3] = xyz[,3] + offset
-  }
-  original_verts = attr(reordered_new_ss,"original_vertices")
-  original_holes = attr(reordered_new_ss,"original_holes")
-  if(base) {
+  if(base && !double_sided) {
     if(length(original_holes) > 0) {
       holes = cumsum((unlist(lapply(original_holes,nrow)) + nrow(original_verts)) - nrow(original_holes[[1]])) + 1
       hole_mat = do.call("rbind", original_holes)
-      original_verts = rbind(original_verts,hole_mat)
+      original_verts_holes = rbind(original_verts, hole_mat)
     } else {
       holes = 0
+      original_verts_holes = original_verts
     }
-    base_indices = matrix(decido::earcut(original_verts, holes = holes),byrow=TRUE, ncol=3)
-    base_indices = base_indices[,3:1]
-    original_verts = cbind(original_verts,rep(0,nrow(original_verts)))
-    base_indices = base_indices + nrow(xyz)
-    original_verts = as.data.frame(original_verts)
-    colnames(original_verts) = c("x","y","z")
-    xyz = rbind(xyz, original_verts)
-    indices_all = rbind(indices_all,base_indices)
-    mesh = construct_mesh(vertices = as.matrix(xyz),
-                                     indices = as.matrix(indices_all)-1) |>
-      rotate_mesh(c(0,0,180))
-    if(!set_max_height) {
-      scale_val = c(1,1,1)
-    } else {
-      max_z = get_mesh_bbox(mesh)[2,3]
-      scale_val = c(1,1,max_height/max_z)
-    }
-    if(swap_yz) {
-      mesh = scale_mesh(mesh, scale_val) |>
-        translate_mesh(c(0,0,offset)) |>
-        rotate_mesh(angle=c(90,0,0))
-    } else {
-      mesh = scale_mesh(mesh, scale_val) |>
-        translate_mesh(c(0,0,offset))
-    }
-    mesh = set_material(mesh, material)
-    return(mesh)
+    base_indices = matrix(decido::earcut(original_verts_holes, holes = holes), byrow = TRUE, ncol=3)
+    base_indices = base_indices[,3:1,drop=FALSE]
+    original_verts_base = cbind(original_verts_holes, rep(base_height, nrow(original_verts_holes)))
+    base_mesh = construct_mesh(vertices = as.matrix(original_verts_base),
+                               indices = as.matrix(base_indices)-1)
+    mesh = scale_mesh(mesh, scale_val) |>
+      translate_mesh(c(0,0,offset)) |>
+      add_shape(base_mesh)
   } else {
-    mesh = construct_mesh(vertices = as.matrix(xyz),
-                                     indices = as.matrix(indices_all)-1) |>
-      rotate_mesh(c(0,0,180))
-    if(!set_max_height) {
-      scale_val = c(1,1,1)
-    } else {
-      max_z = get_mesh_bbox(mesh)[2,3]
-      scale_val = c(1,1,max_height/max_z)
-    }
-    if(swap_yz) {
+    if(double_sided) {
       mesh = scale_mesh(mesh, scale_val) |>
         translate_mesh(c(0,0,offset)) |>
-        rotate_mesh(angle=c(90,0,0))
-    } else {
-      mesh = scale_mesh(mesh, scale_val) |>
-        translate_mesh(c(0,0,offset))
+        add_shape(double_mesh)
     }
-    mesh = set_material(mesh, material)
-    return(mesh)
   }
+  if(double_sided) {
+    mesh = add_shape(mesh, double_mesh)
+  }
+  if(swap_yz) {
+    mesh = rotate_mesh(mesh, angle=c(90,0,0))
+  }
+  if(sides || (base && base_height < offset)) {
+    side_mesh = extrude_sides(original_verts, original_holes, bottom = base_height, top = offset)
+    if(swap_yz) {
+      side_mesh = rotate_mesh(side_mesh, angle=c(90,0,0))
+    }
+    mesh = add_shape(mesh, side_mesh)
+  }
+  mesh = set_material(mesh, material)
+  return(mesh)
 }

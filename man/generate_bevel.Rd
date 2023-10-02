@@ -7,7 +7,7 @@
 generate_bevel(
   bevel_type = "angled",
   bevel_start = 0,
-  bevel_end = 1,
+  bevel_end = 0.2,
   max_height = 1,
   angle = NULL,
   curve_points = 50,
@@ -31,7 +31,7 @@ generate_bevel(
 
 \item{bevel_start}{Default `0`. The starting point of the bevel along the curve, ranges between 0 and 1.}
 
-\item{bevel_end}{Default `1`. The ending point of the bevel along the curve, ranges between 0 and 1.}
+\item{bevel_end}{Default `0.2`. The ending point of the bevel along the curve, ranges between 0 and 1.}
 
 \item{max_height}{Default `1`. The maximum height of the bevel, as measured from the initial height.}
 

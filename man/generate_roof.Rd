@@ -9,6 +9,9 @@ generate_roof(
   max_height = NA,
   offset = 0,
   base = FALSE,
+  base_height = 0,
+  sides = FALSE,
+  double_sided = FALSE,
   swap_yz = TRUE,
   verbose = TRUE,
   material = material_list()
@@ -22,6 +25,13 @@ generate_roof(
 \item{offset}{Default `0`. The vertical offset of the roof.}
 
 \item{base}{Default `FALSE`. A logical flag that controls whether to generate the bottom of the roof.}
+
+\item{base_height}{Default `0`. Height of the base.}
+
+\item{sides}{Default `FALSE`. A logical flag on whether to draw the sides. This will automatically be set to `TRUE`
+if `base = TRUE` and the `base_height` is less than `offset`.}
+
+\item{double_sided}{Default `FALSE`. A logical flag that controls whether the polygon should be double-sided.}
 
 \item{swap_yz}{Default `TRUE`. A logical flag that controls whether to swap the y and z coordinates in the resulting mesh.
 If `TRUE`, the y and z coordinates will be swapped.}

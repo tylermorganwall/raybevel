@@ -13,7 +13,7 @@ modify_bevel_with_skeleton = function(bevel_offsets, bevel_heights, straight_ske
     bevel_heights = bevel_offsets$y
     bevel_offsets = bevel_offsets$x
   }
-  # Extract unique times from the straight skeleton's nodes that are not already in the bevel
+  # Extract skeleton's nodes that are not already in the bevel
   unique_times = unique(straight_skeleton$nodes$time)
   unique_times = setdiff(unique_times, bevel_offsets)
   unique_times = unique_times[unique_times < max(bevel_offsets)]

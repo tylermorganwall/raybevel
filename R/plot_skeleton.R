@@ -46,7 +46,7 @@
 plot_skeleton = function(skeleton, use_arrow = TRUE, xlim = c(0,1), ylim = c(0,1), add = FALSE,
                          arrow_color = "red", polygon_color = "black", size = 1, arrow_size = 1) {
   # Check if skeleton is valid
-  if (!inherits(skeleton, "rayskeleton")) {
+  if (!inherits(skeleton, c("rayskeleton","rayskeleton_polygon"))) {
     stop("Invalid input: The input is not of class 'rayskeleton'")
   }
 

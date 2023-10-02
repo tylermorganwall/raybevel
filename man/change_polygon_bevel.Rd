@@ -12,10 +12,12 @@ change_polygon_bevel(
   max_height = 1,
   offset = 0,
   base = FALSE,
+  base_height = 0,
   raw_offsets = FALSE,
   raw_heights = FALSE,
   swap_yz = TRUE,
   verbose = TRUE,
+  sides = FALSE,
   double_sided = FALSE,
   material = material_list()
 )
@@ -36,6 +38,8 @@ change_polygon_bevel(
 
 \item{base}{Default `FALSE`. A logical flag that controls whether to generate the bottom of the polygon.}
 
+\item{base_height}{Default `NA`. Height of the base, defaulting to the minimum value of `bevel_heights`.}
+
 \item{raw_offsets}{Default `FALSE`. A logical flag indicating whether the `bevel_offsets` are already in raw format and do not need to be multiplied by the maximum time of the skeleton.}
 
 \item{raw_heights}{Default `FALSE`. A logical flag indicating whether the `bevel_heights` are already in raw format and do not need to be multiplied by the maximum time of the skeleton.}
@@ -45,6 +49,9 @@ If `TRUE`, the y and z coordinates will be swapped.}
 
 \item{verbose}{Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.}
 
+\item{sides}{Default `FALSE`. A logical flag on whether to draw the sides. This will automatically be set to `TRUE`
+if `base = TRUE` and the `base_height` is less than `offset`.}
+
 \item{double_sided}{Default `FALSE`. A logical flag that controls whether the polygon should be double-sided.}
 
 \item{material}{Default `material_list()`. Interface to set the color/appearance/material options for the resulting `ray_mesh` mesh.}
@@ -53,7 +60,9 @@ If `TRUE`, the y and z coordinates will be swapped.}
 A 3D mesh of the beveled polygon model.
 }
 \description{
-This function generates a beveled 3D polygon model from a straight skeleton.
+This function generates a beveled 3D polygon model from the modified straight skeleton with
+pre-existing polygons generated from the `generate_beveled_polygon` function when
+`return_skeleton_polygons = TRUE`.
 }
 \examples{
 # example code
