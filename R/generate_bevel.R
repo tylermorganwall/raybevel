@@ -218,12 +218,29 @@ generate_complex_bevel = function(bevel_type,
   # Sort by bevel_start for sequential generation
   completed_vals = completed_vals[order(completed_vals$bevel_start), ]
 
+  # Add stop time to step types
+  for(i in seq_len(nrow(completed_vals))) {
+    if(completed_vals[i,"bevel_type"] == "step") {
+      completed_vals[i,"bevel_end"] = completed_vals[i,"bevel_start"] + 1e-5
+    }
+  }
+  # Error if the bevels overlap
+  for(i in seq_len(nrow(completed_vals)-1)) {
+    if(completed_vals[i,"bevel_end"] > completed_vals[i + 1,"bevel_start"]) {
+      stop(sprintf("%ith `bevel_start` (%0.3f) starts before %ith `bevel_end` (%0.3f)",
+                   i+i, i, completed_vals[i + 1,"bevel_start"], completed_vals[i,"bevel_end"]))
+    }
+  }
   x = c()
   y = c()
   y_prev_end = 0
 
+  manual_offsets_bool = rep(FALSE, length(manual_offsets))
+
   for(i in seq_len(nrow(completed_vals))) {
     row = completed_vals[i, ]
+    manual_offsets_bool[manual_offsets >= row$bevel_start &
+                        manual_offsets <= row$bevel_end] = TRUE
     manual_offset_segment = manual_offsets[manual_offsets >= row$bevel_start &
                                            manual_offsets <= row$bevel_end]
     if(length(manual_offset_segment) == 0) {
@@ -268,6 +285,21 @@ generate_complex_bevel = function(bevel_type,
   duplicated_x = duplicated(x)
   x = x[!duplicated_x]
   y = y[!duplicated_x]
+
+  if(any(manual_offsets_bool)) {
+    manual_offsets_remaining = manual_offsets[!manual_offsets_bool]
+    manual_heights_insert = stats::approx(x=x,y=y, xout = manual_offsets_remaining)$y
+    x = c(x,manual_offsets_remaining)
+    y = c(y,manual_heights_insert)
+    order_x = order(x)
+    x = x[order_x]
+    y = y[order_x]
+  }
+
+  duplicated_x = duplicated(x)
+  x = x[!duplicated_x]
+  y = y[!duplicated_x]
+
 
   if(!is.na(overall_height)) {
     stopifnot(is.numeric(overall_height) && length(overall_height) == 1)

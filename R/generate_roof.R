@@ -447,6 +447,7 @@ generate_beveled_polygon = function(skeleton,
   stopifnot(length(offset) == 1)
 
   valid_bevels = bevel_offsets <= max_time & bevel_offsets > 0
+  zero_height_val = bevel_heights[1]
   bevel_offsets_polys = bevel_offsets[valid_bevels]
   bevel_heights_polys = bevel_heights[valid_bevels]
 
@@ -483,6 +484,9 @@ generate_beveled_polygon = function(skeleton,
   }
   xyz = nodes[,2:4]
   new_xyz = xyz
+  bevel_offsets_polys = c(0,bevel_offsets_polys)
+  bevel_heights_polys = c(zero_height_val,bevel_heights_polys)
+
   if(bevel_offsets_polys[length(bevel_offsets_polys)] != max_time) {
     bevel_offsets_with_max = c(bevel_offsets_polys, max_time)
     bevel_heights_with_max = c(bevel_heights_polys, max(bevel_heights_polys))
@@ -712,6 +716,7 @@ change_polygon_bevel = function(skeleton_polygons,
   bevel_heights = bevel_heights[order(bevel_offsets)]
 
   valid_bevels = bevel_offsets <= max_time & bevel_offsets > 0
+  zero_height_val = bevel_heights[1]
   bevel_offsets_valid = bevel_offsets[valid_bevels]
   bevel_heights_valid = bevel_heights[valid_bevels]
   stopifnot(length(bevel_offsets_valid) == length(bevel_heights_valid))
@@ -738,15 +743,16 @@ change_polygon_bevel = function(skeleton_polygons,
   xyz = nodes[,2:4]
 
   new_xyz = xyz
-  bevel_offsets_with_max = c(0, bevel_offsets_valid)
-  bevel_heights_with_max = c(bevel_heights[1], bevel_heights_valid)
+
+  bevel_offsets_with_max = c(0,bevel_offsets_valid)
+  bevel_heights_with_max = c(zero_height_val,bevel_heights_valid)
   for(i in seq_len(length(bevel_offsets_with_max))) {
     #Need to also include a tolerance due to approx() introducing some small floating point error
     flat_areas = xyz[,3] >= bevel_offsets_with_max[i] | abs(xyz[,3] - bevel_offsets_with_max[i]) < 1e-15
     new_xyz[flat_areas,3] = bevel_heights_with_max[i]
   }
   xyz = new_xyz
-  if(any(is.na(xyz))) {}
+
   colnames(xyz) = c("x","y","z")
 
   original_verts = attr(reordered_new_ss,"original_vertices")
@@ -800,7 +806,8 @@ change_polygon_bevel = function(skeleton_polygons,
     mesh = rotate_mesh(mesh, angle=c(90,0,0))
   }
   if(sides || (base && base_height < offset)) {
-    side_mesh = extrude_sides(original_verts, original_holes, bottom = base_height, top = offset)
+    min_offset = bevel_heights_with_max[1]
+    side_mesh = extrude_sides(original_verts, original_holes, bottom = base_height, top = offset + min_offset)
     if(swap_yz) {
       side_mesh = rotate_mesh(side_mesh, angle=c(90,0,0))
     }
