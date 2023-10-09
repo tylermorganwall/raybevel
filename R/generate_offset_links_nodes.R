@@ -45,19 +45,14 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
     counter = 1
     first = TRUE
     new_poly = TRUE
-    #This list contains any sub-polygons that the loop encounters
-    sub_polygons = list()
-    sub_polygon_counter = 1
 
     any_picked = FALSE
-
-    original_first_source = first_node
-    original_first_dest = first_dest
-    changed_first = FALSE
     while(first || !(tmp_source == first_node && tmp_dest == first_dest) ||
           sum(!links$visited) != 0) {
-      # print(c(first_node, first_dest, tmp_source, tmp_dest, sum(!links$visited),
-      #         offset, nodes[tmp_source,"time"], nodes[tmp_dest,"time"], ii, num_polygons, sub_polygon_counter ))
+      non_visited_links = links[!links$visited,]
+      # print(c(first_node, first_dest, tmp_source, tmp_dest, offset, sum(!links$visited)))
+
+              # offset, nodes[tmp_source,"time"], nodes[tmp_dest,"time"], ii, num_polygons, sub_polygon_counter ))
       if(!first || any_picked) {
         if(is.na(tmp_source) || is.na(tmp_dest)) {
           break
@@ -78,6 +73,12 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
         }
       }
 
+      if((all(non_visited_links$destination_time == offset & non_visited_links$local_maxima_destination) ||
+         all(non_visited_links$source_time == offset & non_visited_links$local_maxima_source)) &
+         new_poly) {
+        break
+      }
+
       first = FALSE
       node1_position = as.numeric(nodes[nodes$id == tmp_source,2:3])
       node2_position = as.numeric(nodes[nodes$id == tmp_dest,2:3])
@@ -88,14 +89,14 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
                        (links$destination == tmp_source &
                         links$source == tmp_dest))
       #   # browser()
-      #   plot_skeleton(ss)
-      #   # cols = c("red","green","blue")
-      #   polynodes = do.call("rbind",new_node_info)
-      #   polygon(polynodes[polynodes[,1] == num_polygons,5:6], col="purple")
-      #
-      #   segments(node1_position[1],node1_position[2],node2_position[1],node2_position[2],
-      #            col="green", lwd=3)
-      #   Sys.sleep(0.1)
+        # plot_skeleton(ss)
+        # # cols = c("red","green","blue")
+        # polynodes = do.call("rbind",new_node_info)
+        # polygon(polynodes[polynodes[,1] == num_polygons,5:6], col="purple")
+        #
+        # segments(node1_position[1],node1_position[2],node2_position[1],node2_position[2],
+        #          col="green", lwd=3)
+        # Sys.sleep(0.1)
 
       stopifnot(length(link_idx) == 1)
       links$visited[link_idx] = TRUE
@@ -213,7 +214,7 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
       if(any_picked) {
         tmp_source = best_source
         tmp_dest = best_dest
-      } else {}
+      }
     }
     all_new_nodes = do.call("rbind",new_node_info)
 

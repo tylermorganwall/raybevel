@@ -8,7 +8,6 @@ identify_maxima_nodes = function(straight_skeleton) {
   links = straight_skeleton$links
 
   local_maxima = list()
-  global_maxima = list()
 
   for(i in seq_len(nrow(nodes))) {
     node_id = nodes[i, 'id']
@@ -21,7 +20,7 @@ identify_maxima_nodes = function(straight_skeleton) {
     neighbor_times = nodes[nodes$id %in% neighbors, 'time']
 
     # Check if the node is a local maximum
-    if(all(node_time > neighbor_times)) {
+    if(all(node_time >= neighbor_times)) {
       local_maxima[[i]] = node_id
     }
   }

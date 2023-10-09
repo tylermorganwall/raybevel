@@ -44,7 +44,8 @@
 #'   plot_skeleton(skeletonize(texas), arrow_size=0.5)
 #' }
 plot_skeleton = function(skeleton, use_arrow = TRUE, xlim = c(0,1), ylim = c(0,1), add = FALSE,
-                         arrow_color = "red", polygon_color = "black", size = 1, arrow_size = 1) {
+                         arrow_color = "red", polygon_color = "black", size = 1, arrow_size = 1,
+                         highlight_links = NULL, highlight_color = "purple") {
   # Check if skeleton is valid
   if (!inherits(skeleton, c("rayskeleton","rayskeleton_polygon"))) {
     stop("Invalid input: The input is not of class 'rayskeleton'")
@@ -81,7 +82,12 @@ plot_skeleton = function(skeleton, use_arrow = TRUE, xlim = c(0,1), ylim = c(0,1
   min_dev_size = min(grDevices::dev.size())
   arrow_size_full = min_dev_size/50 * arrow_size
   # Plot straight skeleton
-  for (i in 1:nrow(skeleton$links)) {
+  for (i in seq_len(nrow(skeleton$links))) {
+    if(i %in% highlight_links) {
+      arr_color = highlight_color
+    } else {
+      arr_color = arrow_color
+    }
     if(use_arrow) {
       x0=skeleton$nodes[skeleton$links$source[i], 'x']
       x1=skeleton$nodes[skeleton$links$destination[i], 'x']
@@ -92,16 +98,16 @@ plot_skeleton = function(skeleton, use_arrow = TRUE, xlim = c(0,1), ylim = c(0,1
                        x1 = interp_pos[1],
                        y0 = y0,
                        y1 = interp_pos[2],
-                       col = arrow_color, lwd=2, length = arrow_size_full, angle = 20)
+                       col = arr_color, lwd=2, length = arrow_size_full, angle = 20)
       graphics::segments(x1 = x1,
                          x0 = interp_pos[1],
                          y1 = y1,
                          y0 = interp_pos[2],
-                         col = arrow_color, lwd = 2)
+                         col = arr_color, lwd = 2)
     } else {
       graphics::lines(c(skeleton$nodes[skeleton$links$source[i], 'x'], skeleton$nodes[skeleton$links$destination[i], 'x']),
                       c(skeleton$nodes[skeleton$links$source[i], 'y'], skeleton$nodes[skeleton$links$destination[i], 'y']),
-                      col=arrow_color, lwd=2)
+                      col=arr_color, lwd=2)
     }
   }
 

@@ -709,7 +709,8 @@ change_polygon_bevel = function(skeleton_polygons,
   } else {
     bevel_heights_with_last = bevel_heights
   }
-  interpolated_data = stats::approx(x = bevel_offsets_pct, y = bevel_heights_with_last, xout = old_bevel_offsets)
+  interpolated_data = stats::approx(x = bevel_offsets_pct, y = bevel_heights_with_last, xout = old_bevel_offsets,
+                                    rule = 2)
   bevel_heights = interpolated_data$y
   bevel_offsets = old_bevel_offsets * max_time
   bevel_offsets = bevel_offsets[order(bevel_offsets)]
