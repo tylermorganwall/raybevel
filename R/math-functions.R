@@ -44,6 +44,12 @@ unit_vector = function(v) {
 
 #' Interpolate Location
 #'
+#' @param node_start Length-2 Numeric x/y position
+#' @param node_end   Length-2 Numeric x/y position
+#' @param height_start Length-1 Numeric height at start node
+#' @param height_end   Length-1 Numeric height at end node
+#' @param height Length-1 Numeric height at which to interpolate
+#'
 #' @keywords internal
 interpolate_location = function(node_start,
                                 node_end,

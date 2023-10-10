@@ -13,7 +13,9 @@ plot_skeleton(
   arrow_color = "red",
   polygon_color = "black",
   size = 1,
-  arrow_size = 1
+  arrow_size = 1,
+  highlight_links = NULL,
+  highlight_color = "purple"
 )
 }
 \arguments{

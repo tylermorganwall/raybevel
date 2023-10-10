@@ -14,7 +14,7 @@ Imports: progress,
          decido,
          rayvertex,
          sf
-LinkingTo: Rcpp, BH, RcppCGAL
+LinkingTo: Rcpp, BH, RcppCGAL, progress, RcppThread
 Suggests: spData, rayrender
 RoxygenNote: 7.2.3
 Remotes: tylermorganwall/RcppCGAL

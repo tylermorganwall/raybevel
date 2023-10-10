@@ -1,3 +1,4 @@
+## usethis namespace: start
 #' @useDynLib rayskeleton, .registration = TRUE
-#' @importFrom Rcpp evalCpp
+## usethis namespace: end
 NULL
