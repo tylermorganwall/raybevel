@@ -306,27 +306,30 @@ insert_polygon_links_nodes = function(ss, new_links_all) {
         old_source_time = old_link$source_time
         old_destination_time = old_link$destination_time
 
-        links_to_remove[[counter]] = link_remove_idx
-        new_link_list[[counter]] = data.frame(source = c(old_source,new_id),
-                                          destination = c(new_id,old_destination),
-                                          source_time = c(old_source_time, new_time),
-                                          destination_time = c(new_time, old_destination_time),
-                                          edge = FALSE,
-                                          link_remove = link_remove_idx,
-                                          old_source_id = old_source,
-                                          old_dest_id = old_destination) #We will remove this variable before joining
-        new_link_list_poly[[counter]] = data.frame(source = new_id,
-                                                   destination = poly_id,
-                                                   source_time = new_time,
-                                                   destination_time = new_time,
-                                                   edge = FALSE)
-        counter = counter + 1
+        if(old_source != new_id) {
+          links_to_remove[[counter]] = link_remove_idx
+          new_link_list[[counter]] = data.frame(source = c(old_source,new_id),
+                                            destination = c(new_id,old_destination),
+                                            source_time = c(old_source_time, new_time),
+                                            destination_time = c(new_time, old_destination_time),
+                                            edge = FALSE,
+                                            link_remove = link_remove_idx,
+                                            old_source_id = old_source,
+                                            old_dest_id = old_destination) #We will remove this variable before joining
+          new_link_list_poly[[counter]] = data.frame(source = new_id,
+                                                     destination = poly_id,
+                                                     source_time = new_time,
+                                                     destination_time = new_time,
+                                                     edge = FALSE)
+          counter = counter + 1
+        }
       }
     }
   }
   new_nodes = do.call("rbind", new_node_list)
   new_skeleton_links_raw = do.call("rbind",new_link_list)
   links_to_slice = split(new_skeleton_links_raw,new_skeleton_links_raw[,6])
+  # browser()
   new_links = lapply(links_to_slice, process_sliced_links)
   new_skeleton_links = do.call("rbind",new_links)
   new_poly_links = do.call("rbind", new_link_list_poly)
@@ -339,7 +342,6 @@ insert_polygon_links_nodes = function(ss, new_links_all) {
   class(new_ss) = "rayskeleton"
   attr(new_ss, "original_vertices") = attr(ss, "original_vertices")
   attr(new_ss, "original_holes") = attr(ss, "original_holes")
-  # new_ss_inc = make_incremental_nodes(new_ss)
   new_ss_no_dupe = remove_node_duplicates(new_ss)
   return(new_ss_no_dupe)
 }

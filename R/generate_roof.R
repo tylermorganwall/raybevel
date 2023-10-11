@@ -466,8 +466,8 @@ generate_beveled_polygon = function(skeleton,
 
   #Generate new nodes
   beveled_ss = generate_offset_links_nodes(skeleton, bevel_offsets_polys, progress = verbose)
-  cleaned_new_ss = remove_node_duplicates(beveled_ss)
-  reordered_new_ss = recalculate_ordered_ids(cleaned_new_ss)
+  # cleaned_new_ss = remove_node_duplicates(beveled_ss) #already done in generate_offset_links_nodes
+  reordered_new_ss = recalculate_ordered_ids(beveled_ss)
   polygon_ind = convert_ss_to_polygons(reordered_new_ss, progress = verbose)
 
   nodes = reordered_new_ss$nodes

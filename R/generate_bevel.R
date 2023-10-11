@@ -42,7 +42,7 @@ generate_bevel = function(bevel_type = "angled", bevel_start = 0, bevel_end = 0.
                           reverse = FALSE, flip = FALSE,
                           initial_height = 0, add_end_points = TRUE,
                           manual_offsets = NULL,
-                          step_epsilon = 1e-5,
+                          step_epsilon = 1e-8,
                           plot_bevel = FALSE) {
   # Check angle constraint if bevel_type is angled
   if(bevel_type == "angled") {
