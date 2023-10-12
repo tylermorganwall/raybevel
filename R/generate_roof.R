@@ -150,7 +150,7 @@ generate_roof = function(skeleton, max_height = NA, offset = 0,
   }
   if(base && !double_sided) {
     if(length(original_holes) > 0) {
-      holes = cumsum(unlist(lapply(original_holes,nrow))) + nrow(original_verts) - nrow(original_holes[[1]]) + 1
+      holes = c(0,head(unlist(lapply(original_holes,nrow)),-1)) + nrow(original_verts) + 1
       hole_mat = do.call("rbind", original_holes)
       original_verts_holes = rbind(original_verts, hole_mat)
     } else {
@@ -466,7 +466,6 @@ generate_beveled_polygon = function(skeleton,
 
   #Generate new nodes
   beveled_ss = generate_offset_links_nodes(skeleton, bevel_offsets_polys, progress = verbose)
-  # cleaned_new_ss = remove_node_duplicates(beveled_ss) #already done in generate_offset_links_nodes
   reordered_new_ss = recalculate_ordered_ids(beveled_ss)
   polygon_ind = convert_ss_to_polygons(reordered_new_ss, progress = verbose)
 
@@ -532,7 +531,7 @@ generate_beveled_polygon = function(skeleton,
   }
   if(base && !double_sided) {
     if(length(original_holes) > 0) {
-      holes = cumsum(unlist(lapply(original_holes,nrow))) + nrow(original_verts) - nrow(original_holes[[1]]) + 1
+      holes = c(0,head(unlist(lapply(original_holes,nrow)),-1)) + nrow(original_verts) + 1
       hole_mat = do.call("rbind", original_holes)
       original_verts_holes = rbind(original_verts, hole_mat)
     } else {
@@ -778,7 +777,7 @@ change_polygon_bevel = function(skeleton_polygons,
   }
   if(base && !double_sided) {
     if(length(original_holes) > 0) {
-      holes = cumsum(unlist(lapply(original_holes,nrow))) + nrow(original_verts) - nrow(original_holes[[1]]) + 1
+      holes = c(0,head(unlist(lapply(original_holes,nrow)),-1)) + nrow(original_verts) + 1
       hole_mat = do.call("rbind", original_holes)
       original_verts_holes = rbind(original_verts, hole_mat)
     } else {

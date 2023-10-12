@@ -44,7 +44,7 @@
 #'   plot_skeleton(skeletonize(texas), arrow_size=0.5)
 #' }
 plot_skeleton = function(skeleton, use_arrow = TRUE, xlim = c(0,1), ylim = c(0,1), add = FALSE,
-                         arrow_color = "red", polygon_color = "black", size = 1, arrow_size = 1,
+                         arrow_color = "red", polygon_color = "black", size = 1, arrow_size = 1, arrow_lwd = 1,
                          highlight_links = NULL, highlight_color = "purple") {
   # Check if skeleton is valid
   if (!inherits(skeleton, c("rayskeleton","rayskeleton_polygon"))) {
@@ -98,16 +98,16 @@ plot_skeleton = function(skeleton, use_arrow = TRUE, xlim = c(0,1), ylim = c(0,1
                        x1 = interp_pos[1],
                        y0 = y0,
                        y1 = interp_pos[2],
-                       col = arr_color, lwd=2, length = arrow_size_full, angle = 20)
+                       col = arr_color, lwd=arrow_lwd, length = arrow_size_full, angle = 20)
       graphics::segments(x1 = x1,
                          x0 = interp_pos[1],
                          y1 = y1,
                          y0 = interp_pos[2],
-                         col = arr_color, lwd = 2)
+                         col = arr_color, lwd = arrow_lwd)
     } else {
       graphics::lines(c(skeleton$nodes[skeleton$links$source[i], 'x'], skeleton$nodes[skeleton$links$destination[i], 'x']),
                       c(skeleton$nodes[skeleton$links$source[i], 'y'], skeleton$nodes[skeleton$links$destination[i], 'y']),
-                      col=arr_color, lwd=2)
+                      col=arr_color, lwd=arrow_lwd)
     }
   }
 
@@ -116,12 +116,12 @@ plot_skeleton = function(skeleton, use_arrow = TRUE, xlim = c(0,1), ylim = c(0,1
   # Plot holes if any
   if (length(original_holes) > 0) {
     for (hole in original_holes) {
-      graphics::polygon(hole[, 1], hole[, 2], col=NA, lwd=2, border=polygon_color)
+      graphics::polygon(hole[, 1], hole[, 2], col=NA, lwd=arrow_lwd, border=polygon_color)
     }
   }
 
   original_vertices = attr(skeleton, "original_vertices")
 
   # Plot original polygon
-  graphics::polygon(original_vertices[, 1], original_vertices[, 2], border=polygon_color, lwd=2, col=NA)
+  graphics::polygon(original_vertices[, 1], original_vertices[, 2], border=polygon_color, lwd=arrow_lwd, col=NA)
 }
