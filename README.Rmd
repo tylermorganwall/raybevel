@@ -19,16 +19,16 @@ knitr::opts_chunk$set(
 options(cores=8)
 ```
 
-# rayskeleton
+# raybevel
 
 <!-- badges: start -->
-  [![R-CMD-check](https://github.com/tylermorganwall/rayskeleton/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tylermorganwall/rayskeleton/actions/workflows/R-CMD-check.yaml)
+  [![R-CMD-check](https://github.com/tylermorganwall/raybevel/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tylermorganwall/raybevel/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-  rayskeleton: Straight Skeletons and Their Applications <img src="man/figures/rayskeleton_hexlogo_small.png" align="right" />
-  =========================================================
+raybevel: 3D Bevels and Straight Skeletons in R <img src="man/figures/raybevel_hex_small.png" align="right" />
+=========================================================
 
-  `rayskeleton` is an R package that can create and visualize straight skeletons, generate offset polygons, and generate 3D roof models and 3D beveled polygons. The 3D beveled polygons can be given any arbitrary 1D bevel profile controlled by the user.
+`raybevel` is an R package that can create and visualize straight skeletons, generate offset polygons, and generate 3D roof models and 3D beveled polygons. The 3D beveled polygons can be given any arbitrary 1D bevel profile controlled by the user.
 
 ## Background
 
@@ -37,6 +37,8 @@ Straight skeletons are geometric objects obtained by shrinking polygon boundarie
 - Offsetting polygons: Creating inner margins for a given polygon.
 - Roof designs: Generating planar straight-line drawings that represent the roof of a structure.
 - Beveling: Designing roof structures with sloping sides.
+
+`raybevel` generates straight skeletons from polygons and uses these structures to generate 3D meshes and offset polygons.
 
 ## Features
 
@@ -50,11 +52,11 @@ Straight skeletons are geometric objects obtained by shrinking polygon boundarie
 
 ## Installation
 
-`rayskeleton` can be installed from Github:
+`raybevel` can be installed from Github:
 
 ```{r initialize, eval=FALSE}
 install.packages("remotes")
-remotes::install_github("tylermorganwall/rayskeleton")
+remotes::install_github("tylermorganwall/raybevel")
 library(spData)
 ```
 
@@ -63,7 +65,7 @@ library(spData)
 First, let's load the library and generate a polygon with holes.
 
 ```{r simple_poly, fig.width=6,fig.height=6}
-library(rayskeleton)
+library(raybevel)
 #Define a simple polygon
 vertices = matrix(c(0,0, 7,0, 7,7, 0,7, 0,0), ncol = 2, byrow = TRUE)-3.5
 # Holes inside the polygon
@@ -98,10 +100,10 @@ plot_offset_polygon(offset_polygon, skeleton = skeleton)
 We can also plot multiple offsets and use color palettes.
 
 ```{r multioffsets, fig.width=6,fig.height=6}
+library(patchwork)
 offset_polygon = generate_offset_polygon(skeleton, offset = seq(0,2.5,by=0.1))
-plot.new()
-plot_offset_polygon(offset_polygon,skeleton = skeleton, palette_border = heat.colors, linewidth = 4)
-plot_skeleton(skeleton, add=TRUE, arrow_color = "black", polygon_color = "black")
+plot_skeleton(skeleton, arrow_color = "black", polygon_color = "black") + 
+plot_offset_polygon(offset_polygon,skeleton = skeleton, plot_original_polygon = TRUE)
 
 ```
 
@@ -124,7 +126,7 @@ And here is a beveled roof (here, setting the base height to the level of the gr
 
 ```{r bevelroof}
 roof_bevel = generate_beveled_polygon(skeleton, base = TRUE, base_height = -0.5,
-                                      bevel_offsets = generate_bevel("circular", max_height = 0.5,
+                                      bevel_offsets = generate_bevel("circular", max_height = 1,
                                                                       bevel_end = 0.5))
 
 generate_ground(depth = -0.5,material = diffuse(color="grey", checkercolor = "white")) |>
@@ -134,14 +136,13 @@ generate_ground(depth = -0.5,material = diffuse(color="grey", checkercolor = "wh
                min_variance = 1e-6, clamp_value = 10, samples=256, width=800,height=800)
 ```
 
-Multiple bevels are also supported (here, we use raw offsets and heights):
+Multiple bevels are also supported (here, we use raw distance offsets, rather than percentage):
 
 ```{r multibevelroof}
 roof_bevel_multi = generate_beveled_polygon(skeleton, 
                                             bevel_offsets = c(0.25,0.5,1,1.5,2),
                                             bevel_heights = c(0.25,0.25,0.5,0.5,0.75)*2,
-                                            raw_offsets = TRUE, base = TRUE, base_height = -0.5,
-                                            raw_heights = TRUE) 
+                                            raw_offsets = TRUE, base = TRUE, base_height = -0.5) 
 
 generate_ground(depth = -0.5,material = diffuse(color="grey", checkercolor = "white")) |>
   add_object(raymesh_model(roof_bevel_multi, material = diffuse(color="dodgerblue"), override_material = TRUE)) |>
@@ -156,8 +157,7 @@ You can use this to generate smooth variations in roof height:
 roof_bevel_multi = generate_beveled_polygon(skeleton, base_height = -0.5,
                                             bevel_offsets = seq(0,2.5,by=0.02),
                                             bevel_heights = sqrt(seq(0,2.5,by=0.02))*2,
-                                            raw_offsets = TRUE,
-                                            raw_heights = TRUE) 
+                                            raw_offsets = TRUE) 
 
 generate_ground(depth = -0.5,material = diffuse(color="grey", checkercolor = "white")) |>
   add_object(raymesh_model(roof_bevel_multi, material = diffuse(color="dodgerblue"), override_material = TRUE)) |>
@@ -171,10 +171,9 @@ And you can specify more complex functions for bevel height as well:
 ```{r functionbevelroof}
 roof_bevel_multi_sin = generate_beveled_polygon(skeleton, 
                                                 bevel_offsets = seq(0,2.5,by=0.02),
-                                                bevel_heights = abs(sinpi(seq(0,2.5,by=0.02))),
-                                                base = TRUE, base_height = -0.5,
-                                                raw_offsets = TRUE, 
-                                                raw_heights = TRUE) 
+                                                bevel_heights = abs(sinpi(exp(seq(0,2.5,by=0.02))/2)),
+                                                base = TRUE, offset=1, base_height = -0.5,
+                                                raw_offsets = TRUE) 
 
 generate_ground(depth = -0.5,material = diffuse(color="grey", checkercolor = "white")) |>
   add_object(raymesh_model(roof_bevel_multi_sin, material = diffuse(color="dodgerblue"), override_material = TRUE)) |>
@@ -223,8 +222,8 @@ bevel = generate_complex_bevel(c("bump", "exp"),
 Now let's create a vertically-oriented (by turning `swap_yz = FALSE` 3D polygon of California and render it as a glossy, double-sided model. 
 
 ```{r ca_sf_bevel, warning=FALSE}
-ca_model = generate_beveled_polygon(cali_skeleton, offset=1, sides = TRUE,  double_sided = TRUE,
-                                    bevel_offsets = bevel, base = TRUE, base_height = 0, swap_yz = FALSE,
+ca_model = generate_beveled_polygon(cali_skeleton, offset=0.2, sides = TRUE,  double_sided = TRUE,
+                                    bevel_offsets = bevel, swap_yz = FALSE,
                                     material = rayvertex::material_list(diffuse="purple"))
 
 ca_model |>
