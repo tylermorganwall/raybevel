@@ -12,15 +12,17 @@ generate_beveled_polygon(
   max_height = 1,
   offset = 0,
   base = TRUE,
-  base_height = NA,
+  base_height = 0,
   raw_offsets = FALSE,
   raw_heights = FALSE,
   swap_yz = TRUE,
-  verbose = TRUE,
+  progress = TRUE,
   double_sided = FALSE,
   sides = FALSE,
   return_skeleton_polygons = FALSE,
-  material = material_list()
+  scale_all_max = FALSE,
+  material = material_list(),
+  verbose = FALSE
 )
 }
 \arguments{
@@ -38,7 +40,7 @@ generate_beveled_polygon(
 
 \item{base}{Default `FALSE`. A logical flag that controls whether to generate the bottom of the polygon.}
 
-\item{base_height}{Default `NA`. Height of the base, defaulting to the minimum value of `bevel_heights`.}
+\item{base_height}{Default `NA`. Height of the base, defaulting to `min(bevel_heights) + offset` .}
 
 \item{raw_offsets}{Default `FALSE`. A logical flag indicating whether the `bevel_offsets` are already in raw format and do not need to be multiplied by the maximum time of the skeleton.}
 
@@ -46,7 +48,7 @@ generate_beveled_polygon(
 
 \item{swap_yz}{Default `TRUE`. A logical flag that controls whether to swap the y and z coordinates in the resulting mesh. If `TRUE`, the y and z coordinates will be swapped.}
 
-\item{verbose}{Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.}
+\item{progress}{Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.}
 
 \item{double_sided}{Default `FALSE`. A logical flag that controls whether the polygon should be double-sided.}
 
@@ -55,7 +57,12 @@ if `base = TRUE` and the `base_height` is less than `offset`.}
 
 \item{return_skeleton_polygons}{Default `FALSE`. A logical flag that controls whether to return the skeleton polygons along with the 3D mesh.}
 
+\item{scale_all_max}{Default `FALSE`. If passing in a list of multiple skeletons with polygons, whether to scale each polygon to the overall
+max height, or whether to scale each max height to the maximum internal distance in the polygon.}
+
 \item{material}{Default `material_list()`. Interface to set the color/appearance/material options for the resulting `ray_mesh` mesh.}
+
+\item{verbose}{Default `FALSE`. A logical flag to control whether additional timing information should be displayed.}
 }
 \value{
 A 3D mesh of the beveled polygon model.
@@ -74,13 +81,14 @@ plot_skeleton(skeleton)
 #Generate a roof model and specify the material
 if(run_documentation()) {
   library(rayrender)
+  library(rayvertex)
   scene_base = xz_rect(xwidth=100,zwidth=100,material=diffuse(color="grey20", checkercolor="white")) |>
     add_object(sphere(y=8,z=10,x=-3,material=light(intensity=100))) |>
     add_object(sphere(y=800,z=10,x=-3,radius=100,material=light(intensity=5))) |>
     add_object(sphere(x=-10,z=-10,y=5,material=light(color="red", intensity=40))) |>
     add_object(sphere(x=10,z=-10,y=5,material=light(color="orange", intensity=40)))
 
-  bevel = generate_bevel("angled", bevel_start = 0, bevel_end = 0.2, max_height=0.25)
+  bevel = generate_bevel("angled", bevel_start = 0, bevel_end = 0.2, max_height=0.5)
   roof_model = generate_beveled_polygon(skeleton,
                                         bevel_offsets = bevel,
                                         material = material_list(diffuse="purple"))
@@ -93,7 +101,7 @@ if(run_documentation()) {
 
 # Change the bevel to be circular
 if(run_documentation()) {
-  bevel = generate_bevel("circular", bevel_start = 0, bevel_end = 0.2, max_height=0.25)
+  bevel = generate_bevel("circular", bevel_start = 0, bevel_end = 0.2, max_height=0.5)
   roof_model = generate_beveled_polygon(skeleton,
                                         bevel_offsets = bevel,
                                         material = material_list(diffuse="purple"))
@@ -106,8 +114,8 @@ if(run_documentation()) {
 
 # Change the bevel to type "bump", change the max height, and raise it off the surface
 if(run_documentation()) {
-  bevel = generate_bevel("bump", bevel_start = 0, bevel_end = 0.4, max_height=0.20)
-  roof_model = generate_beveled_polygon(skeleton,offset=0.1,
+  bevel = generate_bevel("bump", bevel_start = 0, bevel_end = 0.4, max_height=0.5)
+  roof_model = generate_beveled_polygon(skeleton,base_height=0.5,
                                         bevel_offsets = bevel,
                                         material = material_list(diffuse="purple"))
 
@@ -123,7 +131,7 @@ if(run_documentation()) {
                                  bevel_start = c(0,0.3,0.7,0.95),
                                  bevel_end = c(0.1,0.6,0.95,1),
                                  reverse = c(F,F,T,F),
-                                 max_height = c(0.05,0.2,0.2,1),
+                                 segment_height = c(0.25,0.5,0.5,4),
                                  plot_bevel = TRUE)
 
   roof_model = generate_beveled_polygon(skeleton, offset=0.1,
@@ -136,15 +144,15 @@ if(run_documentation()) {
                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
 }
 
-# Turn the polygon into a ziggurat, using the
+# Turn the polygon into a ziggurat, using the step bevel type
 if(run_documentation()) {
   offs = seq(0, 1, by = 0.05)
   bevel = generate_complex_bevel("step",
                                  bevel_start = offs[-length(offs)],
                                  bevel_end = offs[-1],
-                                 max_height = 0.05)
+                                 segment_height = 0.2)
 
-  roof_model = generate_beveled_polygon(skeleton, offset=0.1,
+  roof_model = generate_beveled_polygon(skeleton, offset=0.2,
                                         bevel_offsets = bevel,
                                         material = material_list(diffuse = "purple"))
 
@@ -154,15 +162,17 @@ if(run_documentation()) {
                  width = 800, height = 800, fov = 0, ortho_dimensions = c(10,10))
 }
 
-# Turn the polygon into a ziggurat
+# Turn the polygon into a smooth wavy slide, taking advantage of vector recycling to flip/reverse
 if(run_documentation()) {
-  offs = seq(0, 1, by = 0.05)
-  bevel = generate_complex_bevel("step",
+  offs = seq(0, 1, by = 0.1)
+  bevel = generate_complex_bevel("exp",
                                  bevel_start = offs[-length(offs)],
                                  bevel_end = offs[-1],
-                                 max_height = 0.05)
+                                 reverse = c(TRUE, FALSE),
+                                 flip = c(TRUE, FALSE),
+                                 segment_height = 0.25)
 
-  roof_model = generate_beveled_polygon(skeleton, offset=0.1,
+  roof_model = generate_beveled_polygon(skeleton, offset=0.2,
                                         bevel_offsets = bevel,
                                         material = material_list(diffuse = "purple"))
 
@@ -172,21 +182,42 @@ if(run_documentation()) {
                  width = 800, height = 800, fov = 0, ortho_dimensions = c(10,10))
 }
 
-# Skeletonize and turn an {sf} object into a roof
+# Skeletonize and turn an {sf} object into a beveled polygon
 if(run_documentation()) {
   us_states = spData::us_states
   texas = us_states[us_states$NAME == "Texas",]
   texas_skeleton = skeletonize(texas)
-  plot_skeleton(texas_skeleton, arrow_size=0.5)
-  roof_model_texas = generate_roof(texas_skeleton, max_height = 5) |>
+  plot_skeleton(texas_skeleton)
+
+  bevel = generate_bevel("angled" , bevel_end=0.2, max_height = 1)
+  roof_model_texas = generate_beveled_polygon(texas_skeleton,
+                                        bevel_offsets = bevel,
+                                        material = material_list(diffuse = "purple")) |>
     center_mesh() |>
-    translate_mesh(c(0,2.5,0))
+    translate_mesh(c(0,1,0))
 
   raymesh_model(roof_model_texas, material = diffuse(color="purple")) |>
     add_object(scene_base) |>
     add_object(sphere(x=-10,z=-10,y=5,material=light(color="red", intensity=40))) |>
     add_object(sphere(x=10,z=-10,y=5,material=light(color="orange", intensity=40))) |>
-    render_scene(lookfrom=c(0,10,-1), sample_method = "sobol_blue",
+    render_scene(lookfrom=c(0,10,0),camera_up=c(0,0,-1), sample_method = "sobol_blue",
+                 width=800,height=800,fov=0, ortho_dimensions=c(15,15))
+}
+
+# Generate a smooth bevel
+if(run_documentation()) {
+  bevel = generate_bevel("exp", bevel_start = 0, bevel_end=0.5, max_height=2)
+  roof_model_texas = generate_beveled_polygon(texas_skeleton,
+                                        bevel_offsets = bevel,
+                                        material = material_list(diffuse = "purple")) |>
+    center_mesh() |>
+    translate_mesh(c(0,0.5,0))
+
+  raymesh_model(roof_model_texas, material = diffuse(color="purple")) |>
+    add_object(scene_base) |>
+    add_object(sphere(x=-10,z=-10,y=5,material=light(color="red", intensity=40))) |>
+    add_object(sphere(x=10,z=-10,y=5,material=light(color="orange", intensity=40))) |>
+    render_scene(lookfrom=c(0,10,0),camera_up=c(0,0,-1), sample_method = "sobol_blue",
                  width=800,height=800,fov=0, ortho_dimensions=c(15,15))
 }
 }

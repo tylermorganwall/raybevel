@@ -15,3 +15,4 @@ Vector containting maxima ids
 \description{
 Identify Local and Global Maxima Nodes
 }
+\keyword{internal}

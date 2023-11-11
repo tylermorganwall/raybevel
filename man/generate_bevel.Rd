@@ -16,8 +16,10 @@ generate_bevel(
   initial_height = 0,
   add_end_points = TRUE,
   manual_offsets = NULL,
-  step_epsilon = 1e-05,
-  plot_bevel = FALSE
+  step_epsilon = 1e-08,
+  plot_bevel = FALSE,
+  set_minimum_zero = TRUE,
+  zero_offset_epsilon = 1e-05
 )
 }
 \arguments{
@@ -27,7 +29,8 @@ generate_bevel(
 - "bump": Creates a bump-like profile, rising and falling within the coverage.
 - "step": Generates a step-like bevel with a flat top.
 - "block": Generates a block-like bevel, jumping straight to the max_height and back to the base.
-- "angled": Generates a straight angled bevel. You can optionally set the 'angle' parameter for this bevel.}
+- "angled": Generates a straight angled bevel. You can optionally set the 'angle' parameter for this bevel.
+- "flat": Generates a flat area.}
 
 \item{bevel_start}{Default `0`. The starting point of the bevel along the curve, ranges between 0 and 1.}
 
@@ -53,6 +56,10 @@ at the specified offsets. This is useful when you want to add points at specific
 \item{step_epsilon}{Default `1e-5`. The size for the small percentage step when using a step bevel.}
 
 \item{plot_bevel}{Default `FALSE`. Whether to plot the bevel.}
+
+\item{set_minimum_zero}{Default `TRUE`. Whether to offset the lowest point of the bevel so it's at zero.}
+
+\item{zero_offset_epsilon}{Default `1e-5`. Amount to offset the bevel to ensure no self-intersection with the base.}
 }
 \value{
 List containing 'x' and 'y', which are the coordinates of the 2D bevel profile.

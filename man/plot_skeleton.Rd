@@ -9,13 +9,12 @@ plot_skeleton(
   use_arrow = TRUE,
   xlim = c(0, 1),
   ylim = c(0, 1),
-  add = FALSE,
   arrow_color = "red",
   polygon_color = "black",
   size = 1,
-  arrow_size = 1,
+  arrow_size = 0.05,
   highlight_links = NULL,
-  highlight_color = "purple"
+  highlight_color = "green"
 )
 }
 \arguments{
@@ -33,9 +32,6 @@ to the bounding box around the skeleton.}
 plot in the form c(min, max). These are proportional limits relative
 to the bounding box around the skeleton.}
 
-\item{add}{Default `FALSE`. A logical indicating whether to add the straight skeleton to
-an existing plot (`TRUE`) or create a new one (`FALSE`).}
-
 \item{arrow_color}{Default `"red"`. Color of the arrows.}
 
 \item{polygon_color}{Default `"black"`. Color of the polygon.}
@@ -43,9 +39,15 @@ an existing plot (`TRUE`) or create a new one (`FALSE`).}
 \item{size}{Default `1`. Size of the vertex points.}
 
 \item{arrow_size}{Default `1`. Scales the arrow size.}
+
+\item{highlight_links}{Default `NULL`. A numeric vector indicating which links
+(by their index) to highlight. If specified, the corresponding links will
+be colored with the `highlight_color`.}
+
+\item{highlight_color}{Default `"purple"`. Color of the highlighted links.}
 }
 \value{
-A plot visualizing the straight skeleton and the original polygon.
+A ggplot object visualizing the straight skeleton and the original polygon.
 }
 \description{
 This function visualizes the straight skeleton derived from a given polygon.
@@ -53,9 +55,10 @@ The original polygon (with holes if present) is plotted in black, while the
 straight skeleton is plotted in red.
 }
 \details{
-The function uses base R plotting capabilities. The original graphics
-         parameters (`par`) are restored after plotting to ensure no unintended
-         side-effects.
+The function uses the {ggplot2} package for plotting. The straight skeleton
+         is visualized based on the details provided in the `skeleton` object.
+         The original polygon and holes are plotted based on attributes stored
+         in the `skeleton` object.
 }
 \examples{
 # Assuming skeleton1 is already defined as in the previous example
@@ -71,6 +74,9 @@ plot_skeleton(skeleton)
 if(length(find.package("spData",quiet = TRUE)) > 0) {
   us_states = spData::us_states
   texas = us_states[us_states$NAME == "Texas",]
-  plot_skeleton(skeletonize(texas), arrow_size=0.5)
+  plot_skeleton(skeletonize(texas))
 }
+# Highlighting certain links in the skeleton
+max_links =which(skeleton$links$destination_time == max(skeleton$links$destination_time))
+plot_skeleton(skeleton, highlight_links = max_links, highlight_color = "green")
 }

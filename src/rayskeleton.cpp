@@ -72,10 +72,10 @@ List skeletonize_rcpp(NumericMatrix vertices,
     base_poly.push_back(Point(vertices(i,0),vertices(i,1)));
   }
   if(!base_poly.is_counterclockwise_oriented()) {
-    throw std::runtime_error("rayskeleton: Polygon is not CCW oriented.");
+    throw std::runtime_error("raybevel: Polygon is not CCW oriented.");
   }
   if(!base_poly.is_simple()) {
-    throw std::runtime_error("rayskeleton: Polygon is not simple.");
+    throw std::runtime_error("raybevel: Polygon is not simple.");
   }
   Polygon_with_holes poly(base_poly);
 

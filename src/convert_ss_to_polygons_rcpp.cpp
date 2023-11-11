@@ -54,7 +54,7 @@ double determinant2x2(const std::vector<double>& v1, const std::vector<double>& 
 double dot(const std::vector<double>& v1, const std::vector<double>& v2);
 
 // [[Rcpp::export]]
-List convert_ss_to_polygons_rcpp(List ss, int numbercores) {
+List convert_ss_to_polygons_rcpp(List ss, int numbercores, bool progress) {
   List nodesDF = ss["nodes"];
   List linksDF = ss["links"];
 
@@ -89,8 +89,8 @@ List convert_ss_to_polygons_rcpp(List ss, int numbercores) {
   std::vector<std::vector<int>> list_all_polygons;
   list_all_polygons.resize(links.size());
   RcppThread::ThreadPool pool(numbercores);
-
-  RcppThread::parallelFor(0, links.size(), [&links, &nodes, &list_all_polygons, &pb] (int k) {
+  // for(int k = 0; k< links.size(); k++) {
+  RcppThread::parallelFor(0, links.size(), [&links, &nodes, &list_all_polygons, &pb, &progress] (int k) {
     bool first = true;
     int first_node = links[k].source;
     int tmp_source = first_node;
@@ -102,11 +102,19 @@ List convert_ss_to_polygons_rcpp(List ss, int numbercores) {
       if(tmp_source == first_node && tmp_dest == first_dest && !first) {
         break;
       }
-
       first = false;
 
       std::vector<double> node1_position = getNodePositionById(nodes, tmp_source);
       std::vector<double> node2_position = getNodePositionById(nodes, tmp_dest);
+
+      std::vector<double> node1_position_first = getNodePositionById(nodes, first_node);
+      std::vector<double> node2_position_first = getNodePositionById(nodes, first_dest);
+
+      // RcppThread::Rcout << first_node << " " << tmp_source << " " << first_dest << " " << tmp_dest << "\n";
+      // RcppThread::Rcout << node1_position_first[0] << " " << node1_position_first[1] << " " <<
+      //   node1_position[0] << " " << node1_position[1] << " | " << node2_position_first[0] << " " << node2_position_first[1] << " " <<
+      //     node2_position[0] << " " << node2_position[1] <<"\n";
+
 
       // Calculate the direction vector v1 for the current link
       std::vector<double> v1 = {node2_position[0] - node1_position[0], node2_position[1] - node1_position[1]};
@@ -165,117 +173,13 @@ List convert_ss_to_polygons_rcpp(List ss, int numbercores) {
       tmp_dest = best_dest;
       single_polygon_indices.push_back(best_dest);
     }
-    pb++;
+    if(progress) {
+      pb++;
+    }
     list_all_polygons[k] = single_polygon_indices;
   });
+  // }
 
-  // for(size_t j = 0; j < links.size(); j++) {
-  //   pool.push(worker, j);
-  // }
-  // pool.join();
-  // for(auto &link : links) {
-  //   pb.tick();
-  //
-  // }
-  // while(true) {
-  //
-  //   Rcpp::checkUserInterrupt();
-  //   int remaining_links_count = std::count_if(links.begin(), links.end(), [](Link l) { return !l.visited; });
-  //   if(remaining_links_count == 0) {
-  //     break;
-  //   }
-  //
-  //   if(tmp_source == first_node && tmp_dest == first_dest && !first) {
-  //     // Mark current link as visited
-  //     for(auto &link : links) {
-  //       if((link.source == tmp_source && link.destination == tmp_dest) ||
-  //          (link.destination == tmp_source && link.source == tmp_dest)) {
-  //         link.visited = true;
-  //         pb.tick();
-  //       }
-  //     }
-  //
-  //     // Find the next un-visited link
-  //     for(const auto &link : links) {
-  //       if(!link.visited) {
-  //         tmp_source = link.source;
-  //         tmp_dest = link.destination;
-  //         first_node = tmp_source;
-  //         first_dest = tmp_dest;
-  //         break;
-  //       }
-  //     }
-  //
-  //     // Save current polygon and prepare for the next
-  //     list_all_polygons.push_back(single_polygon_indices);
-  //     single_polygon_indices.clear();
-  //     total_polygons++;
-  //     polygon_indices = 1;
-  //   }
-  //
-  //   first = false;
-  //
-  //   std::vector<double> node1_position = getNodePositionById(nodes, tmp_source);
-  //   std::vector<double> node2_position = getNodePositionById(nodes, tmp_dest);
-  //
-  //   // Calculate the direction vector v1 for the current link
-  //   std::vector<double> v1 = {node2_position[0] - node1_position[0], node2_position[1] - node1_position[1]};
-  //
-  //   double best_angle = 180.0;
-  //   int best_dest = -1;
-  //   int best_source = -1;
-  //   double best_len = std::numeric_limits<double>::infinity();
-  //
-  //   // Loop over all candidate next links
-  //   for(const auto& link : links) {
-  //     if((link.destination == tmp_dest && link.source == tmp_source) ||
-  //        (link.source == tmp_dest && link.destination == tmp_source)) {
-  //       continue;
-  //     }
-  //
-  //     if(link.source != tmp_dest && link.destination != tmp_dest) {
-  //       continue;
-  //     }
-  //
-  //     int candidate_source, candidate_dest;
-  //     if(link.destination == tmp_dest) {
-  //       candidate_source = link.destination;
-  //       candidate_dest = link.source;
-  //     } else {
-  //       candidate_source = link.source;
-  //       candidate_dest = link.destination;
-  //     }
-  //
-  //     // Calculate the direction vector v2 for the candidate link
-  //     std::vector<double> cs_position = getNodePositionById(nodes, candidate_source);
-  //     std::vector<double> cd_position = getNodePositionById(nodes, candidate_dest);
-  //     std::vector<double> v2 = {cd_position[0] - cs_position[0], cd_position[1] - cs_position[1]};
-  //
-  //     // Calculate angle between v1 and v2
-  //     double det_val = determinant2x2(v1, v2);
-  //     double dot_val = dot(v1, v2);
-  //     double angle = std::atan2(det_val, dot_val) * 180.0 / M_PI;
-  //
-  //     // Check if this angle is the smallest so far
-  //     double length_v2 = dot(v2, v2);
-  //     if((angle < best_angle) || (angle == best_angle && best_len > length_v2)) {
-  //       best_angle = angle;
-  //
-  //       best_dest = candidate_dest;
-  //       best_source = candidate_source;
-  //       best_len = length_v2;
-  //     }
-  //   }
-  //   if(best_source < 0 || best_dest < 0) {
-  //     throw std::runtime_error("Didn't find candidate");
-  //   }
-  //
-  //   // Update tmp_source and tmp_dest for the next iteration
-  //   tmp_source = best_source;
-  //   tmp_dest = best_dest;
-  //   single_polygon_indices.push_back(best_dest);
-  //   polygon_indices++;
-  // }
   // Here I'm doing the sorting and hashing in C++
   std::unordered_map<std::size_t, bool> seen_hashes;
   std::vector<std::vector<int>> unique_polygons;

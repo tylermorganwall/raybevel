@@ -1,6 +1,7 @@
 #' Identify Local and Global Maxima Nodes
 #'
 #' @param straight_skeleton The straight skeleton object.
+#' @keywords internal
 #'
 #' @return Vector containting maxima ids
 identify_maxima_nodes = function(straight_skeleton) {

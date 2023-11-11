@@ -7,15 +7,11 @@
 plot_offset_polygon(
   offset_polygons,
   skeleton = NULL,
-  main = "Offset Polygons",
   plot_original_polygon = TRUE,
-  col = NA,
-  border = "blue",
+  color = NULL,
+  border = "dodgerblue",
   xlim = NULL,
   ylim = NULL,
-  add = FALSE,
-  palette_border = NULL,
-  palette_col = NULL,
   linewidth = 1
 )
 }
@@ -25,23 +21,15 @@ plot_offset_polygon(
 \item{skeleton}{Default `NULL`. The straight skeleton used to generate the offset polygon. Include this if you want to adjust the plot
 range to encompass the entire original polygon.}
 
-\item{main}{Default "Offset Polygons". The main title for the plot.}
-
 \item{plot_original_polygon}{Default `TRUE`. If `skeleton` passed as well, plots the original polygon.}
 
-\item{col}{Default "lightblue". The fill color for the polygons. This argument is ignored if `palette_col` is provided.}
+\item{color}{Default `NULL`. A color or palette function to generate the fill palette for the polygons' interiors.}
 
-\item{border}{Default "blue". The border color for the polygons. This argument is ignored if `palette_border` is provided.}
+\item{border}{Default `grDevices::heat.colors`.  A color or palette function to generate the color palette for the offset polygons' borders.}
 
 \item{xlim}{Default `NULL`. The x-axis limits as a vector of two values (min, max). If `NULL`, it calculates the limits from the data.}
 
 \item{ylim}{Default `NULL`. The y-axis limits as a vector of two values (min, max). If `NULL`, it calculates the limits from the data.}
-
-\item{add}{Default `FALSE`. A logical indicating whether to add the offset polygons to an existing plot (`TRUE`) or create a new one (`FALSE`).}
-
-\item{palette_border}{Default `NULL`. A function to generate the color palette for the polygons' borders . This function should accept the number of polygons as input and return a vector of colors. If provided, it overrides the `border` argument.}
-
-\item{palette_col}{Default `NULL`. A function to generate the color palette for the polygons' interiors. This function should accept the number of polygons as input and return a vector of colors. If provided, it overrides the `col` argument.}
 
 \item{linewidth}{Default `1`. The linewidth of the polygon.}
 }
@@ -59,11 +47,15 @@ hole_1 = matrix(c(1,1, 2,1, 2,2, 1,2, 1,1), ncol = 2, byrow = TRUE)[5:1,]
 hole_2 = matrix(c(5,5, 6,5, 6,6, 5,6, 5,5), ncol = 2, byrow = TRUE)[5:1,]
 skeleton = skeletonize(vertices, holes = list(hole_1, hole_2))
 plot_skeleton(skeleton)
-plot_offset_polygon(generate_offset_polygon(skeleton, seq(0,2.5,by=0.1)), add = TRUE)
-# Now with colors
-plot_offset_polygon(generate_offset_polygon(skeleton, seq(0,2.5,by=0.1)),
-                    palette_border = terrain.colors, skeleton = skeleton,
-                    linewidth = 3)
+
+#Generate three offsets
+plot_offset_polygon(generate_offset_polygon(skeleton, c(0.25,0.75,1.5,2)))
+
+#Generate three offsets, including the original polygon
+plot_offset_polygon(generate_offset_polygon(skeleton, c(0.25,0.75,1.5,2)), skeleton = skeleton)
+
+#Generate many offsets
+plot_offset_polygon(generate_offset_polygon(skeleton, seq(0,2.5,by=0.1)))
 
 # Skeletonize and plot an {sf} object
 if(length(find.package("spData",quiet = TRUE)) > 0) {
@@ -71,7 +63,7 @@ if(length(find.package("spData",quiet = TRUE)) > 0) {
   texas = us_states[us_states$NAME == "Texas",]
   texas_skeleton = skeletonize(texas)
   plot_offset_polygon(generate_offset_polygon(texas_skeleton, seq(0, 2.5, by = 0.1)),
-                      palette_border = heat.colors, skeleton = texas_skeleton,
-                      linewidth = 2)
+                      border = heat.colors,
+                      linewidth = 1)
 }
 }

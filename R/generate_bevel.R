@@ -7,6 +7,7 @@
 #'   - "step": Generates a step-like bevel with a flat top.
 #'   - "block": Generates a block-like bevel, jumping straight to the max_height and back to the base.
 #'   - "angled": Generates a straight angled bevel. You can optionally set the 'angle' parameter for this bevel.
+#'   - "flat": Generates a flat area.
 #' @param bevel_start Default `0`. The starting point of the bevel along the curve, ranges between 0 and 1.
 #' @param bevel_end Default `0.2`. The ending point of the bevel along the curve, ranges between 0 and 1.
 #' @param max_height Default `1`. The maximum height of the bevel, as measured from the initial height.
@@ -19,6 +20,8 @@
 #' at the specified offsets. This is useful when you want to add points at specific distances along the curve.
 #' @param add_end_points Default `TRUE`. Whether to ensure there is a point at zero and a point at one.
 #' @param step_epsilon Default `1e-5`. The size for the small percentage step when using a step bevel.
+#' @param set_minimum_zero Default `TRUE`. Whether to offset the lowest point of the bevel so it's at zero.
+#' @param zero_offset_epsilon Default `1e-5`. Amount to offset the bevel to ensure no self-intersection with the base.
 #' @param plot_bevel Default `FALSE`. Whether to plot the bevel.
 #'
 #' @return List containing 'x' and 'y', which are the coordinates of the 2D bevel profile.
@@ -43,7 +46,9 @@ generate_bevel = function(bevel_type = "angled", bevel_start = 0, bevel_end = 0.
                           initial_height = 0, add_end_points = TRUE,
                           manual_offsets = NULL,
                           step_epsilon = 1e-8,
-                          plot_bevel = FALSE) {
+                          plot_bevel = FALSE,
+                          set_minimum_zero = TRUE,
+                          zero_offset_epsilon = 1e-5) {
   # Check angle constraint if bevel_type is angled
   if(bevel_type == "angled") {
     if(!is.null(angle)) {
@@ -66,6 +71,9 @@ generate_bevel = function(bevel_type = "angled", bevel_start = 0, bevel_end = 0.
   } else if(bevel_type == "angled") {
     x = c(bevel_start, bevel_end)
     y = c(0, max_height)
+  } else if(bevel_type == "flat") {
+    x = c(bevel_start, bevel_end)
+    y = c(0, 0)
   } else {
     x_curve = seq(bevel_start, bevel_end, length.out = curve_points)
     if(bevel_type == "circular") {
@@ -122,6 +130,10 @@ generate_bevel = function(bevel_type = "angled", bevel_start = 0, bevel_end = 0.
   diff_height = y[1]-initial_height
   y = y - diff_height
 
+  if(set_minimum_zero && min(y) <= 0) {
+    y = y - min(y) + zero_offset_epsilon
+  }
+
   if(plot_bevel) {
     plot(x, y, type = 'l', axes = FALSE, lwd = 2, xlim = c(min(x)-0.1, max(x)+0.1), ylim = c(min(y)-0.1, max(y)+0.1))
     graphics::box()
@@ -151,6 +163,8 @@ generate_bevel = function(bevel_type = "angled", bevel_start = 0, bevel_end = 0.
 #' @param flip Default `FALSE`. Whether to reverse each bevel horizontally.
 #' @param plot_bevel Default `FALSE`. Whether to plot the resulting bevel.
 #' @param overall_height Default `NA`. Numeric value specifying the overall height of the curve.
+#' @param set_minimum_zero Default `TRUE`. Whether to offset the lowest point of the bevel so it's at zero.
+#' @param zero_offset_epsilon Default `1e-5`. Amount to offset the bevel to ensure no self-intersection with the base.
 #'
 #' @return List containing 'x' and 'y', which are the coordinates of the complex 2D bevel profile
 #' @export
@@ -206,7 +220,9 @@ generate_complex_bevel = function(bevel_type,
                                   manual_offsets = NULL,
                                   add_end_points = TRUE,
                                   plot_bevel = FALSE,
-                                  overall_height = NA) {
+                                  overall_height = NA,
+                                  set_minimum_zero = TRUE,
+                                  zero_offset_epsilon = 1e-6) {
   completed_vals = data.frame(bevel_type = bevel_type,
                               bevel_start = bevel_start,
                               bevel_end = bevel_end,
@@ -257,7 +273,8 @@ generate_complex_bevel = function(bevel_type,
       flip = row$flip,
       manual_offsets = manual_offset_segment,
       initial_height = y_prev_end,  # Pass the last height of the previous bevel as the initial height
-      add_end_points = FALSE
+      add_end_points = FALSE,
+      set_minimum_zero = FALSE
     )
 
     y_prev_end = bevel_segment$y[length(bevel_segment$y)]  # Update y_prev_end for the next iteration
@@ -306,6 +323,13 @@ generate_complex_bevel = function(bevel_type,
     min_val = min(y)
     max_val = max(y)
     y = (y - min_val) / (max_val - min_val) * overall_height + min_val
+  }
+
+  if(set_minimum_zero && min(y) <= 0) {
+    range_y = range(y)
+    range_y = range_y[2] - range_y[1]
+    epsilon = range_y * zero_offset_epsilon
+    y = y - min(y) + epsilon
   }
 
   if(plot_bevel) {

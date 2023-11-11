@@ -73,6 +73,6 @@ raw_skeleton5 = skeletonize(vertices5, debug = TRUE, return_raw_ss = TRUE)
 if(length(find.package("spData",quiet = TRUE)) > 0) {
   us_states = spData::us_states
   texas = us_states[us_states$NAME == "Texas",]
-  plot_skeleton(skeletonize(texas), arrow_size=0.5)
+  plot_skeleton(skeletonize(texas))
 }
 }

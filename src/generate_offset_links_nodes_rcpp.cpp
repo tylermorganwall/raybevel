@@ -159,10 +159,14 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
 
   // Main loop to iterate over offsets
   RProgress::RProgress pb("Calculating [:bar] ETA: :eta");
-  pb.set_total(offsets.size());
-  pb.tick(0);
+  if(progress) {
+    pb.set_total(offsets.size());
+    pb.tick(0);
+  }
   for(int ii = 0; ii < offsets.size(); ++ii) {
-    pb.tick(ii);
+    if(progress) {
+      pb.tick(ii);
+    }
     double offset = offsets[ii];
     std::vector<bool> visited(links.size());
     std::vector<bool> away_from_offset(links.size());
@@ -228,18 +232,6 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
       }
       int remaining_links_count = std::count_if(visited.begin(), visited.end(), [](bool l) { return !l; });
 
-      bool all_remaining_at_offset = true;
-      for(int jj = 0; jj < non_visited_links.size(); jj++) {
-        if(((non_visited_links[jj].destination_time == offset && non_visited_links[jj].maxima_dest) ||
-           (non_visited_links[jj].source_time == offset && non_visited_links[jj].maxima_source)) &&
-           new_poly) {
-        } else {
-          all_remaining_at_offset = false;
-        }
-      }
-      if(all_remaining_at_offset) {
-        break;
-      }
       first = false;
 
       std::vector<double> node1_position = getNodePositionById(nodes, tmp_source);
@@ -295,6 +287,20 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
         }
       }
 
+      // bool all_remaining_at_offset = true;
+      // for(int jj = 0; jj < non_visited_links.size(); jj++) {
+      //   if(((non_visited_links[jj].destination_time == offset && non_visited_links[jj].maxima_dest) ||
+      //      (non_visited_links[jj].source_time == offset && non_visited_links[jj].maxima_source)) &&
+      //      new_poly) {
+      //     Rcpp::Rcout << "All remaining offset \n";
+      //   } else {
+      //     all_remaining_at_offset = false;
+      //   }
+      // }
+      // if(all_remaining_at_offset) {
+      //   break;
+      // }
+
       bool is_edge = false;
       for(int jj = 0; jj < nodes.size(); jj++) {
         if(nodes[jj].id == tmp_dest) {
@@ -302,8 +308,11 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
         }
       }
       // Rcpp::Rcout << offset << " " << node1_time << " " << node2_time << " " <<
-      //   tmp_source << " " << tmp_dest << " " << remaining_links_count << " " <<
+      //   first_node << " " << first_dest << " " << tmp_source << " " << tmp_dest << " " << remaining_links_count << " " <<
       //     is_edge << " " << bool((node1_time - offset) == 0) <<  " " << bool((node2_time - offset) == 0) << "\n";
+      // Rcpp::Rcout << tmp_source << " " << tmp_dest << " " << offset << " " <<
+      //   remaining_links_count << "\n";
+      //
       if((offset < node1_time && offset >= node2_time) ||
           is_edge) {
         int new_source = tmp_dest;
@@ -388,6 +397,19 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
       if(any_picked) {
         tmp_source = best_source;
         tmp_dest = best_dest;
+      }
+      bool all_remaining_at_offset = true;
+      for(int jj = 0; jj < non_visited_links.size(); jj++) {
+        if(((non_visited_links[jj].destination_time == offset && non_visited_links[jj].maxima_dest) ||
+           (non_visited_links[jj].source_time == offset && non_visited_links[jj].maxima_source)) &&
+           new_poly) {
+          // Rcpp::Rcout << "All remaining offset \n";
+        } else {
+          all_remaining_at_offset = false;
+        }
+      }
+      if(all_remaining_at_offset) {
+        break;
       }
       // if(best_source < 0 || best_dest < 0) {
       //   throw std::runtime_error("Didn't find candidate");

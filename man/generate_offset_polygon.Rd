@@ -4,12 +4,14 @@
 \alias{generate_offset_polygon}
 \title{Generate an offset polygon}
 \usage{
-generate_offset_polygon(skeleton, offset)
+generate_offset_polygon(skeleton, offset, progress = FALSE)
 }
 \arguments{
 \item{skeleton}{Default `NULL`. A straight skeleton generated from the `skeletonize` function.}
 
 \item{offset}{Default `NULL`. The offset(s) of the polygon.}
+
+\item{progress}{Default `FALSE`. Whether to display a progress bar.}
 }
 \value{
 A list of data frames, each representing a polygon offset by the specified amount.
@@ -25,11 +27,30 @@ offset_polys = generate_offset_polygon(skeleton, c(0.25, 0.5))
 print(offset_polys)
 
 # Polygon with hole example
-vertices4 = matrix(c(0,0, 7,0, 7,7, 0,7, 0,0), ncol = 2, byrow = TRUE)
+# Outer polygon
+vertices = matrix(c(0,0, 7,0, 7,7, 0,7, 0,0), ncol = 2, byrow = TRUE)
 # Holes inside the polygon
-hole4_1 = matrix(c(1,1, 2,1, 2,2, 1,2, 1,1), ncol = 2, byrow = TRUE)[5:1,]
-hole4_2 = matrix(c(5,5, 6,5, 6,6, 5,6, 5,5), ncol = 2, byrow = TRUE)[5:1,]
-skeleton4 = skeletonize(vertices4, holes = list(hole4_1, hole4_2))
-plot_skeleton(skeleton4)
-plot_offset_polygon(generate_offset_polygon(skeleton4, c(0.25, 0.5)))
+hole_1 = matrix(c(1,1, 2,1, 2,2, 1,2, 1,1), ncol = 2, byrow = TRUE)[5:1,]
+hole_2 = matrix(c(5,5, 6,5, 6,6, 5,6, 5,5), ncol = 2, byrow = TRUE)[5:1,]
+skeleton = skeletonize(vertices, holes = list(hole_1, hole_2))
+plot_skeleton(skeleton)
+
+#Generate three offsets
+plot_offset_polygon(generate_offset_polygon(skeleton, c(0.25,0.75,1.5,2)))
+
+#Generate three offsets, including the original polygon
+plot_offset_polygon(generate_offset_polygon(skeleton, c(0.25,0.75,1.5,2)), skeleton = skeleton)
+
+#Generate many offsets
+plot_offset_polygon(generate_offset_polygon(skeleton, seq(0,2.5,by=0.1)))
+
+# Skeletonize and plot an {sf} object
+if(length(find.package("spData",quiet = TRUE)) > 0) {
+  us_states = spData::us_states
+  texas = us_states[us_states$NAME == "Texas",]
+  texas_skeleton = skeletonize(texas)
+  plot_offset_polygon(generate_offset_polygon(texas_skeleton, seq(0, 2.5, by = 0.1)),
+                      border = heat.colors,
+                      linewidth = 1)
+}
 }

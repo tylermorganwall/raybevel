@@ -53,7 +53,7 @@
 #' if(length(find.package("spData",quiet = TRUE)) > 0) {
 #'   us_states = spData::us_states
 #'   texas = us_states[us_states$NAME == "Texas",]
-#'   plot_skeleton(skeletonize(texas), arrow_size=0.5)
+#'   plot_skeleton(skeletonize(texas))
 #' }
 skeletonize = function(vertices, holes = list(), debug = FALSE,
                        merge_nodes_tolerance = 1e-5,
@@ -191,6 +191,27 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
     } else {
       return(ss_list[[1]])
     }
+  } else {
+    #Fix orientations
+    if(all(vertices[1,] == vertices[nrow(vertices),])) {
+      vertices = vertices[-nrow(vertices),]
+    }
+    if(!is_ccw_polygon(as.matrix(vertices))) {
+      vertices = vertices[rev(seq_len(nrow(vertices))),]
+    }
+    for(k in seq_len(length(holes))) {
+      if(all(holes[[k]][1,] == holes[[k]][nrow(holes[[k]]),])) {
+        holes[[k]] = holes[[k]][-nrow(holes[[k]]),]
+      }
+      holes[[k]] = as.matrix(holes[[k]])
+      if(!is_simple_polygon(as.matrix(holes[[k]]))) {
+        warning(sprintf("Hole in row %i in `sf` object not simple polygon, skipping", i))
+        next
+      }
+      if(is_ccw_polygon(holes[[k]])) {
+        holes[[k]] = holes[[k]][rev(seq_len(nrow(holes[[k]]))),]
+      }
+    }
   }
   stopifnot(ncol(vertices) == 2)
   if(all(vertices[1,] == vertices[nrow(vertices),])) {
@@ -258,6 +279,9 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
   edge_links = edge_links[rev(seq_len(nrow(edge_links))),c(2,1,3,5,4)]
   colnames(edge_links) = c("source","destination" ,"edge", "source_time","destination_time")
   links = rbind(edge_links, links[!links$edge,])
+  rownames(nodes) = seq_len(nrow(nodes))
+  rownames(links) = seq_len(nrow(links))
+
   ss = list(nodes = nodes, links = links)
   class(ss) = "rayskeleton"
   attr(ss,"original_vertices") = vertices

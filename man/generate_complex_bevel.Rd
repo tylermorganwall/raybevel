@@ -16,7 +16,9 @@ generate_complex_bevel(
   manual_offsets = NULL,
   add_end_points = TRUE,
   plot_bevel = FALSE,
-  overall_height = NA
+  overall_height = NA,
+  set_minimum_zero = TRUE,
+  zero_offset_epsilon = 1e-06
 )
 }
 \arguments{
@@ -47,6 +49,10 @@ at the specified offsets. This is useful when you want to add points at specific
 \item{plot_bevel}{Default `FALSE`. Whether to plot the resulting bevel.}
 
 \item{overall_height}{Default `NA`. Numeric value specifying the overall height of the curve.}
+
+\item{set_minimum_zero}{Default `TRUE`. Whether to offset the lowest point of the bevel so it's at zero.}
+
+\item{zero_offset_epsilon}{Default `1e-5`. Amount to offset the bevel to ensure no self-intersection with the base.}
 }
 \value{
 List containing 'x' and 'y', which are the coordinates of the complex 2D bevel profile

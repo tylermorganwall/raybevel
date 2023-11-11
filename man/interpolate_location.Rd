@@ -6,6 +6,17 @@
 \usage{
 interpolate_location(node_start, node_end, height_start, height_end, height)
 }
+\arguments{
+\item{node_start}{Length-2 Numeric x/y position}
+
+\item{node_end}{Length-2 Numeric x/y position}
+
+\item{height_start}{Length-1 Numeric height at start node}
+
+\item{height_end}{Length-1 Numeric height at end node}
+
+\item{height}{Length-1 Numeric height at which to interpolate}
+}
 \description{
 Interpolate Location
 }

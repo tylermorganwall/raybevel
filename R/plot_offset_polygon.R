@@ -5,14 +5,10 @@
 #' @param offset_polygons Default `NULL`. A list of data frames, where each data frame represents an offset polygon. Each data frame should have 'x' and 'y' columns representing coordinates.
 #' @param skeleton Default `NULL`. The straight skeleton used to generate the offset polygon. Include this if you want to adjust the plot
 #' range to encompass the entire original polygon.
-#' @param main Default "Offset Polygons". The main title for the plot.
-#' @param col Default "lightblue". The fill color for the polygons. This argument is ignored if `palette_col` is provided.
-#' @param border Default "blue". The border color for the polygons. This argument is ignored if `palette_border` is provided.
+#' @param border Default `grDevices::heat.colors`.  A color or palette function to generate the color palette for the offset polygons' borders.
 #' @param xlim Default `NULL`. The x-axis limits as a vector of two values (min, max). If `NULL`, it calculates the limits from the data.
 #' @param ylim Default `NULL`. The y-axis limits as a vector of two values (min, max). If `NULL`, it calculates the limits from the data.
-#' @param add Default `FALSE`. A logical indicating whether to add the offset polygons to an existing plot (`TRUE`) or create a new one (`FALSE`).
-#' @param palette_col Default `NULL`. A function to generate the color palette for the polygons' interiors. This function should accept the number of polygons as input and return a vector of colors. If provided, it overrides the `col` argument.
-#' @param palette_border Default `NULL`. A function to generate the color palette for the polygons' borders . This function should accept the number of polygons as input and return a vector of colors. If provided, it overrides the `border` argument.
+#' @param color Default `NULL`. A color or palette function to generate the fill palette for the polygons' interiors.
 #' @param linewidth Default `1`. The linewidth of the polygon.
 #' @param plot_original_polygon Default `TRUE`. If `skeleton` passed as well, plots the original polygon.
 #'
@@ -26,11 +22,15 @@
 #' hole_2 = matrix(c(5,5, 6,5, 6,6, 5,6, 5,5), ncol = 2, byrow = TRUE)[5:1,]
 #' skeleton = skeletonize(vertices, holes = list(hole_1, hole_2))
 #' plot_skeleton(skeleton)
-#' plot_offset_polygon(generate_offset_polygon(skeleton, seq(0,2.5,by=0.1)), add = TRUE)
-#' # Now with colors
-#' plot_offset_polygon(generate_offset_polygon(skeleton, seq(0,2.5,by=0.1)),
-#'                     palette_border = terrain.colors, skeleton = skeleton,
-#'                     linewidth = 3)
+#'
+#' #Generate three offsets
+#' plot_offset_polygon(generate_offset_polygon(skeleton, c(0.25,0.75,1.5,2)))
+#'
+#' #Generate three offsets, including the original polygon
+#' plot_offset_polygon(generate_offset_polygon(skeleton, c(0.25,0.75,1.5,2)), skeleton = skeleton)
+#'
+#' #Generate many offsets
+#' plot_offset_polygon(generate_offset_polygon(skeleton, seq(0,2.5,by=0.1)))
 #'
 #' # Skeletonize and plot an {sf} object
 #' if(length(find.package("spData",quiet = TRUE)) > 0) {
@@ -38,78 +38,89 @@
 #'   texas = us_states[us_states$NAME == "Texas",]
 #'   texas_skeleton = skeletonize(texas)
 #'   plot_offset_polygon(generate_offset_polygon(texas_skeleton, seq(0, 2.5, by = 0.1)),
-#'                       palette_border = heat.colors, skeleton = texas_skeleton,
-#'                       linewidth = 2)
+#'                       border = heat.colors,
+#'                       linewidth = 1)
 #' }
-plot_offset_polygon = function(offset_polygons, skeleton = NULL, main="Offset Polygons",
+plot_offset_polygon = function(offset_polygons, skeleton = NULL,
                                plot_original_polygon = TRUE,
-                               col = NA, border="blue", xlim=NULL, ylim=NULL, add=FALSE,
-                               palette_border = NULL, palette_col = NULL, linewidth = 1) {
+                               color = NULL, border= "dodgerblue", xlim=NULL, ylim=NULL,
+                               linewidth = 1) {
+  # Check if ggplot2 package is installed
+  if(!(length(find.package("ggplot2", quiet = TRUE)) > 0)) {
+    stop("{ggplot2} package required for plot_offset_polygon_ggplot()")
+  }
+
+  # Import ggplot2 functions
+  ggplot = ggplot2::ggplot
+  aes = ggplot2::aes
+  geom_polygon = ggplot2::geom_polygon
+  theme_void = ggplot2::theme_void
+  coord_fixed = ggplot2::coord_fixed
+  x = y = NULL
+  # Set color palettes if provided
   n_polygons = length(offset_polygons)
-  if(!is.null(skeleton)) {
-    xlim = c(0,1)
-    ylim = c(0,1)
-
-    min_x = min(skeleton$nodes$x) - 1
-    min_y = min(skeleton$nodes$y) - 1
-    max_x = max(skeleton$nodes$x) + 1
-    max_y = max(skeleton$nodes$y) + 1
-
-    span_x = max_x - min_x
-    span_y = max_y - min_y
-
-    xlim_vals = c(min_x + span_x * xlim[1], min_x + span_x * xlim[2])
-    ylim_vals = c(min_y + span_y * ylim[1], min_y + span_y * ylim[2])
-  } else {
-    xlim_vals = xlim
-    ylim_vals = ylim
-  }
-  if (!is.null(palette_border)) {
-    generated_colors_border = palette_border(n_polygons)
-    border = generated_colors_border
-  }
-  if (!is.null(palette_col)) {
-    generated_colors_col = palette_col(n_polygons)
-    col = generated_colors_col
-  }
-
-  if(length(border) == 1) {
-    border = rep(border, n_polygons)
-  }
-  if(length(col) == 1) {
-    col = rep(col, n_polygons)
-  }
-
-  # If not adding to an existing plot, set up the new plot
-  if(!add) {
-    if(is.null(xlim)) {
-      xlim = range(sapply(offset_polygons, function(poly) range(poly$x)))
+  if(is.function(border)) {
+    border = border(n_polygons)
+  } else if (is.character(border)) {
+    if(length(border) == 1) {
+      border = rep(border[1], n_polygons)
     }
-    if(is.null(ylim)) {
-      ylim = range(sapply(offset_polygons, function(poly) range(poly$y)))
-    }
-
-    plot(1, 1, type="n", xlab="", ylab="", xlim=xlim_vals, ylim=ylim_vals,
-         main=main, xaxs="i", yaxs="i",
-         axes=FALSE, ann=FALSE, asp = 1)
   }
-  if (!is.null(skeleton) && plot_original_polygon) {
-    # Plot the main outer polygon
+  if(is.function(color)) {
+    color = color(n_polygons)
+  } else if (is.character(border)) {
+    if(length(color) == 1) {
+      color = rep(color[1], n_polygons)
+    }
+  }
+
+  # Create an empty ggplot object
+  p = ggplot() + theme_void()
+
+  # If skeleton is provided, calculate xlim and ylim based on skeleton
+  if (!is.null(skeleton)) {
+    # p = plot_skeleton(skeleton)
+
     original_vertices = attr(skeleton, "original_vertices")
-    graphics::polygon(original_vertices[,1], original_vertices[,2], col=NA, border="black", lwd=linewidth)
+    colnames(original_vertices) = c("x","y")
+    # xlim_vals = range(original_vertices[, 1])
+    # ylim_vals = range(original_vertices[, 2])
+  } else {
+    p = ggplot() + theme_void() + coord_fixed()
+  }
+
+  # Add offset polygons to the plot
+  for(i in seq_len(n_polygons)) {
+    poly = offset_polygons[[i]]
+    colnames(poly) = c("x","y")
+    p = p + geom_polygon(data = data.frame(poly), aes(x = x, y = y),
+                         fill = NA, color = border[i], size = linewidth)
+  }
+
+  # If skeleton is provided and plot_original_polygon is TRUE, add original polygon and holes to the plot
+  if (!is.null(skeleton) && plot_original_polygon) {
+    p = p + geom_polygon(data = data.frame(original_vertices),
+                         aes(x = x, y = y), fill = NA, color = "black", size = linewidth)
 
     # Plot holes, if they exist
     original_holes = attr(skeleton, "original_holes")
     if (!is.null(original_holes)) {
       for (hole in original_holes) {
-        graphics::polygon(hole[,1], hole[,2], col=NA, border="black", lwd=linewidth)
+        colnames(hole) = c("x","y")
+
+        p = p + geom_polygon(data = data.frame(hole),
+                             aes(x = x, y = y), fill = NA, color = "black", size = linewidth)
       }
     }
   }
 
-  # Plot each offset polygon
-  for(i in seq_len(n_polygons)) {
-    poly = offset_polygons[[i]]
-    graphics::polygon(poly$x, poly$y, col=col[i], border=border[i], lwd = linewidth)
-  }
+  # Set x and y limits if provided
+  p = p + coord_fixed()
+  # }
+  # if(!is.null(ylim)) {
+  #   p = p + coord_cartesian(ylim = ylim)
+  # }
+
+  # Return the plot
+  return(p)
 }

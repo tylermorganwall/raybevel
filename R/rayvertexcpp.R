@@ -1,4 +1,4 @@
 ## usethis namespace: start
-#' @useDynLib rayskeleton, .registration = TRUE
+#' @useDynLib raybevel, .registration = TRUE
 ## usethis namespace: end
 NULL
