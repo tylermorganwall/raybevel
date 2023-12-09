@@ -69,9 +69,11 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
       total = nrow(vertices), clear = TRUE, width = 60)
     non_empty_geometry = list()
     cntr = 1
-    for(i in rev(seq_len(length(vertices$geometry)))) {
+    list_idx = list()
+    for(i in seq_len(length(vertices$geometry))) {
       if(length(vertices$geometry[[i]]) > 0) {
         non_empty_geometry[[cntr]]  = vertices$geometry[[i]]
+        list_idx[[cntr]] = i
         cntr = cntr + 1
       }
     }
@@ -129,6 +131,7 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
                                            holes = holes,
                                            return_raw_ss = return_raw_ss,
                                            merge_nodes_tolerance = merge_nodes_tolerance)
+          attr(ss_list[[counter]], "original_sf_row_index") = list_idx[[i]]
           counter = counter + 1
         }
       } else if (is_multipolygon[i]) {
@@ -180,6 +183,7 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
                                              holes = cleaned_holes,
                                              return_raw_ss = return_raw_ss,
                                              merge_nodes_tolerance = merge_nodes_tolerance)
+            attr(ss_list[[counter]], "original_sf_row_index") = list_idx[[i]]
             counter = counter + 1
           }
         }

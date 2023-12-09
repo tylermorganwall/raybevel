@@ -10,12 +10,14 @@ generate_roof(
   offset = 0,
   base = FALSE,
   base_height = 0,
+  angle = 45,
   sides = FALSE,
   double_sided = FALSE,
   scale_all_max = FALSE,
   swap_yz = TRUE,
   progress = TRUE,
   material = material_list(),
+  roof_material = NA,
   verbose = FALSE
 )
 }
@@ -29,6 +31,8 @@ generate_roof(
 \item{base}{Default `FALSE`. A logical flag that controls whether to generate the bottom of the roof.}
 
 \item{base_height}{Default `offset`. Height of the base.}
+
+\item{angle}{Default `45`. Angle of the roof.}
 
 \item{sides}{Default `FALSE`. A logical flag on whether to draw the sides. This will automatically be set to `TRUE`
 if `base = TRUE` and the `base_height` is less than `offset`.}
@@ -44,6 +48,8 @@ If `TRUE`, the y and z coordinates will be swapped.}
 \item{progress}{Default `TRUE`. A logical flag to control whether a progress bar is displayed during roof generation.}
 
 \item{material}{Default `material_list()`. Interface to set the color/appearance/material options for the resulting `ray_mesh` mesh.}
+
+\item{roof_material}{Default `NA`, uses the material specified in `material`. Interface to set the color/appearance/material options for the resulting `ray_mesh` rooftop mesh.}
 
 \item{verbose}{Default `FALSE`. A logical flag to control whether additional timing information should be displayed.}
 }

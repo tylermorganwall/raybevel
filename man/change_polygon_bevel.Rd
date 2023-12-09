@@ -21,6 +21,7 @@ change_polygon_bevel(
   double_sided = FALSE,
   scale_all_max = FALSE,
   material = material_list(),
+  bevel_material = NA,
   verbose = FALSE
 )
 }
@@ -60,6 +61,8 @@ if `base = TRUE` and the `base_height` is less than `offset`.}
 max height, or whether to scale each max height to the maximum internal distance in the polygon.}
 
 \item{material}{Default `material_list()`. Interface to set the color/appearance/material options for the resulting `ray_mesh` mesh.}
+
+\item{bevel_material}{Default `NA`, uses the material specified in `material`. Interface to set the color/appearance/material options for the resulting `ray_mesh` bevel mesh.}
 
 \item{verbose}{Default `FALSE`. A logical flag to control whether additional timing information should be displayed.}
 }

@@ -7,6 +7,7 @@
 plot_skeleton(
   skeleton,
   use_arrow = TRUE,
+  use_points = TRUE,
   xlim = c(0, 1),
   ylim = c(0, 1),
   arrow_color = "red",
@@ -23,6 +24,8 @@ skeleton details. It should have 'nodes' and 'links' as its primary components.}
 
 \item{use_arrow}{Default `TRUE`. A logical value indicating whether or not to use arrows
 to represent the links of the straight skeleton. Default is TRUE.}
+
+\item{use_points}{Default `TRUE`. Whether to plot the vertex points as well.}
 
 \item{xlim}{Default`c(0,1)`. A numeric vector of length 2 specifying the x-limits of the
 plot in the form `c(min, max)`. These are proportional limits relative

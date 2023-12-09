@@ -19,14 +19,13 @@ knitr::opts_chunk$set(
 options(cores=8)
 ```
 
-# raybevel
+# raybevel: 3D Bevels and Straight Skeletons in R 
+
+<img src="man/figures/raybevelhex_big.png" align="right" width = "400px"/>
 
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/tylermorganwall/raybevel/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tylermorganwall/raybevel/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
-
-raybevel: 3D Bevels and Straight Skeletons in R <img src="man/figures/raybevel_hex_small.png" align="right" />
-=========================================================
 
 `raybevel` is an R package that can create and visualize straight skeletons, generate offset polygons, and generate 3D roof models and 3D beveled polygons. The 3D beveled polygons can be given any arbitrary 1D bevel profile controlled by the user.
 
@@ -66,18 +65,18 @@ First, let's load the library and generate a polygon with holes.
 
 ```{r simple_poly, fig.width=6,fig.height=6}
 library(raybevel)
-#Define a simple polygon
-vertices = matrix(c(0,0, 7,0, 7,7, 0,7, 0,0), ncol = 2, byrow = TRUE)-3.5
+# Define a simple polygon
+vertices = matrix(c(0, 0, 7, 0, 7, 7, 0, 7, 0, 0), ncol = 2, byrow = TRUE) - 3.5
 # Holes inside the polygon
-hole_1 = matrix(c(1,1, 2,1, 2,2, 1,2, 1,1), ncol = 2, byrow = TRUE)[5:1,]-3.5
-hole_2 = matrix(c(5,5, 6,5, 6,6, 5,6, 5,5), ncol = 2, byrow = TRUE)[5:1,]-3.5
+hole_1 = matrix(c(1, 1, 2, 1, 2, 2, 1, 2, 1, 1), ncol = 2, byrow = TRUE)[5:1, ] - 3.5
+hole_2 = matrix(c(5, 5, 6, 5, 6, 6, 5, 6, 5, 5), ncol = 2, byrow = TRUE)[5:1, ] - 3.5
 plot.new()
-par(mai = c(0,0,0,0))
-plot(vertices, type="n", xlim=c(-4,4), ylim=c(-4,4), xlab="", ylab="",
-     xaxt='n', yaxt='n', frame.plot = FALSE, asp = 1)
-polygon(vertices,col="lightblue")
-polygon(hole_1,col="white")
-polygon(hole_2,col="white")
+par(mai = c(0, 0, 0, 0))
+plot(vertices, type = "n", xlim = c(-4, 4), ylim = c(-4, 4), xlab = "", ylab = "",
+     xaxt = 'n', yaxt = 'n', frame.plot = FALSE, asp = 1)
+polygon(vertices, col = "lightblue")
+polygon(hole_1, col = "white")
+polygon(hole_2, col = "white")
 dev.off()
 
 ```
@@ -85,7 +84,7 @@ dev.off()
 Generate the straight skeleton. This plots arrows indicating the directionality of the links, which either point up-roof or along constant distance contours.
 
 ```{r plot_skeleton, fig.width=6,fig.height=6}
-skeleton = skeletonize(vertices, holes = list(hole_1,hole_2))
+skeleton = skeletonize(vertices, holes = list(hole_1, hole_2))
 plot_skeleton(skeleton)
 ```
 
@@ -101,9 +100,9 @@ We can also plot multiple offsets and use color palettes.
 
 ```{r multioffsets, fig.width=6,fig.height=6}
 library(patchwork)
-offset_polygon = generate_offset_polygon(skeleton, offset = seq(0,2.5,by=0.1))
+offset_polygon = generate_offset_polygon(skeleton, offset = seq(0, 2.5, by = 0.1))
 plot_skeleton(skeleton, arrow_color = "black", polygon_color = "black") + 
-plot_offset_polygon(offset_polygon,skeleton = skeleton, plot_original_polygon = TRUE)
+plot_offset_polygon(offset_polygon, skeleton = skeleton, plot_original_polygon = TRUE)
 
 ```
 
@@ -115,55 +114,56 @@ library(rayvertex)
 
 roof = generate_roof(skeleton)  
 
-generate_ground(depth = -0.5,material = diffuse(color="grey", checkercolor = "white")) |>
-  add_object(raymesh_model(roof, material = diffuse(color="dodgerblue"))) |>
-  add_object(sphere(y=20,x=0,z=-10,material=light(intensity = 200))) |> 
-  render_scene(lookfrom=c(10,20,0), sample_method = "sobol_blue",fov=25, 
-               min_variance = 1e-6, clamp_value = 10, samples=256, width=800,height=800)
+generate_ground(depth = -0.5, material = diffuse(color = "grey", checkercolor = "white")) |>
+  add_object(raymesh_model(roof, material = diffuse(color = "dodgerblue"))) |>
+  add_object(sphere(y = 20, x = 0, z = -10, material = light(intensity = 200))) |> 
+  render_scene(lookfrom = c(10, 20, 0), sample_method = "sobol_blue", fov = 25, 
+               min_variance = 1e-6, clamp_value = 10, samples = 256, width = 800, height = 800)
 ```
 
 And here is a beveled roof (here, setting the base height to the level of the ground, which generates the sides of the polygon as well):
 
 ```{r bevelroof}
 roof_bevel = generate_beveled_polygon(skeleton, base = TRUE, base_height = -0.5,
-                                      bevel_offsets = generate_bevel("circular", max_height = 1,
-                                                                      bevel_end = 0.5))
+                                      bevel_offsets = generate_bevel("circular", max_height = 0.5,
+                                                                      bevel_end = 0.5),)
 
-generate_ground(depth = -0.5,material = diffuse(color="grey", checkercolor = "white")) |>
-  add_object(raymesh_model(roof_bevel, material = diffuse(color="dodgerblue"), override_material = TRUE)) |>
-  add_object(sphere(y=15,x=0,z=-10,material=light(intensity = 200))) |> 
-  render_scene(lookfrom=c(10,20,0), sample_method = "sobol_blue",fov=25, 
-               min_variance = 1e-6, clamp_value = 10, samples=256, width=800,height=800)
+generate_ground(depth = -0.5, material = diffuse(color = "grey", checkercolor = "white")) |>
+  add_object(raymesh_model(roof_bevel, material = diffuse(color = "dodgerblue"), override_material = TRUE)) |>
+  add_object(sphere(y = 15, x = 0, z = -10, material = light(intensity = 200))) |> 
+  render_scene(lookfrom = c(10, 20, 0), sample_method = "sobol_blue", fov = 25, 
+               min_variance = 1e-6, clamp_value = 10, samples = 256, width = 800, height = 800)
 ```
 
 Multiple bevels are also supported (here, we use raw distance offsets, rather than percentage):
 
 ```{r multibevelroof}
 roof_bevel_multi = generate_beveled_polygon(skeleton, 
-                                            bevel_offsets = c(0.25,0.5,1,1.5,2),
-                                            bevel_heights = c(0.25,0.25,0.5,0.5,0.75)*2,
+                                            bevel_offsets = c(0.25, 0.5, 1, 1.5, 2),
+                                            bevel_heights = c(0.25, 0.25, 0.5, 0.5, 0.75),
                                             raw_offsets = TRUE, base = TRUE, base_height = -0.5) 
 
-generate_ground(depth = -0.5,material = diffuse(color="grey", checkercolor = "white")) |>
-  add_object(raymesh_model(roof_bevel_multi, material = diffuse(color="dodgerblue"), override_material = TRUE)) |>
-  add_object(sphere(y=15,x=0,z=-10,material=light(intensity = 200))) |> 
-  render_scene(lookfrom=c(10,20,0), sample_method = "sobol_blue",fov=25, 
-               min_variance = 1e-6, clamp_value = 10, samples=256, width=800,height=800)
+generate_ground(depth = -0.5, material = diffuse(color = "grey", checkercolor = "white")) |>
+  add_object(raymesh_model(roof_bevel_multi, material = diffuse(color = "dodgerblue"), override_material = TRUE)) |>
+  add_object(sphere(y = 15, x = 0, z = -10, material = light(intensity = 200))) |> 
+  render_scene(lookfrom = c(10, 20, 0), sample_method = "sobol_blue", fov = 25, 
+               min_variance = 1e-6, clamp_value = 10, samples = 256, width = 800, height = 800)
 ```
 
 You can use this to generate smooth variations in roof height:
 
 ```{r smoothbevelroof}
 roof_bevel_multi = generate_beveled_polygon(skeleton, base_height = -0.5,
-                                            bevel_offsets = seq(0,2.5,by=0.02),
-                                            bevel_heights = sqrt(seq(0,2.5,by=0.02))*2,
+                                            bevel_offsets = seq(0, 2.5, by = 0.02),
+                                            bevel_heights = 1 - exp(-seq(0, 2.5, by = 0.02) * 10),
+                                            raw_heights = TRUE,
                                             raw_offsets = TRUE) 
 
-generate_ground(depth = -0.5,material = diffuse(color="grey", checkercolor = "white")) |>
-  add_object(raymesh_model(roof_bevel_multi, material = diffuse(color="dodgerblue"), override_material = TRUE)) |>
-  add_object(sphere(y=15,x=0,z=-10,material=light(intensity = 200))) |> 
-  render_scene(lookfrom=c(10,20,0), sample_method = "sobol_blue",fov=25,
-               min_variance = 1e-6, clamp_value = 10, samples=256, width=800,height=800)
+generate_ground(depth = -0.5, material = diffuse(color = "grey", checkercolor = "white")) |>
+  add_object(raymesh_model(roof_bevel_multi, material = diffuse(color = "dodgerblue"), override_material = TRUE)) |>
+  add_object(sphere(y = 15, x = 0, z = -10, material = light(intensity = 200))) |> 
+  render_scene(lookfrom = c(10, 20, 0), sample_method = "sobol_blue", fov = 25,
+               min_variance = 1e-6, clamp_value = 10, samples = 256, width = 800, height = 800)
 ```
 
 And you can specify more complex functions for bevel height as well:
@@ -171,8 +171,8 @@ And you can specify more complex functions for bevel height as well:
 ```{r functionbevelroof}
 roof_bevel_multi_sin = generate_beveled_polygon(skeleton, 
                                                 bevel_offsets = seq(0,2.5,by=0.02),
-                                                bevel_heights = abs(sinpi(exp(seq(0,2.5,by=0.02))/2)),
-                                                base = TRUE, offset=1, base_height = -0.5,
+                                                bevel_heights = abs(sinpi(exp(seq(0,2.5,by=0.02))/2))/2,
+                                                base = TRUE, offset=0.5, base_height = -0.5,
                                                 raw_offsets = TRUE) 
 
 generate_ground(depth = -0.5,material = diffuse(color="grey", checkercolor = "white")) |>
@@ -184,28 +184,30 @@ generate_ground(depth = -0.5,material = diffuse(color="grey", checkercolor = "wh
 
 You can also plot {sf} objects. Here, we generate a roof in the shape of California.
 
-```{r ca_sf}
+```{r ca_sf, message=FALSE}
 library(rayvertex)
-library(sf)
+library(sf) 
 
+# Load US states data and extract California
 us_states = spData::us_states
 california = us_states[us_states$NAME == "California",]
-cali_skeleton = skeletonize(california)
+cali_skeleton = skeletonize(california)  # Skeletonize the California shape
 
-roof_cali = generate_roof(cali_skeleton, base = TRUE, sides = TRUE, offset = 2, base_height = 0) |> 
+# Generate and transform the roof model
+roof_cali = generate_roof(cali_skeleton, base = TRUE, sides = TRUE, offset = 1, base_height = 0,
+                          angle = 30) |> 
   center_mesh() |> 
-  scale_unit_mesh() |> 
-  translate_mesh(c(0,0.5,0)) |>
-  scale_mesh(c(10,2,10))
+  translate_mesh(c(0,1,0)) 
 
-generate_ground(depth = -0.1,material = diffuse(color="grey50",checkercolor = "white",checkerperiod = 0.5)) |>
-  add_object(raymesh_model(roof_cali, material = diffuse(color ="purple"), override_material = TRUE)) |>
-  add_object(sphere(y=10,x=20,z=-50,radius=10,material=light(color="white", intensity = 20))) |>
-  add_object(sphere(y=20,x=30,z=50,radius=10,material=light(color="white", intensity = 20))) |>
-  add_object(sphere(y=10,x=-20,z=-50,radius=10,material=light(color="lightblue", intensity = 20))) |>
-  render_scene(lookfrom=c(0,10,9), camera_up=c(0,1,0), lookat=c(0,0,-0.5),
-               sample_method = "sobol_blue", fov=0, ortho_dimensions = c(11,11),
-               min_variance = 0, clamp_value = 10, samples=256, width=800,height=800)
+# Render the scene with the California roof model
+generate_ground(depth = -0.1, material = diffuse(color="grey50", checkercolor = "white", checkerperiod = 0.5)) |>
+  add_object(raymesh_model(roof_cali, material = diffuse(color = "purple"), override_material = TRUE)) |>
+  add_object(sphere(y=20, x=20, z=-50, radius=10, material=light(color="white", intensity = 20))) |>
+  add_object(sphere(y=20, x=30, z=50, radius=10, material=light(color="orange", intensity = 20))) |>
+  render_scene(lookfrom=c(0,10,-5), camera_up=c(0,0,1), lookat=c(0,0,0.25),
+               sample_method = "sobol_blue", fov=0, ortho_dimensions = c(12,12),
+               min_variance = 0, clamp_value = 10, samples=256, width=800, height=800)
+
 ```
 
 We can also generate a complex beveled polygon with `generate_beveled_polygon()`. We'll first generate and plot our more complex bevel:
@@ -216,25 +218,26 @@ bevel = generate_complex_bevel(c("bump", "exp"),
                                bevel_end = c(0.1,0.6),
                                reverse = c(F,F),
                                segment_height = c(0.05,0.2),
-                               plot_bevel = TRUE)
+                               plot_bevel = TRUE) 
 ```
 
 Now let's create a vertically-oriented (by turning `swap_yz = FALSE` 3D polygon of California and render it as a glossy, double-sided model. 
 
-```{r ca_sf_bevel, warning=FALSE}
-ca_model = generate_beveled_polygon(cali_skeleton, offset=0.2, sides = TRUE,  double_sided = TRUE,
+```{r ca_sf_bevel, warning=FALSE, message=FALSE}
+ca_model = generate_beveled_polygon(cali_skeleton, offset = 0.2, sides = TRUE, double_sided = TRUE,
                                     bevel_offsets = bevel, swap_yz = FALSE,
-                                    material = rayvertex::material_list(diffuse="purple"))
+                                    material = rayvertex::material_list(diffuse = "purple"))
 
+# Rendering the 3D model
 ca_model |>
   rayvertex::center_mesh() |>
-  raymesh_model(y=1.5, material = glossy(color="purple", gloss=0.8)) |>
-  add_object(generate_studio(depth=-4, distance=-15,
-                             material = diffuse(color="grey50", checkercolor="grey20"))) |>
-  add_object(xy_rect(y=15,x=5,z=60,xwidth=100,ywidth=50,
-                     flipped =TRUE,angle = c(0,45,0),
-                     material=light(intensity = 3))) |>
-  render_scene(lookfrom=c(10,10,50), lookat=c(0,1.5,1),
-               sample_method = "sobol_blue", samples=256, clamp_value = 10,
-               width=800,height=800,fov=15,ortho_dimensions=c(10,10))
+  raymesh_model(y = 1.5, material = glossy(color = "purple", gloss = 0.8)) |>
+  add_object(generate_studio(depth = -4, distance = -15,
+                             material = diffuse(color = "grey50", checkercolor = "grey20"))) |>
+  add_object(xy_rect(y = 15, x = 5, z = 60, xwidth = 100, ywidth = 50,
+                     flipped = TRUE, angle = c(0, 45, 0),
+                     material = light(intensity = 3))) |>
+  render_scene(lookfrom = c(10, 10, 50), lookat = c(0, 1.5, 1),
+               sample_method = "sobol_blue", samples = 256, clamp_value = 10,
+               width = 800, height = 800, fov = 15, ortho_dimensions = c(10, 10))
 ```

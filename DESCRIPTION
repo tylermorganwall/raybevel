@@ -21,5 +21,4 @@ Suggests:
     testthat (>= 3.0.0),
     ggplot2
 RoxygenNote: 7.2.3
-Remotes: tylermorganwall/RcppCGAL
 Config/testthat/edition: 3
