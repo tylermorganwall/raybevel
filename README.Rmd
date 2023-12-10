@@ -225,7 +225,7 @@ Now let's create a vertically-oriented (by turning `swap_yz = FALSE` 3D polygon 
 
 ```{r ca_sf_bevel, warning=FALSE, message=FALSE}
 ca_model = generate_beveled_polygon(cali_skeleton, offset = 0.2, sides = TRUE, double_sided = TRUE,
-                                    bevel_offsets = bevel, swap_yz = FALSE,
+                                    bevel_offsets = bevel, swap_yz = FALSE, 
                                     material = rayvertex::material_list(diffuse = "purple"))
 
 # Rendering the 3D model

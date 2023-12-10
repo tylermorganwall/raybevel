@@ -271,7 +271,7 @@ polygon of California and render it as a glossy, double-sided model.
 
 ``` r
 ca_model = generate_beveled_polygon(cali_skeleton, offset = 0.2, sides = TRUE, double_sided = TRUE,
-                                    bevel_offsets = bevel, swap_yz = FALSE,
+                                    bevel_offsets = bevel, swap_yz = FALSE, 
                                     material = rayvertex::material_list(diffuse = "purple"))
 
 # Rendering the 3D model
