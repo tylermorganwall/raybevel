@@ -14,7 +14,7 @@ Imports: progress,
          rayvertex,
          sf,
          grid
-LinkingTo: Rcpp, BH, RcppCGAL, progress, RcppThread
+LinkingTo: Rcpp, BH, RcppCGAL, progress, RcppThread (>= 2.1.6)
 Suggests: 
     spData,
     rayrender,

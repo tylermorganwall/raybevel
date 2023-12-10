@@ -17,7 +17,7 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
                  paste0(sprintf("%0.4f", offsets), collapse = ", "), max_time))
   }
   poly_list = generate_offset_links_nodes_rcpp(links, nodes, offsets = offsets, progress = progress)
-  # browser()
+
   new_links_offset = list()
   for(ii in seq_along(poly_list)) {
     if(length(poly_list[[ii]]) > 0) {
@@ -52,7 +52,6 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
 #'
 #' @keywords internal
 insert_polygon_links_nodes = function(ss, new_links_all) {
-  # browser()
   links = ss$links
   nodes = ss$nodes
   counter = 1
@@ -61,6 +60,11 @@ insert_polygon_links_nodes = function(ss, new_links_all) {
   new_link_list_poly = list()
   new_node_list = list()
   links_to_remove = list()
+  raw_df = function(list_vals) {
+    structure(list_vals,
+              class = "data.frame",
+              row.names = seq_len(length(list_vals[[1]])))
+  }
   # plot_skeleton(ss, label_ids = TRUE)
   for(ii in seq_len(length(new_links_all))) {
     new_links = new_links_all[[ii]]
@@ -91,28 +95,34 @@ insert_polygon_links_nodes = function(ss, new_links_all) {
                                 (links$destination == old_source &
                                  links$source == old_destination))
         stopifnot(length(link_remove_idx) == 1)
+        stopifnot(length(old_source) == 1)
+        stopifnot(length(old_destination) == 1)
+        stopifnot(length(poly_id) == 1)
+        stopifnot(length(new_time) == 1)
+
         old_link = links[link_remove_idx,]
         old_source_time = old_link$source_time
         old_destination_time = old_link$destination_time
 
         if(old_source != new_id) {
           links_to_remove[[counter]] = link_remove_idx
-          new_link_list[[counter]] = data.frame(source = c(old_source,new_id),
-                                            destination = c(new_id,old_destination),
-                                            source_time = c(old_source_time, new_time),
-                                            destination_time = c(new_time, old_destination_time),
-                                            edge = FALSE,
-                                            link_remove = link_remove_idx,
-                                            old_source_id = old_source,
-                                            old_dest_id = old_destination) #We will remove this variable before joining
+
+          new_link_list[[counter]] = raw_df(list(source = c(old_source,new_id),
+                                                 destination = c(new_id,old_destination),
+                                                 source_time = c(old_source_time, new_time),
+                                                 destination_time = c(new_time, old_destination_time),
+                                                 edge = c(FALSE, FALSE),
+                                                 link_remove = rep(link_remove_idx,2),
+                                                 old_source_id = rep(old_source,2),
+                                                 old_dest_id = rep(old_destination,2))) #We will remove this variable before joining
           counter = counter + 1
         }
         # if(prev_id == 0 || prev_id == new_id ) {
-          new_link_list_poly[[poly_counter]] = data.frame(source = new_id,
-                                                     destination = poly_id,
-                                                     source_time = new_time,
-                                                     destination_time = new_time,
-                                                     edge = FALSE)
+          new_link_list_poly[[poly_counter]] = raw_df(list(source = new_id,
+                                                          destination = poly_id,
+                                                          source_time = new_time,
+                                                          destination_time = new_time,
+                                                          edge = FALSE))
           poly_counter = poly_counter + 1
 
         # } else {

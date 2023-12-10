@@ -461,7 +461,7 @@ generate_beveled_polygon = function(skeleton,
   init_time()
   if(inherits(skeleton, "rayskeleton_list")) {
     pb = progress::progress_bar$new(
-      format = ":current/:total Generating roof [:bar] eta: :eta",
+      format = ":current/:total Generating bevel [:bar] eta: :eta",
       total = length(skeleton), clear = TRUE, width = 60)
     meshlist = list()
     counter  = 1
@@ -504,7 +504,7 @@ generate_beveled_polygon = function(skeleton,
                                                      set_max_height = set_max_height,
                                                      return_skeleton_polygons = return_skeleton_polygons,
                                                      swap_yz = swap_yz,
-                                                     progress = FALSE,
+                                                     progress = progress,
                                                      material = material)
       counter = counter + 1
     }
@@ -524,10 +524,6 @@ generate_beveled_polygon = function(skeleton,
      !is.null(bevel_offsets$y)) {
     bevel_heights = bevel_offsets$y
     bevel_offsets = bevel_offsets$x
-    # if(set_max_height) {
-    #   warning("`set_max_height` is ignored when passing in bevel curve--set the max height when generating the bevel.")
-    #   set_max_height = FALSE
-    # }
   }
 
   if(!raw_offsets) {
@@ -552,17 +548,10 @@ generate_beveled_polygon = function(skeleton,
                          roof_material = bevel_material,
                          material = material))
   }
-  # browser()
   if(!raw_heights) {
     bevel_heights = bevel_heights * max_time
   }
 
-  # bevel_offsets_inserted = modify_bevel_with_skeleton(bevel_offsets, bevel_heights, skeleton)
-  # bevel_offsets_inserted = approx(bevel_offsets_inserted, xout = seq(0,1,by=0.1), rule = 2)
-  # print_time(verbose, "Modified Bevel Offsets with Skeleton Nodes")
-  # bevel_offsets = bevel_offsets_inserted$x
-  # bevel_heights = bevel_offsets_inserted$y[order(bevel_offsets)]
-  # bevel_offsets = bevel_offsets[order(bevel_offsets)]
   bevel_heights = bevel_heights[order(bevel_offsets)]
   bevel_offsets = bevel_offsets[order(bevel_offsets)]
 
@@ -888,7 +877,7 @@ change_polygon_bevel = function(skeleton_polygons,
                                                  base_height = base_height,
                                                  bevel_material = bevel_material,
                                                  material = material,
-                                                 swap_yz = swap_yz, progress = progress)
+                                                 swap_yz = swap_yz)
       counter = counter + 1
     }
     return(scene_from_list(meshlist))

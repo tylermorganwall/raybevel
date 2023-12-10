@@ -158,7 +158,7 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
   std::vector<Node> newNodes;
 
   // Main loop to iterate over offsets
-  RProgress::RProgress pb("Calculating [:bar] ETA: :eta");
+  RProgress::RProgress pb("Inserting links: :percent (:eta remaining)");
   if(progress) {
     pb.set_total(offsets.size());
     pb.tick(0);

@@ -84,8 +84,7 @@ List convert_ss_to_polygons_rcpp(List ss, int numbercores, bool progress) {
     Link l = {link_source[i], link_dest[i], link_edge[i], link_source_time[i], link_dest_time[i], false};
     links.push_back(l);
   }
-  RcppThread::ProgressBar pb(link_source.size(), 1);
-
+  RcppThread::ProgressCounter pb(link_source.size(), 1, "Polygonizing: ");
   std::vector<std::vector<int>> list_all_polygons;
   list_all_polygons.resize(links.size());
   RcppThread::ThreadPool pool(numbercores);
