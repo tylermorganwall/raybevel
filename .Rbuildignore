@@ -3,3 +3,6 @@
 ^README\.Rmd$
 README_cache
 ^\.github$
+^tests/*$
+^docs/*$
+^README\.md$

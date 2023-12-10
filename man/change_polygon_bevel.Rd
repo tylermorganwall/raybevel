@@ -92,14 +92,17 @@ if(run_documentation()) {
                                               return_skeleton_polygons = TRUE)
 
   bevel_new = change_polygon_bevel(bevel_model_cali,
-                                   bevel_offsets = generate_bevel(max_height=0.5, bevel_end=0.5)) |>
+                                   bevel_offsets = generate_bevel(max_height=0.5,
+                                   bevel_end=0.5)) |>
     center_mesh()
 
-  scene_base = xz_rect(xwidth=100,zwidth=100,material=diffuse(color="grey20", checkercolor="white")) |>
+  scene_base = xz_rect(xwidth=100,zwidth=100,
+                       material=diffuse(color="grey20", checkercolor="white")) |>
     add_object(sphere(y=8,z=10,x=-3,material=light(intensity=100))) |>
     add_object(sphere(y=800,z=10,x=-3,radius=100,material=light(intensity=5)))
 
-  raymesh_model(bevel_new, y=0.5, override_material = TRUE, material = diffuse(color="purple")) |>
+  raymesh_model(bevel_new, y=0.5, override_material = TRUE,
+                material = diffuse(color="purple")) |>
     add_object(scene_base) |>
     render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue",clamp_value = 10,
                  width=800,height=800,fov=0,ortho_dimensions=c(12,12))
@@ -145,7 +148,8 @@ if(run_documentation()) {
                                        bevel_offsets = seq(0,1, length.out=100),
                                        base = TRUE) |>
         translate_mesh(c(120.49,0,38.72))
-      raymesh_model(bevel_new, y = 0, override_material = TRUE,material = glossy(color="darkred")) |>
+      raymesh_model(bevel_new, y = 0, override_material = TRUE,
+                    material = glossy(color="darkred")) |>
         add_object(scene_base) |>
         add_object(sphere(x=30,z=-30,y=5,radius=10,material=light(color="white"))) |>
         add_object(sphere(x=-30,z=30,y=5,radius=10,material=light(color="white"))) |>

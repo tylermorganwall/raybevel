@@ -72,7 +72,8 @@ if(run_documentation()) {
   library(rayrender)
   library(rayvertex)
   roof_model = generate_roof(skeleton, material = material_list(diffuse="purple"))
-  scene_base = xz_rect(xwidth=100,zwidth=100,material=diffuse(color="grey20", checkercolor="white")) |>
+  scene_base = xz_rect(xwidth=100,zwidth=100,
+                       material=diffuse(color="grey20", checkercolor="white")) |>
     add_object(sphere(y=8,z=10,x=-3,material=light(intensity=100))) |>
     add_object(sphere(y=800,z=10,x=-3,radius=100,material=light(intensity=5)))
 

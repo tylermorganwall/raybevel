@@ -35,7 +35,7 @@ run_tests_bevel = function(argument_grid, plot_prefix="", interactive_run=FALSE,
         add_object(sphere(y=-15,x=10,z=-10,material=light(intensity = 200))) |>
 
         render_scene(lookfrom=c(10,10,0), sample_method = "sobol_blue",fov=50,
-                     preview=TRUE, debug="normal",
+                     preview=TRUE, debug_channel="normal",
                      samples=128, width=100,height=100)
     } else {
       raymesh_model(poly_bevel_mesh, material = diffuse(color="dodgerblue"), override_material = TRUE) |>
@@ -43,7 +43,7 @@ run_tests_bevel = function(argument_grid, plot_prefix="", interactive_run=FALSE,
         add_object(sphere(y=-15,x=10,z=-10,material=light(intensity = 200))) |>
 
         render_scene(lookfrom=c(10,10,0), sample_method = "sobol_blue",fov=50,
-                     filename = path, preview=FALSE,debug="normal",
+                     filename = path, preview=FALSE,debug_channel="normal",
                      samples=1, width=100,height=100)
       expect_snapshot_file(path = path, name = test_filename, compare = compare_image)
     }
