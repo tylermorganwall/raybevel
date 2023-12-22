@@ -23,6 +23,8 @@
 #'        (by their index) to highlight. If specified, the corresponding links will
 #'        be colored with the `highlight_color`.
 #' @param highlight_color Default `"purple"`. Color of the highlighted links.
+#' @param return_layers Default `FALSE`, plots the figure. If `TRUE`, this will instead
+#' return a list of the ggplot layers.
 #'
 #' @details The function uses the {ggplot2} package for plotting. The straight skeleton
 #'          is visualized based on the details provided in the `skeleton` object.
@@ -52,7 +54,8 @@
 #' plot_skeleton(skeleton, highlight_links = max_links, highlight_color = "green")
 plot_skeleton = function(skeleton, use_arrow = TRUE, use_points = TRUE, xlim = c(0,1), ylim = c(0,1),
                          arrow_color = "red", polygon_color = "black", size = 1,
-                         arrow_size = 0.05, highlight_links = NULL, highlight_color = "green") {
+                         arrow_size = 0.05, highlight_links = NULL, highlight_color = "green",
+                         return_layers = FALSE) {
   if(!(length(find.package("ggplot2", quiet = TRUE)) > 0)) {
     stop("{ggplot2} package required for plot_skeleton()")
   }
@@ -77,8 +80,8 @@ plot_skeleton = function(skeleton, use_arrow = TRUE, use_points = TRUE, xlim = c
   coord_fixed = ggplot2::coord_fixed
 
   # Create base ggplot object
-  p = ggplot() + theme_void()
-
+  # p = ggplot() + theme_void()
+  p = list()
   if(!inherits(skeleton, "rayskeleton_list")) {
     skeleton_all = list(skeleton)
   } else {
@@ -104,44 +107,43 @@ plot_skeleton = function(skeleton, use_arrow = TRUE, use_points = TRUE, xlim = c
 
   # Plot skeleton nodes
   if(use_points) {
-    p = p + geom_point(data = final_nodes,
+    p[[length(p) + 1]] = geom_point(data = final_nodes,
                        aes(x = x, y = y),
                        color = polygon_color, size = size)
   }
 
   # Plot skeleton links (arrows or segments)
   if (use_arrow) {
-    p = p + geom_segment(data = final_links,
+    p[[length(p) + 1]] = geom_segment(data = final_links,
                           aes(x = x,
                               y = y,
                               xend = mid_x,
                               yend = mid_y,
                               color = is_highlighted),
-                          arrow = grid::arrow(type = "closed", length = grid::unit(arrow_size, "inches"))) +
-      geom_segment(data = final_links,
-                   aes(x = mid_x,
-                       y = mid_y,
-                       xend = xend,
-                       yend = yend,
-                       color = is_highlighted))
+                          arrow = grid::arrow(type = "closed", length = grid::unit(arrow_size, "inches")))
+    p[[length(p) + 1]] =   geom_segment(data = final_links,
+                 aes(x = mid_x,
+                     y = mid_y,
+                     xend = xend,
+                     yend = yend,
+                     color = is_highlighted))
   } else {
-    p = p + geom_segment(data = final_links,
+    p[[length(p) + 1]] = geom_segment(data = final_links,
                          aes(x = x,
                              y = y,
                              xend = xend,
                              yend = yend,
                              color = is_highlighted))
   }
-  p = p +
-    scale_color_manual(values=c(arrow_color, highlight_color)) +
-    theme(legend.position = "none")
+  p[[length(p) + 1]] = scale_color_manual(values=c(arrow_color, highlight_color))
+  p[[length(p) + 1]] =   theme(legend.position = "none")
 
   # Plot original polygon
   for(i in seq_along(skeleton_all)) {
     skeleton = skeleton_all[[i]]
     original_vertices = attr(skeleton, "original_vertices")
     colnames(original_vertices) = c("x","y")
-    p = p + geom_polygon(data = data.frame(original_vertices),
+    p[[length(p) + 1]] = geom_polygon(data = data.frame(original_vertices),
                           aes(x = x, y = y),
                           color = polygon_color, fill = NA)
 
@@ -152,16 +154,21 @@ plot_skeleton = function(skeleton, use_arrow = TRUE, use_points = TRUE, xlim = c
         hole = data.frame(hole)
         colnames(hole) = c("x","y")
 
-        p = p + geom_polygon(data = hole,
+        p[[length(p) + 1]] = geom_polygon(data = hole,
                               aes(x = x, y = y),
                               color = polygon_color, fill = NA)
       }
     }
   }
-  # Adjust plot limits and maintain aspect ratio
-  suppressWarnings({
-    p = p + coord_fixed(ratio = 1)
-  })
+  if(!return_layers) {
+    # Adjust plot limits and maintain aspect ratio
+    p[[length(p) + 1]] = coord_fixed(ratio = 1)
+    p[[length(p) + 1]] = theme_void()
+    p[[length(p) + 1]] = theme(legend.position = "none")
 
-  return(p)
+    return(ggplot() + p)
+
+  } else {
+    return(p)
+  }
 }

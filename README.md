@@ -289,3 +289,9 @@ ca_model |>
 ```
 
 <img src="man/figures/README-ca_sf_bevel-1.png" width="100%" />
+
+## To-do
+
+- [ ] Keep CRS information and add option to convert back to {sf} object
+- [ ] ggplot2 geom
+- [ ] external offsets

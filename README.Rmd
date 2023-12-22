@@ -24,7 +24,7 @@ options(cores=8)
 <img src="man/figures/raybevelhex_big.png" align="right" width = "400px"/>
 
 <!-- badges: start -->
-  [![R-CMD-check](https://github.com/tylermorganwall/raybevel/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tylermorganwall/raybevel/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/tylermorganwall/raybevel/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tylermorganwall/raybevel/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 `raybevel` is an R package that can create and visualize straight skeletons, generate offset polygons, and generate 3D roof models and 3D beveled polygons. The 3D beveled polygons can be given any arbitrary 1D bevel profile controlled by the user.
@@ -241,3 +241,11 @@ ca_model |>
                sample_method = "sobol_blue", samples = 256, clamp_value = 10,
                width = 800, height = 800, fov = 15, ortho_dimensions = c(10, 10))
 ```
+
+
+## To-do
+
+- [ ]  Keep CRS information and add option to convert back to {sf} object
+- [ ]  ggplot2 geom
+- [ ]  external offsets
+ 

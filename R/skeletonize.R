@@ -288,6 +288,10 @@ skeletonize = function(vertices, holes = list(), debug = FALSE,
 
   ss = list(nodes = nodes, links = links)
   class(ss) = "rayskeleton"
+  for(i in seq_len(length(holes))) {
+    colnames(holes[[i]]) = c("x","y")
+  }
+  colnames(vertices) = c("x","y")
   attr(ss,"original_vertices") = vertices
   attr(ss,"original_holes") = holes
   if(merge_nodes_tolerance > 0) {

@@ -439,7 +439,7 @@ generate_beveled_polygon = function(skeleton,
                                     bevel_offsets = generate_bevel(),
                                     bevel_heights = NULL,
                                     set_max_height = FALSE,
-                                    max_height = 1,
+                                    max_height = NA,
                                     offset = 0,
                                     base = TRUE,
                                     base_height = 0,
@@ -519,7 +519,6 @@ generate_beveled_polygon = function(skeleton,
   if(!inherits(skeleton, "rayskeleton")) {
     stop("`skeleton` must be of class `rayskeleton`")
   }
-  stopifnot(max_height > 0)
   max_time = max(skeleton$links$destination_time)
   if(is.list(bevel_offsets) &&
      !is.null(bevel_offsets$x) &&
@@ -559,7 +558,8 @@ generate_beveled_polygon = function(skeleton,
 
   height_range = range(bevel_heights)
   height_range = height_range[2]-height_range[1]
-  if(set_max_height) {
+  if(set_max_height && !is.na(max_height)) {
+    stopifnot(max_height > 0)
     min_height = min(bevel_heights)
     offset_bevel_heights = bevel_heights - min_height
     offset_bevel_heights = max_height * offset_bevel_heights / height_range + min_height

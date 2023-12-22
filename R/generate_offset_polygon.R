@@ -28,9 +28,6 @@
 #' #Generate three offsets
 #' plot_offset_polygon(generate_offset_polygon(skeleton, c(0.25,0.75,1.5,2)))
 #'
-#' #Generate three offsets, including the original polygon
-#' plot_offset_polygon(generate_offset_polygon(skeleton, c(0.25,0.75,1.5,2)), skeleton = skeleton)
-#'
 #' #Generate many offsets
 #' plot_offset_polygon(generate_offset_polygon(skeleton, seq(0,2.5,by=0.1)))
 #'
@@ -44,17 +41,56 @@
 #'                       linewidth = 1)
 #' }
 generate_offset_polygon = function(skeleton, offset, progress = FALSE) {
-  if(length(offset) > 1) {
-    if(any(offset > max(skeleton$nodes$time))) {
-      warning("Removing offsets greater than maximum straight skeleton distance (%f)", max(skeleton$nodes$time))
-    }
-    offset = offset[offset < max(skeleton$nodes$time)]
-    poly_list = list()
-    for(i in seq_len(length(offset))) {
-      poly_list[[i]] = generate_offset_polygon(skeleton,offset[i])
-      names(poly_list[[i]]) = sprintf("%s_off%i",names(poly_list[[i]]),i)
-    }
-    return(unlist(poly_list,recursive = FALSE))
+  offset = offset[order(offset)]
+  if(inherits(skeleton, "rayskeleton_list")) {
+    is_list = TRUE
+    max_internal_distance = max(unlist(lapply(skeleton, \(x) max(x$nodes$time))))
+  } else {
+    is_list = FALSE
+    max_internal_distance =  max(skeleton$nodes$time)
   }
-  return(generate_offset_links_nodes(skeleton, offset, return_polys = TRUE, verbose = FALSE, progress = progress))
+  offset = offset[offset < max_internal_distance]
+  if(length(offset) == 0) {
+    stop(sprintf("offsets are all greater than maximum internal distance (%f)",max_internal_distance))
+  }
+  poly_list = list()
+  if(is_list) {
+    for(j in seq_len(length(skeleton))) {
+      poly_list_skeleton = list()
+      for(i in seq_len(length(offset))) {
+        poly_list_skeleton[[i]] = generate_offset_links_nodes(skeleton[[j]], offset[i], return_polys = TRUE,
+                                                              verbose = FALSE, progress = progress)
+        class(poly_list_skeleton[[i]]) = c("rayskeleton_offset_polygons", "list")
+        num_polygons = length(poly_list_skeleton[[i]])
+        attr(poly_list_skeleton[[i]], "number_polygons") = num_polygons
+        offset_len = seq_len(length(num_polygons))
+        names(poly_list_skeleton[[i]]) = sprintf("%s_off%i",offset_len,i)
+      }
+      class(poly_list_skeleton) = c("rayskeleton_offset_polygons_collection", "list")
+      attr(poly_list_skeleton, "skeleton") = skeleton[[j]]
+      attr(poly_list_skeleton, "number_offsets") = length(offset)
+      attr(poly_list_skeleton, "original_vertices") = attr(skeleton[[j]], "original_vertices")
+      attr(poly_list_skeleton, "original_holes") = attr(skeleton[[j]], "original_holes")
+      poly_list[[j]] = poly_list_skeleton
+    }
+  } else {
+    poly_list_skeleton = list()
+    for(i in seq_len(length(offset))) {
+      poly_list_skeleton[[i]] = generate_offset_links_nodes(skeleton, offset[i], return_polys = TRUE,
+                                                   verbose = FALSE, progress = progress)
+      class(poly_list_skeleton[[i]]) = c("rayskeleton_offset_polygons", "list")
+      num_polygons = length(poly_list_skeleton[[i]])
+      attr(poly_list_skeleton[[i]], "number_polygons") = num_polygons
+      offset_len = seq_len(length(poly_list_skeleton[[i]]))
+      names(poly_list_skeleton[[i]]) = sprintf("offset_%f_%i",offset[i],i)
+    }
+    class(poly_list_skeleton) = c("rayskeleton_offset_polygons_collection", "list")
+    attr(poly_list_skeleton, "skeleton") = skeleton
+    attr(poly_list_skeleton, "number_offsets") = length(offset)
+    attr(poly_list_skeleton, "original_vertices") = attr(skeleton, "original_vertices")
+    attr(poly_list_skeleton, "original_holes") = attr(skeleton, "original_holes")
+    poly_list[[1]] = poly_list_skeleton
+  }
+  class(poly_list) = c("rayskeleton_polygons", "list")
+  return(poly_list)
 }

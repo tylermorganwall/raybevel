@@ -6,22 +6,23 @@
 \usage{
 plot_offset_polygon(
   offset_polygons,
-  skeleton = NULL,
   plot_original_polygon = TRUE,
   color = NULL,
   border = "dodgerblue",
   xlim = NULL,
   ylim = NULL,
-  linewidth = 1
+  linewidth = 1,
+  final_layer = TRUE,
+  background = "white",
+  plot_skeleton = FALSE,
+  ...
 )
 }
 \arguments{
-\item{offset_polygons}{Default `NULL`. A list of data frames, where each data frame represents an offset polygon. Each data frame should have 'x' and 'y' columns representing coordinates.}
+\item{offset_polygons}{Default `NULL`. A `rayskeleton_polygon` or `rayskeleton_polygon_list` object, generated from
+`generate_offset_polygon()`.}
 
-\item{skeleton}{Default `NULL`. The straight skeleton used to generate the offset polygon. Include this if you want to adjust the plot
-range to encompass the entire original polygon.}
-
-\item{plot_original_polygon}{Default `TRUE`. If `skeleton` passed as well, plots the original polygon.}
+\item{plot_original_polygon}{Default `TRUE`. Whether to plot the original polygon.}
 
 \item{color}{Default `NULL`. A color or palette function to generate the fill palette for the polygons' interiors.}
 
@@ -32,6 +33,10 @@ range to encompass the entire original polygon.}
 \item{ylim}{Default `NULL`. The y-axis limits as a vector of two values (min, max). If `NULL`, it calculates the limits from the data.}
 
 \item{linewidth}{Default `1`. The linewidth of the polygon.}
+
+\item{plot_skeleton}{Default `FALSE`. Whether to plot the straight skeleton.}
+
+\item{...}{Additional arguments to pass to `plot_skeleton()` if `plot_skeleton = TRUE`}
 }
 \value{
 A plot showing the offset polygons.
@@ -48,14 +53,19 @@ hole_2 = matrix(c(5,5, 6,5, 6,6, 5,6, 5,5), ncol = 2, byrow = TRUE)[5:1,]
 skeleton = skeletonize(vertices, holes = list(hole_1, hole_2))
 plot_skeleton(skeleton)
 
-#Generate three offsets
-plot_offset_polygon(generate_offset_polygon(skeleton, c(0.25,0.75,1.5,2)))
-
-#Generate three offsets, including the original polygon
-plot_offset_polygon(generate_offset_polygon(skeleton, c(0.25,0.75,1.5,2)), skeleton = skeleton)
+#Generate three offsets with the skeleton
+plot_offset_polygon(generate_offset_polygon(skeleton, c(0.25,0.75,1.5,2)), plot_skeleton = TRUE)
 
 #Generate many offsets
-plot_offset_polygon(generate_offset_polygon(skeleton, seq(0,2.5,by=0.1)))
+plot_offset_polygon(generate_offset_polygon(skeleton, seq(0.05,2.55,by=0.1)))
+
+#Pass a palette
+plot_offset_polygon(generate_offset_polygon(skeleton, seq(0.05,2.55,by=0.1)),
+                    border = heat.colors)
+
+#Pass colors manually (colors in excess of the number of offsets are ignored)
+plot_offset_polygon(generate_offset_polygon(skeleton, seq(0.05,2.55,by=0.1)),
+                    border = rep(c("red","red","blue","blue"),100))
 
 # Skeletonize and plot an {sf} object
 if(length(find.package("spData",quiet = TRUE)) > 0) {

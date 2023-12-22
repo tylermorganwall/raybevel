@@ -13,8 +13,7 @@ generate_offset_links_nodes = function(ss, offsets, return_polys = FALSE, progre
 
   max_time = max(links$destination_time)
   if(all(offsets >= max_time)) {
-    stop(sprintf("offsets `c(%s)` must not be greater than or equal to max time: %0.4f",
-                 paste0(sprintf("%0.4f", offsets), collapse = ", "), max_time))
+    return(list(data.frame(x=numeric(),y=numeric())))
   }
   poly_list = generate_offset_links_nodes_rcpp(links, nodes, offsets = offsets, progress = progress)
 

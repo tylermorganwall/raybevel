@@ -15,7 +15,8 @@ plot_skeleton(
   size = 1,
   arrow_size = 0.05,
   highlight_links = NULL,
-  highlight_color = "green"
+  highlight_color = "green",
+  return_layers = FALSE
 )
 }
 \arguments{
@@ -48,6 +49,9 @@ to the bounding box around the skeleton.}
 be colored with the `highlight_color`.}
 
 \item{highlight_color}{Default `"purple"`. Color of the highlighted links.}
+
+\item{return_layers}{Default `FALSE`, plots the figure. If `TRUE`, this will instead
+return a list of the ggplot layers.}
 }
 \value{
 A ggplot object visualizing the straight skeleton and the original polygon.

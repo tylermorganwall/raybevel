@@ -38,9 +38,6 @@ plot_skeleton(skeleton)
 #Generate three offsets
 plot_offset_polygon(generate_offset_polygon(skeleton, c(0.25,0.75,1.5,2)))
 
-#Generate three offsets, including the original polygon
-plot_offset_polygon(generate_offset_polygon(skeleton, c(0.25,0.75,1.5,2)), skeleton = skeleton)
-
 #Generate many offsets
 plot_offset_polygon(generate_offset_polygon(skeleton, seq(0,2.5,by=0.1)))
 
