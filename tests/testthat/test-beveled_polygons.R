@@ -68,7 +68,7 @@ test_that("Checking generate_beveled_polygon() raw extrusion ", {
                               max_height = list(3),
                               double_sided = list(TRUE, FALSE),
                               base_height = list(NA, -1.5,-0.5,0.5),
-                              offset = list(NA,-0.5,0.5))
+                              vertical_offset = list(NA,-0.5,0.5))
 
   run_tests_bevel(generate_polygon_args, plot_prefix = "bevel_raw", interactive_run = FALSE,
                   list(skeleton = skeleton))
