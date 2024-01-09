@@ -7,7 +7,7 @@
 generate_roof(
   skeleton,
   max_height = NA,
-  offset = 0,
+  vertical_offset = 0,
   base = FALSE,
   base_height = 0,
   angle = 45,
@@ -26,16 +26,16 @@ generate_roof(
 
 \item{max_height}{Default `NA`. The maximum height of the roof.}
 
-\item{offset}{Default `0`. The vertical offset of the roof.}
+\item{vertical_offset}{Default `0`. The vertical offset of the roof.}
 
-\item{base}{Default `FALSE`. A logical flag that controls whether to generate the bottom of the roof.}
+\item{base}{Default `TRUE`. A logical flag that controls whether to generate the bottom of the roof.}
 
-\item{base_height}{Default `offset`. Height of the base.}
+\item{base_height}{Default `vertical_offset`. Height of the base.}
 
 \item{angle}{Default `45`. Angle of the roof.}
 
 \item{sides}{Default `FALSE`. A logical flag on whether to draw the sides. This will automatically be set to `TRUE`
-if `base = TRUE` and the `base_height` is less than `offset`.}
+if `base = TRUE` and the `base_height` is less than `vertical_offset`.}
 
 \item{double_sided}{Default `FALSE`. A logical flag that controls whether the polygon should be double-sided.}
 
@@ -92,27 +92,27 @@ if(run_documentation()) {
                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
 }
 
-#Add an offset to the roof
+#Add a vertical_offset to the roof, without a base
 if(run_documentation()) {
-  roof_model = generate_roof(skeleton, offset = 2)
+  roof_model = generate_roof(skeleton, vertical_offset = 2, base = FALSE)
   raymesh_model(roof_model, material = diffuse(color="purple")) |>
     add_object(scene_base) |>
     render_scene(lookfrom=c(10,10,20), lookat=c(0,2,0), sample_method = "sobol_blue",
                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
 }
 
-# Add a base, which defaults to height zero
+# Add a base
 if(run_documentation()) {
-  roof_model = generate_roof(skeleton, offset = 2, base = TRUE)
+  roof_model = generate_roof(skeleton, vertical_offset = 2, base = TRUE)
   raymesh_model(roof_model, material = diffuse(color="purple")) |>
     add_object(scene_base) |>
     render_scene(lookfrom=c(10,10,20), lookat=c(0,2,0), sample_method = "sobol_blue",
                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
 }
 
-# Change the base height (note that the offset is measured from the base, not from zero)
+# Change the base height (note that the vertical_offset is measured from the base, not from zero)
 if(run_documentation()) {
-  roof_model = generate_roof(skeleton, offset = 2, base = TRUE, base_height=1)
+  roof_model = generate_roof(skeleton, vertical_offset = 2, base = TRUE, base_height=1)
   raymesh_model(roof_model, material = diffuse(color="purple")) |>
     add_object(scene_base) |>
     render_scene(lookfrom=c(10,10,20), lookat=c(0,2,0), sample_method = "sobol_blue",
@@ -134,7 +134,7 @@ if(run_documentation()) {
     add_object(scene_base) |>
     add_object(sphere(x=-10,z=-10,y=4,material=light(color="red", intensity=40))) |>
     add_object(sphere(x=10,z=-10,y=4,material=light(color="orange", intensity=40))) |>
-    render_scene(lookfrom=c(0,10,1), sample_method = "sobol_blue",
+    render_scene(lookfrom=c(0,10,-1), sample_method = "sobol_blue",
                  width=800,height=800,fov=0, ortho_dimensions=c(12,12))
 }
 }

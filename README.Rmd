@@ -11,9 +11,9 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%",
-  fig.width=8,
-  fig.height=8,
+  fig.align = "center",
+  fig.width=6,
+  fig.height=6,
   cache = TRUE,
   dpi=100)
 options(cores=8)
@@ -63,7 +63,7 @@ library(spData)
 
 First, let's load the library and generate a polygon with holes.
 
-```{r simple_poly, fig.width=6,fig.height=6}
+```{r simple_poly, fig.width=4,fig.height=4}
 library(raybevel)
 # Define a simple polygon
 vertices = matrix(c(0, 0, 7, 0, 7, 7, 0, 7, 0, 0), ncol = 2, byrow = TRUE) - 3.5
@@ -83,14 +83,14 @@ dev.off()
 
 Generate the straight skeleton. This plots arrows indicating the directionality of the links, which either point up-roof or along constant distance contours.
 
-```{r plot_skeleton, fig.width=6,fig.height=6}
+```{r plot_skeleton, fig.width=4,fig.height=4}
 skeleton = skeletonize(vertices, holes = list(hole_1, hole_2))
 plot_skeleton(skeleton)
 ```
 
 Now, we can offset this polygon inwards:
 
-```{r offsets, fig.width=6,fig.height=6}
+```{r offsets, fig.width=4,fig.height=4}
 offset_polygon = generate_offset_polygon(skeleton, offset = 1.2)
 offset_polygon
 plot_offset_polygon(offset_polygon, skeleton = skeleton)
@@ -98,15 +98,15 @@ plot_offset_polygon(offset_polygon, skeleton = skeleton)
 
 We can also plot multiple offsets and use color palettes.
 
-```{r multioffsets, fig.width=6,fig.height=6}
+```{r multioffsets, fig.width=8,fig.height=4}
 library(patchwork)
-offset_polygon = generate_offset_polygon(skeleton, offset = seq(0, 2.5, by = 0.1))
+offset_polygon = generate_offset_polygon(skeleton, offset = seq(0, 2.5, by = 0.1)+0.05)
 plot_skeleton(skeleton, arrow_color = "black", polygon_color = "black") + 
 plot_offset_polygon(offset_polygon, skeleton = skeleton, plot_original_polygon = TRUE)
 
 ```
 
-Let's design a simple roof and render it with rayrender. When base_height is less than the roof offset (default of 0), the sides of the polygon will also be extruded.
+Let's design a simple roof and render it with rayrender. When base_height is less than the vertical offset (default of 0), the sides of the polygon will also be extruded.
 
 ```{r roof}
 library(rayrender)
@@ -172,14 +172,14 @@ And you can specify more complex functions for bevel height as well:
 roof_bevel_multi_sin = generate_beveled_polygon(skeleton, 
                                                 bevel_offsets = seq(0,2.5,by=0.02),
                                                 bevel_heights = abs(sinpi(exp(seq(0,2.5,by=0.02))/2))/2,
-                                                base = TRUE, offset=0.5, base_height = -0.5,
+                                                base = TRUE, vertical_offset=0.5, base_height = -0.5,
                                                 raw_offsets = TRUE) 
 
 generate_ground(depth = -0.5,material = diffuse(color="grey", checkercolor = "white")) |>
   add_object(raymesh_model(roof_bevel_multi_sin, material = diffuse(color="dodgerblue"), override_material = TRUE)) |>
   add_object(sphere(y=15,x=0,z=-10,material=light(intensity = 200))) |> 
   render_scene(lookfrom=c(10,20,0), sample_method = "sobol_blue",fov=25, ortho_dimensions = c(8,8),
-               min_variance = 1e-6, clamp_value = 10, samples=256, width=800,height=800)
+               min_variance = 1e-6, clamp_value = 10, samples = 256, width=800,height=800)
 ```
 
 You can also plot {sf} objects. Here, we generate a roof in the shape of California.
@@ -194,7 +194,7 @@ california = us_states[us_states$NAME == "California",]
 cali_skeleton = skeletonize(california)  # Skeletonize the California shape
 
 # Generate and transform the roof model
-roof_cali = generate_roof(cali_skeleton, base = TRUE, sides = TRUE, offset = 1, base_height = 0,
+roof_cali = generate_roof(cali_skeleton, base = TRUE, sides = TRUE, vertical_offset = 1, base_height = 0,
                           angle = 30) |> 
   center_mesh() |> 
   translate_mesh(c(0,1,0)) 
@@ -206,13 +206,13 @@ generate_ground(depth = -0.1, material = diffuse(color="grey50", checkercolor = 
   add_object(sphere(y=20, x=30, z=50, radius=10, material=light(color="orange", intensity = 20))) |>
   render_scene(lookfrom=c(0,10,-5), camera_up=c(0,0,1), lookat=c(0,0,0.25),
                sample_method = "sobol_blue", fov=0, ortho_dimensions = c(12,12),
-               min_variance = 0, clamp_value = 10, samples=256, width=800, height=800)
+               min_variance = 0, clamp_value = 10, samples = 256, width=800, height=800)
 
 ```
 
 We can also generate a complex beveled polygon with `generate_beveled_polygon()`. We'll first generate and plot our more complex bevel:
 
-```{r complex_bevel, fig.width=6, fig.height=6} 
+```{r complex_bevel, fig.width=4, fig.height=4} 
 bevel = generate_complex_bevel(c("bump", "exp"),
                                bevel_start = c(0,0.3),
                                bevel_end = c(0.1,0.6),
@@ -224,7 +224,7 @@ bevel = generate_complex_bevel(c("bump", "exp"),
 Now let's create a vertically-oriented (by turning `swap_yz = FALSE` 3D polygon of California and render it as a glossy, double-sided model. 
 
 ```{r ca_sf_bevel, warning=FALSE, message=FALSE}
-ca_model = generate_beveled_polygon(cali_skeleton, offset = 0.2, sides = TRUE, double_sided = TRUE,
+ca_model = generate_beveled_polygon(cali_skeleton, vertical_offset = 0.2, sides = TRUE, double_sided = TRUE,
                                     bevel_offsets = bevel, swap_yz = FALSE, 
                                     material = rayvertex::material_list(diffuse = "purple"))
 

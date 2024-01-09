@@ -9,6 +9,7 @@
 #' @param ylim Default `NULL`. The y-axis limits as a vector of two values (min, max). If `NULL`, it calculates the limits from the data.
 #' @param fill Default `NULL`. A color or palette function to generate the fill palette for the polygons' interiors.
 #' @param linewidth Default `1`. The linewidth of the polygon.
+#' @param background Default `"white"`. Background color.
 #' @param plot_original_polygon Default `TRUE`. Whether to plot the original polygon.
 #' @param plot_skeleton Default `FALSE`. Whether to plot the straight skeleton.
 #' @param return_layers Default `FALSE`, plots the figure. If `TRUE`, this will instead
@@ -53,7 +54,7 @@
 plot_offset_polygon = function(offset_polygons,
                                plot_original_polygon = TRUE,
                                fill = NA, color= "dodgerblue", xlim=NULL, ylim=NULL,
-                               linewidth = 1, final_layer = TRUE, background = "white",
+                               linewidth = 1, background = "white",
                                plot_skeleton = FALSE, return_layers = FALSE, ...) {
   # Check if ggplot2 package is installed
   if(!(length(find.package("ggplot2", quiet = TRUE)) > 0)) {
@@ -114,7 +115,7 @@ plot_offset_polygon = function(offset_polygons,
             poly = single_offset[[i]]
             colnames(poly) = c("x","y")
             p[[length(p) + 1]] = geom_polygon(data = data.frame(poly), aes(x = x, y = y),
-                                              fill = fill[j], color = color[j], size = linewidth)
+                                              fill = fill[j], color = color[j], linewidth = linewidth)
           }
         }
       }
@@ -131,7 +132,7 @@ plot_offset_polygon = function(offset_polygons,
     # If skeleton is provided and plot_original_polygon is TRUE, add original polygon and holes to the plot
     if (plot_original_polygon) {
       p[[length(p) + 1]] = geom_polygon(data = data.frame(original_vertices),
-                           aes(x = x, y = y), fill = NA, color = "black", size = linewidth)
+                           aes(x = x, y = y), fill = NA, color = "black", linewidth = linewidth)
 
       # Plot holes, if they exist
       original_holes = attr(offset_polygons[[i]], "original_holes")
@@ -139,7 +140,7 @@ plot_offset_polygon = function(offset_polygons,
         for (hole in original_holes) {
           colnames(hole) = c("x","y")
           p[[length(p) + 1]] = geom_polygon(data = data.frame(hole),
-                               aes(x = x, y = y), fill = NA, color = "black", size = linewidth)
+                               aes(x = x, y = y), fill = NA, color = "black", linewidth = linewidth)
         }
       }
     }

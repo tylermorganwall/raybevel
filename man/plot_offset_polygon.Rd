@@ -7,14 +7,14 @@
 plot_offset_polygon(
   offset_polygons,
   plot_original_polygon = TRUE,
-  color = NULL,
-  border = "dodgerblue",
+  fill = NA,
+  color = "dodgerblue",
   xlim = NULL,
   ylim = NULL,
   linewidth = 1,
-  final_layer = TRUE,
   background = "white",
   plot_skeleton = FALSE,
+  return_layers = FALSE,
   ...
 )
 }
@@ -24,9 +24,9 @@ plot_offset_polygon(
 
 \item{plot_original_polygon}{Default `TRUE`. Whether to plot the original polygon.}
 
-\item{color}{Default `NULL`. A color or palette function to generate the fill palette for the polygons' interiors.}
+\item{fill}{Default `NULL`. A color or palette function to generate the fill palette for the polygons' interiors.}
 
-\item{border}{Default `grDevices::heat.colors`.  A color or palette function to generate the color palette for the offset polygons' borders.}
+\item{color}{Default `grDevices::heat.colors`.  A color or palette function to generate the color palette for the offset polygons' borders.}
 
 \item{xlim}{Default `NULL`. The x-axis limits as a vector of two values (min, max). If `NULL`, it calculates the limits from the data.}
 
@@ -34,7 +34,12 @@ plot_offset_polygon(
 
 \item{linewidth}{Default `1`. The linewidth of the polygon.}
 
+\item{background}{Default `"white"`. Background color.}
+
 \item{plot_skeleton}{Default `FALSE`. Whether to plot the straight skeleton.}
+
+\item{return_layers}{Default `FALSE`, plots the figure. If `TRUE`, this will instead
+return a list of the ggplot layers.}
 
 \item{...}{Additional arguments to pass to `plot_skeleton()` if `plot_skeleton = TRUE`}
 }
@@ -61,11 +66,11 @@ plot_offset_polygon(generate_offset_polygon(skeleton, seq(0.05,2.55,by=0.1)))
 
 #Pass a palette
 plot_offset_polygon(generate_offset_polygon(skeleton, seq(0.05,2.55,by=0.1)),
-                    border = heat.colors)
+                    color = heat.colors)
 
 #Pass colors manually (colors in excess of the number of offsets are ignored)
 plot_offset_polygon(generate_offset_polygon(skeleton, seq(0.05,2.55,by=0.1)),
-                    border = rep(c("red","red","blue","blue"),100))
+                    color = rep(c("red","red","blue","blue"),100))
 
 # Skeletonize and plot an {sf} object
 if(length(find.package("spData",quiet = TRUE)) > 0) {
@@ -73,7 +78,7 @@ if(length(find.package("spData",quiet = TRUE)) > 0) {
   texas = us_states[us_states$NAME == "Texas",]
   texas_skeleton = skeletonize(texas)
   plot_offset_polygon(generate_offset_polygon(texas_skeleton, seq(0, 2.5, by = 0.1)),
-                      border = heat.colors,
+                      color = heat.colors,
                       linewidth = 1)
 }
 }

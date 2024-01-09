@@ -9,8 +9,8 @@ generate_beveled_polygon(
   bevel_offsets = generate_bevel(),
   bevel_heights = NULL,
   set_max_height = FALSE,
-  max_height = 1,
-  offset = 0,
+  max_height = NA,
+  vertical_offset = 0,
   base = TRUE,
   base_height = 0,
   raw_offsets = FALSE,
@@ -37,11 +37,11 @@ generate_beveled_polygon(
 
 \item{max_height}{Default `1`. The maximum height of the polygon.}
 
-\item{offset}{Default `0`. The vertical offset of the polygon.}
+\item{vertical_offset}{Default `0`. The vertical offset of the polygon.}
 
-\item{base}{Default `FALSE`. A logical flag that controls whether to generate the bottom of the polygon.}
+\item{base}{Default `TRUE`. A logical flag that controls whether to generate the bottom of the polygon.}
 
-\item{base_height}{Default `NA`. Height of the base, defaulting to `min(bevel_heights) + offset` .}
+\item{base_height}{Default `NA`. Height of the base, defaulting to `min(bevel_heights) + vertical_offset` .}
 
 \item{raw_offsets}{Default `FALSE`. A logical flag indicating whether the `bevel_offsets` are already in raw format and do not need to be multiplied by the maximum time of the skeleton.}
 
@@ -54,7 +54,7 @@ generate_beveled_polygon(
 \item{double_sided}{Default `FALSE`. A logical flag that controls whether the polygon should be double-sided.}
 
 \item{sides}{Default `FALSE`. A logical flag on whether to draw the sides. This will automatically be set to `TRUE`
-if `base = TRUE` and the `base_height` is less than `offset`.}
+if `base = TRUE` and the `base_height` is less than `vertical_offset`.}
 
 \item{return_skeleton_polygons}{Default `FALSE`. A logical flag that controls whether to return the skeleton polygons along with the 3D mesh.}
 
@@ -138,7 +138,7 @@ if(run_documentation()) {
                                  segment_height = c(0.25,0.5,0.5,4),
                                  plot_bevel = TRUE)
 
-  roof_model = generate_beveled_polygon(skeleton, offset=0.1,
+  roof_model = generate_beveled_polygon(skeleton, vertical_offset=0.1,
                                         bevel_offsets = bevel,
                                         raw_heights = TRUE,
                                         material = material_list(diffuse="purple"))
@@ -157,7 +157,7 @@ if(run_documentation()) {
                                  bevel_end = offs[-1],
                                  segment_height = 0.2)
 
-  roof_model = generate_beveled_polygon(skeleton, offset=0.2,
+  roof_model = generate_beveled_polygon(skeleton, vertical_offset=0.2,
                                         bevel_offsets = bevel,
                                         raw_heights = TRUE,
                                         material = material_list(diffuse = "purple"))
@@ -178,7 +178,7 @@ if(run_documentation()) {
                                  flip = c(TRUE, FALSE),
                                  segment_height = 0.25)
 
-  roof_model = generate_beveled_polygon(skeleton, offset=0.2,
+  roof_model = generate_beveled_polygon(skeleton, vertical_offset=0.2,
                                         bevel_offsets = bevel,
                                         raw_heights = TRUE,
                                         material = material_list(diffuse = "purple"))

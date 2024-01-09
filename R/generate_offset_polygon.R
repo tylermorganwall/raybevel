@@ -29,7 +29,7 @@
 #' plot_offset_polygon(generate_offset_polygon(skeleton, c(0.25,0.75,1.5,2)))
 #'
 #' #Generate many offsets
-#' plot_offset_polygon(generate_offset_polygon(skeleton, seq(0,2.5,by=0.1)))
+#' plot_offset_polygon(generate_offset_polygon(skeleton, seq(0,2.5,by=0.1)+0.05))
 #'
 #' # Skeletonize and plot an {sf} object
 #' if(length(find.package("spData",quiet = TRUE)) > 0) {

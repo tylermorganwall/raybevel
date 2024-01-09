@@ -10,8 +10,8 @@ change_polygon_bevel(
   bevel_heights = NULL,
   set_max_height = FALSE,
   max_height = 1,
-  offset = 0,
-  base = FALSE,
+  vertical_offset = 0,
+  base = TRUE,
   base_height = NA,
   raw_offsets = FALSE,
   raw_heights = FALSE,
@@ -37,11 +37,11 @@ change_polygon_bevel(
 
 \item{max_height}{Default `1`. The maximum height of the polygon.}
 
-\item{offset}{Default `0`. The vertical offset of the polygon.}
+\item{vertical_offset}{Default `0`. The vertical offset of the polygon.}
 
-\item{base}{Default `FALSE`. A logical flag that controls whether to generate the bottom of the polygon.}
+\item{base}{Default `TRUE`. A logical flag that controls whether to generate the bottom of the polygon.}
 
-\item{base_height}{Default `NA`. Height of the base, defaulting to the `min(bevel_heights) + offset` .}
+\item{base_height}{Default `NA`. Height of the base, defaulting to the `min(bevel_heights) + vertical_offset` .}
 
 \item{raw_offsets}{Default `FALSE`. A logical flag indicating whether the `bevel_offsets` are already in raw format and do not need to be multiplied by the maximum time of the skeleton.}
 
@@ -53,7 +53,7 @@ If `TRUE`, the y and z coordinates will be swapped.}
 \item{progress}{Default `TRUE`. Whether to display a progress bar.}
 
 \item{sides}{Default `FALSE`. A logical flag on whether to draw the sides. This will automatically be set to `TRUE`
-if `base = TRUE` and the `base_height` is less than `offset`.}
+if `base = TRUE` and the `base_height` is less than `vertical_offset`.}
 
 \item{double_sided}{Default `FALSE`. A logical flag that controls whether the polygon should be double-sided.}
 
@@ -104,18 +104,18 @@ if(run_documentation()) {
   raymesh_model(bevel_new, y=0.5, override_material = TRUE,
                 material = diffuse(color="purple")) |>
     add_object(scene_base) |>
-    render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue",clamp_value = 10,
+    render_scene(lookfrom=c(0,30,-10), sample_method = "sobol_blue",clamp_value = 10,
                  width=800,height=800,fov=0,ortho_dimensions=c(12,12))
 }
 # Change to a smooth bevel
 if(run_documentation()) {
   new_bevel = generate_bevel("circular", bevel_start = 0, bevel_end=1)
   bevel_new = change_polygon_bevel(bevel_model_cali,
-                                   bevel_offsets = new_bevel) |>
+                                   bevel_offsets = new_bevel, solid ) |>
     center_mesh()
   raymesh_model(bevel_new, override_material = TRUE, y=1,material = diffuse(color="purple")) |>
     add_object(scene_base) |>
-    render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue",clamp_value = 10,
+    render_scene(lookfrom=c(0,30,-10), sample_method = "sobol_blue",clamp_value = 10,
                  width=800,height=800,fov=0,ortho_dimensions=c(12,12))
 }
 
@@ -135,28 +135,26 @@ if(run_documentation()) {
     center_mesh()
   raymesh_model(bevel_new, override_material = TRUE, y=1,material = diffuse(color="purple")) |>
     add_object(scene_base) |>
-    render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue",clamp_value = 10,
+    render_scene(lookfrom=c(0,30,-20), sample_method = "sobol_blue",clamp_value = 10,
                  width=800,height=800,fov=0,ortho_dimensions=c(12,12))
 }
 
 # Quickly generate new bevels to inflate California like a balloon using the arctan function.
 if(run_documentation()) {
   inflate_california = function(magnitudes) {
-    for(val in magnitudes) {
-      bevel_new = change_polygon_bevel(bevel_model_cali,
-                                       bevel_heights = 1/2*atan(seq(0,val,length.out=100)),
-                                       bevel_offsets = seq(0,1, length.out=100),
-                                       base = TRUE) |>
-        translate_mesh(c(120.49,0,38.72))
-      raymesh_model(bevel_new, y = 0, override_material = TRUE,
-                    material = glossy(color="darkred")) |>
-        add_object(scene_base) |>
-        add_object(sphere(x=30,z=-30,y=5,radius=10,material=light(color="white"))) |>
-        add_object(sphere(x=-30,z=30,y=5,radius=10,material=light(color="white"))) |>
-        add_object(sphere(y=50,radius=10,material=light(color="white"))) |>
-        render_scene(lookfrom=c(12.42, 28.77, 20.32), lookat=c(1.77, 1.46, 2.69),
-                     sample_method = "sobol_blue", clamp_value = 10,
-                     width=800,height=800,fov=20,samples=256)
+  for(val in magnitudes) {
+    bevel_new = change_polygon_bevel(bevel_model_cali,
+                                     bevel_heights = 1/2*atan(seq(0,val,length.out=100)),
+                                     bevel_offsets = seq(0,1, length.out=100),
+                                     base = TRUE) |>
+      translate_mesh(c(-120.49,0,-38.72))
+    raymesh_model(bevel_new, y = 0, override_material = TRUE,
+                  material = glossy(color="darkred")) |>
+      add_object(scene_base) |>
+      add_object(sphere(x=-30,z=30,y=18,radius=30,material=light(color="white", intensity=5))) |>
+      render_scene(lookfrom=c(-1, 28, -20.32), lookat=c(-1, 1.46, -2),
+                   sample_method = "sobol_blue", clamp_value = 10,
+                   width=800,height=800,fov=20,samples=256)
     }
   }
   inflate_california(c(1,4,16,64))

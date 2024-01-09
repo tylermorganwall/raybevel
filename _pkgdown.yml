@@ -1,0 +1,75 @@
+url: https://www.raybevel.com
+
+pandoc: 2.3.1
+pkgdown: 1.3.0.9000
+pkgdown_sha: 2f40b4769ea9ad2312aa4cc93f27ab116461543b
+articles: []
+
+template:
+  opengraph:
+    twitter:
+      creator: "@tylermorganwall"
+      site: "@tylermorganwall"
+      card: summary_large_image
+
+figures:
+  dev: ragg::agg_png
+  dpi: 100
+  dev.args: []
+  fig.ext: png
+  fig.width: 8
+  fig.height: 8
+  fig.retina: 2
+  fig.asp: 1
+  bg: NA
+
+reference:
+  - title: "Skeletonization"
+    desc: "Function to calculate straight skeletons"
+    contents:
+      - matches("skeletonize")
+  - title: "2D Inset Polygons"
+    desc: "Function to calculate 2D inset polygons"
+    contents:
+      - matches("generate_offset_polygon")
+  - title: "3D Bevels"
+    desc: "Functions to generate 3D bevels"
+    contents:
+      - matches("generate_roof")
+      - matches("generate_beveled_polygon")
+      - matches("change_polygon_bevel")
+  - title: "2D Profiles"
+    desc: "Functions to generate 2D bevel profiles"
+    contents:
+      - matches("generate_bevel")
+      - matches("generate_complex_bevel")
+  - title: "Plotting"
+    desc: "Functions to plot skeletons and bevels"
+    contents:
+      - starts_with("plot")
+  - title: "pkgdown utils"
+    desc: "Internal but must be exported to meet CRAN guidelines"
+    contents:
+      - starts_with("run")
+
+navbar:
+  title: "raybevel"
+  type: inverse
+  left:
+    - icon: fa-home
+      href: index.html
+    - text: "Tutorials/Blog Posts"
+      menu:
+      -  text: "Roofs, Bevels, and Skeletons: Introducing the Raybevel Package"
+         href: https://www.tylermw.com/posts/rayverse/raybevel-introduction.html
+  right:
+    - icon: fa-file-code-o
+      text: "functions"
+      href: reference/index.html
+    - icon: fa-github fa-lg
+      text: "GitHub"
+      href: https://github.com/tylermorganwall/raybevel
+
+authors:
+  Tyler Morgan-Wall:
+    href: https://www.tylermw.com
