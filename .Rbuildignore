@@ -6,3 +6,6 @@ README_cache
 ^tests/*$
 ^docs/*$
 ^README\.md$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
