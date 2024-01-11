@@ -6,7 +6,7 @@
 
 using namespace Rcpp;
 
-struct Node{
+struct Node {
   int id;
   double x;
   double y;
@@ -19,11 +19,11 @@ struct Link {
   int source;
   int destination;
   int edge;
-  double source_time;
-  double destination_time;
   int maxima_source;
   int maxima_dest;
   int visited;
+  double source_time;
+  double destination_time;
 };
 
 struct NewNode {
@@ -61,6 +61,7 @@ double getNodeTimeById(const std::vector<Node>& nodes, int id) {
 
 // Convert DataFrame to std::vector of Nodes
 std::vector<Node> convertDataFrameToNodes(DataFrame df) {
+  size_t nrows = df.nrow();
   IntegerVector id = Rcpp::as<IntegerVector>(df["id"]);
   NumericVector x = Rcpp::as<NumericVector>(df["x"]);
   NumericVector y = Rcpp::as<NumericVector>(df["y"]);
@@ -69,16 +70,14 @@ std::vector<Node> convertDataFrameToNodes(DataFrame df) {
   IntegerVector maxima = Rcpp::as<IntegerVector>(df["local_maxima"]);
 
   std::vector<Node> nodes;
-  for (int i = 0; i < id.size(); ++i) {
-    Node n{id[i], x[i], y[i], time[i], edge[i], maxima[i]};
-    n.id = id[i];
-    n.x = x[i];
-    n.y = y[i];
-    n.time = time[i];
-    n.edge = edge[i];
-    n.local_maxima = maxima[i];
-
-    nodes.push_back(n);
+  nodes.resize(nrows);
+  for (int i = 0; i < nrows; ++i) {
+    nodes[i].id = id(i);
+    nodes[i].x = x(i);
+    nodes[i].y = y(i);
+    nodes[i].time = time(i);
+    nodes[i].edge = edge(i);
+    nodes[i].local_maxima = maxima(i);
   }
   return nodes;
 }
@@ -114,6 +113,7 @@ std::vector<double> interpolate_location(const std::vector<double>& node_start,
 
 // Convert DataFrame to std::vector of Links
 std::vector<Link> convertDataFrameToLinks(DataFrame df) {
+  size_t nrows = df.nrow();
   IntegerVector source = Rcpp::as<IntegerVector>(df["source"]);
   IntegerVector destination = Rcpp::as<IntegerVector>(df["destination"]);
   LogicalVector edge = Rcpp::as<LogicalVector>(df["edge"]);
@@ -123,18 +123,17 @@ std::vector<Link> convertDataFrameToLinks(DataFrame df) {
   LogicalVector local_maxima_source = Rcpp::as<LogicalVector>(df["local_maxima_source"]);
 
   std::vector<Link> links;
-  for (int i = 0; i < source.size(); ++i) {
-    Link l;
-    l.source = source[i];
-    l.destination = destination[i];
-    l.edge = edge[i];
-    l.source_time = source_time[i];
-    l.destination_time = destination_time[i];
-    l.maxima_source = local_maxima_source[i];
-    l.maxima_dest = local_maxima_destination[i];
-    l.visited = 0;
+  links.resize(nrows);
 
-    links.push_back(l);
+  for (int i = 0; i < nrows; ++i) {
+    links[i].source = (int)source(i);
+    links[i].destination = (int)destination(i);
+    links[i].edge = (int)edge(i);
+    links[i].source_time = (double)source_time(i);
+    links[i].destination_time = (double)destination_time(i);
+    links[i].maxima_source = (int)local_maxima_source(i);
+    links[i].maxima_dest = (int)local_maxima_destination(i);
+    links[i].visited = (int)0;
   }
   return links;
 }
@@ -160,8 +159,8 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
   // Main loop to iterate over offsets
   RProgress::RProgress pb("Inserting links: :percent (:eta remaining)");
   if(progress) {
-    pb.set_total(offsets.size());
-    pb.tick(0);
+   pb.set_total(offsets.size());
+   pb.tick(0);
   }
   for(int ii = 0; ii < offsets.size(); ++ii) {
     if(progress) {
@@ -174,11 +173,12 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
     std::vector<NewNode> new_node_info;
 
     for(int jj = 0; jj < links.size(); jj++) {
-      visited[jj] = links[jj].edge;
+      visited[jj] = (bool)links[jj].edge;
       away_from_offset[jj] = (links[jj].source_time < offset && links[jj].destination_time < offset) ||
                              (links[jj].source_time > offset && links[jj].destination_time > offset);
       equal_to_offset[jj] = links[jj].source_time == offset;
     }
+
     int first_node = -1;
     int first_dest = -1;
     int tmp_source = -1;
@@ -188,7 +188,7 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
     bool any_picked = false;
     bool new_poly = true;
 
-    for(int jj = 0; jj < links.size(); jj++) {
+    for(size_t jj = 0; jj < links.size(); jj++) {
       if(links[jj].maxima_dest && links[jj].destination_time >= offset) {
         first_node = links[jj].source;
         first_dest = links[jj].destination;
@@ -197,15 +197,19 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
         break;
       }
     }
+
     while(true) {
       Rcpp::checkUserInterrupt();
       // if(tmp_source == first_node && tmp_dest == first_dest && !first) {
       //   break;
       // }
       std::vector<Link> non_visited_links;
-      for(int jj = 0; jj < links.size(); jj++) {
+      for(size_t jj = 0; jj < links.size(); ++jj) {
         if(!visited[jj]) {
           non_visited_links.push_back(links[jj]);
+        }
+        if(non_visited_links.size() > links.size()) {
+          throw std::runtime_error("Memory corruption");
         }
       }
       std::vector<Link> remaining_links;
@@ -215,7 +219,7 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
         }
         if(tmp_source == first_node && tmp_dest == first_dest) {
           new_poly = true;
-          for(int jj = 0; jj < links.size(); jj++) {
+          for(size_t jj = 0; jj < links.size(); ++jj) {
             if(!visited[jj] && !away_from_offset[jj] && !links[jj].edge) {
               remaining_links.push_back(links[jj]);
             }
@@ -230,7 +234,7 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
           num_polygons++;
         }
       }
-      int remaining_links_count = std::count_if(visited.begin(), visited.end(), [](bool l) { return !l; });
+      size_t remaining_links_count = std::count_if(visited.begin(), visited.end(), [](bool l) { return !l; });
 
       first = false;
 
@@ -239,7 +243,7 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
       double node1_time = getNodeTimeById(nodes, tmp_source);
       double node2_time = getNodeTimeById(nodes, tmp_dest);
 
-      for(int jj = 0; jj < links.size(); jj++) {
+      for(size_t jj = 0; jj < links.size(); jj++) {
         if((links[jj].source == tmp_source &&
             links[jj].destination == tmp_dest) ||
            (links[jj].destination == tmp_source &&
@@ -302,7 +306,7 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
       // }
 
       bool is_edge = false;
-      for(int jj = 0; jj < nodes.size(); jj++) {
+      for(size_t jj = 0; jj < nodes.size(); jj++) {
         if(nodes[jj].id == tmp_dest) {
           is_edge = nodes[jj].edge;
         }
@@ -399,7 +403,7 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
         tmp_dest = best_dest;
       }
       bool all_remaining_at_offset = true;
-      for(int jj = 0; jj < non_visited_links.size(); jj++) {
+      for(size_t jj = 0; jj < non_visited_links.size(); jj++) {
         if(((non_visited_links[jj].destination_time == offset && non_visited_links[jj].maxima_dest) ||
            (non_visited_links[jj].source_time == offset && non_visited_links[jj].maxima_source)) &&
            new_poly) {
@@ -416,7 +420,7 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
       // }
     }
     List single_offset_nodes;
-    for(int jj = 0; jj < new_node_info.size(); jj++) {
+    for(size_t jj = 0; jj < new_node_info.size(); jj++) {
       NewNode& x = new_node_info[jj];
       NumericVector node_data = {(double)x.polygon_id,
                                  (double)x.source,
