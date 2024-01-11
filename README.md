@@ -407,4 +407,3 @@ ca_model |>
 - [ ] Keep CRS information and add option to convert back to {sf} object
 - [ ] ggplot2 geom
 - [ ] external offsets
-- [ ] Investigate Ubuntu crash
