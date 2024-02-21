@@ -1,7 +1,5 @@
 #' Discretize and Merge Nodes
 #'
-#' @param ss
-#'
 #' @keywords internal
 find_dangling_nodes = function(skeleton) {
   # Extract node IDs from links dataframe

@@ -1,8 +1,5 @@
 #' Modify bevel data using straight skeleton
 #'
-#' @param bevel_height numeric vector. The existing heights for the bevel.
-#' @param bevel_offset numeric vector. The existing offsets for the bevel.
-#' @param straight_skeleton list. Straight skeleton data structure.
 #'
 #' @keywords internal
 #' @return list. Modified bevel_height and bevel_offset vectors.
@@ -17,7 +14,6 @@ modify_bevel_with_skeleton = function(bevel_offsets, bevel_heights, straight_ske
   unique_times = unique(straight_skeleton$nodes$time)
   unique_times = setdiff(unique_times, bevel_offsets)
   unique_times = unique_times[unique_times < max(bevel_offsets)]
-  maxtime = max(straight_skeleton$nodes$time)
 
   # Initialize new bevel data vectors
   new_bevel_height = bevel_heights

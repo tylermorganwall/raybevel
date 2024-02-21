@@ -6,9 +6,6 @@
 \usage{
 recalculate_ordered_ids(skeleton)
 }
-\arguments{
-\item{ss}{}
-}
 \description{
 Recalculate Ordered IDs
 }

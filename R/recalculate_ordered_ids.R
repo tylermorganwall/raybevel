@@ -1,7 +1,5 @@
 #' Recalculate Ordered IDs
 #'
-#' @param ss
-#'
 #' @keywords internal
 recalculate_ordered_ids = function(skeleton) {
   nodes = skeleton$nodes

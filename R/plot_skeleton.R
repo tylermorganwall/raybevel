@@ -26,7 +26,7 @@
 #' @param return_layers Default `FALSE`, plots the figure. If `TRUE`, this will instead
 #' return a list of the ggplot layers.
 #'
-#' @details The function uses the {ggplot2} package for plotting. The straight skeleton
+#' @details The function uses the `ggplot2` package for plotting. The straight skeleton
 #'          is visualized based on the details provided in the `skeleton` object.
 #'          The original polygon and holes are plotted based on attributes stored
 #'          in the `skeleton` object.

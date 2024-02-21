@@ -62,7 +62,7 @@ The original polygon (with holes if present) is plotted in black, while the
 straight skeleton is plotted in red.
 }
 \details{
-The function uses the {ggplot2} package for plotting. The straight skeleton
+The function uses the `ggplot2` package for plotting. The straight skeleton
          is visualized based on the details provided in the `skeleton` object.
          The original polygon and holes are plotted based on attributes stored
          in the `skeleton` object.

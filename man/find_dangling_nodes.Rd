@@ -6,9 +6,6 @@
 \usage{
 find_dangling_nodes(skeleton)
 }
-\arguments{
-\item{ss}{}
-}
 \description{
 Discretize and Merge Nodes
 }

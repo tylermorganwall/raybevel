@@ -29,8 +29,6 @@ dot = function(v1,v2) {
 
 #' Dot Product
 #'
-#' @param v1 Vector 1
-#' @param v2 Vector 2
 #'
 #' @return Value
 #' @keywords internal

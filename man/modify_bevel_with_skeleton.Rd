@@ -6,13 +6,6 @@
 \usage{
 modify_bevel_with_skeleton(bevel_offsets, bevel_heights, straight_skeleton)
 }
-\arguments{
-\item{straight_skeleton}{list. Straight skeleton data structure.}
-
-\item{bevel_height}{numeric vector. The existing heights for the bevel.}
-
-\item{bevel_offset}{numeric vector. The existing offsets for the bevel.}
-}
 \value{
 list. Modified bevel_height and bevel_offset vectors.
 }

@@ -6,9 +6,6 @@
 \usage{
 discretize_and_merge_nodes(skeleton, tolerance = 1e-05)
 }
-\arguments{
-\item{ss}{}
-}
 \description{
 Discretize and Merge Nodes
 }

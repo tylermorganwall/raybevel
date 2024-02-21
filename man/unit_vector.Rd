@@ -6,11 +6,6 @@
 \usage{
 unit_vector(v)
 }
-\arguments{
-\item{v1}{Vector 1}
-
-\item{v2}{Vector 2}
-}
 \value{
 Value
 }

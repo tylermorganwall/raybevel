@@ -1,7 +1,5 @@
 #' Remove Reversed Links
 #'
-#' @param ss
-#'
 #' @keywords internal
 remove_reversed_links = function(skeleton) {
   # Create two new columns: min_id and max_id

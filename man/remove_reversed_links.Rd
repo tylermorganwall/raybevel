@@ -6,9 +6,6 @@
 \usage{
 remove_reversed_links(skeleton)
 }
-\arguments{
-\item{ss}{}
-}
 \description{
 Remove Reversed Links
 }
