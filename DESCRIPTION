@@ -4,7 +4,7 @@ Title: Generates Polygon Straight Skeletons and 3D Bevels
 Version: 0.1.0
 Author: Tyler Morgan-Wall
 Maintainer: Tyler Morgan-Wall <tylermw@gmail.com>
-Description: Generates polygon straight skeletons using the CGAL library. Provides functions to create and visualize interior polygon offsets, 3D beveled polygons, and 3D roof models.
+Description: Generates polygon straight skeletons using the `CGAL` library. Provides functions to create and visualize interior polygon offsets, 3D beveled polygons, and 3D roof models.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -12,7 +12,7 @@ Depends: R (>= 3.0.2)
 Imports: progress,
          digest,
          decido,
-         rayvertex,
+         rayvertex (>= 0.10.4),
          sf,
          grid
 LinkingTo: Rcpp, BH, RcppCGAL, progress, RcppThread (>= 2.1.6)
@@ -22,9 +22,10 @@ Suggests:
     testthat (>= 3.0.0),
     ggplot2,
     png
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.0
 Config/testthat/edition: 3
 URL: https://tylermorganwall.github.io/raybevel/
+BugReports: https://github.com/tylermorganwall/raybevel/issues
 Remotes: 
   tylermorganwall/rayrender,
   tylermorganwall/rayvertex
