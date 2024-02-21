@@ -234,7 +234,7 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
           num_polygons++;
         }
       }
-      size_t remaining_links_count = std::count_if(visited.begin(), visited.end(), [](bool l) { return !l; });
+      // size_t remaining_links_count = std::count_if(visited.begin(), visited.end(), [](bool l) { return !l; });
 
       first = false;
 

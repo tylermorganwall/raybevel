@@ -121,9 +121,9 @@ List skeletonize_rcpp(NumericMatrix vertices,
   } catch (...) {
     throw std::runtime_error("unknown cgal error occurred");
   };
-  double lOffset = offset ;
+  // double lOffset = offset ;
 
-  int contours = 0;
+  // int contours = 0;
   int bisectors = 0;
 
 
