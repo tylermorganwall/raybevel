@@ -12,7 +12,9 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Generates Polygon Straight Skeletons and 3D Bevels">
-<meta property="og:description" content="Generates polygon straight skeletons using the `CGAL` library. Provides functions to create and visualize interior polygon offsets, 3D beveled polygons, and 3D roof models.">
+<meta property="og:description" content="Generates polygon straight skeletons and 3D models.  
+    Provides functions to create and visualize interior polygon offsets, 
+    3D beveled polygons, and 3D roof models.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:creator" content="@tylermorganwall">
 <meta name="twitter:site" content="@tylermorganwall">
@@ -130,7 +132,7 @@
 </h2>
 <p>First, let’s load the library and generate a polygon with holes.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tylermorganwall.github.io/raybevel/">raybevel</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.raybevel.com" class="external-link">raybevel</a></span><span class="op">)</span></span>
 <span><span class="co"># Define a simple polygon</span></span>
 <span><span class="va">vertices</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">7</span>, <span class="fl">0</span>, <span class="fl">7</span>, <span class="fl">7</span>, <span class="fl">0</span>, <span class="fl">7</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">-</span> <span class="fl">3.5</span></span>
 <span><span class="co"># Holes inside the polygon</span></span>
@@ -461,7 +463,7 @@
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>
-<a href="https://www.tylermw.com" class="external-link">Tyler Morgan-Wall</a> <br><small class="roles"> Maintainer </small>  </li>
+<a href="https://www.tylermw.com" class="external-link">Tyler Morgan-Wall</a> <br><small class="roles"> Author, copyright holder, maintainer </small> <a href="https://orcid.org/0000-0002-3131-3814" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
 
