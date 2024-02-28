@@ -72,12 +72,16 @@ Generate 2D Bevel Profile for 3D Polygons
 coords = generate_bevel("circular", 0.2, 0.8, 0.2, plot_bevel = TRUE)
 
 # Plot all bevel profiles in a grid
-par(mfrow = c(4, 3), mai = c(0.2, 0.2, 0.5, 0.2))
-max_height = c(1,1,1,1)
-types = rep(c("circular", "exp", "bump", "step", "block", "angled"),2)
-reverses = c(rep(FALSE,6),rep(TRUE,6))
-for(i in seq_len(length(types))) {
-  coords = generate_bevel(types[i], 0.2, 0.8, 1, flip = TRUE,
-                          angle = 45, reverse = reverses[i], plot_bevel = TRUE)
+plot_all_bevels = function() {
+  oldpar = par(mfrow = c(4, 3), mai = c(0.2, 0.2, 0.5, 0.2))
+  on.exit(par(oldpar))
+  max_height = c(1,1,1,1)
+  types = rep(c("circular", "exp", "bump", "step", "block", "angled"),2)
+  reverses = c(rep(FALSE,6),rep(TRUE,6))
+  for(i in seq_len(length(types))) {
+    coords = generate_bevel(types[i], 0.2, 0.8, 1, flip = TRUE,
+                            angle = 45, reverse = reverses[i], plot_bevel = TRUE)
+  }
 }
+plot_all_bevels()
 }

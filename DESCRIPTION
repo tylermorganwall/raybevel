@@ -1,7 +1,7 @@
 Package: raybevel
 Type: Package
 Title: Generates Polygon Straight Skeletons and 3D Bevels
-Version: 0.1.0
+Version: 0.1.2
 Authors@R: 
     person("Tyler", "Morgan-Wall", email = "tylermw@gmail.com",
     role = c("aut", "cph", "cre"), comment = c(ORCID = "0000-0002-3131-3814"))

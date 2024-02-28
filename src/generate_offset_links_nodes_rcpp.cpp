@@ -71,7 +71,7 @@ std::vector<Node> convertDataFrameToNodes(DataFrame df) {
 
   std::vector<Node> nodes;
   nodes.resize(nrows);
-  for (int i = 0; i < nrows; ++i) {
+  for (size_t i = 0; i < nrows; ++i) {
     nodes[i].id = id(i);
     nodes[i].x = x(i);
     nodes[i].y = y(i);
@@ -125,7 +125,7 @@ std::vector<Link> convertDataFrameToLinks(DataFrame df) {
   std::vector<Link> links;
   links.resize(nrows);
 
-  for (int i = 0; i < nrows; ++i) {
+  for (size_t i = 0; i < nrows; ++i) {
     links[i].source = (int)source(i);
     links[i].destination = (int)destination(i);
     links[i].edge = (int)edge(i);
@@ -162,7 +162,7 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
    pb.set_total(offsets.size());
    pb.tick(0);
   }
-  for(int ii = 0; ii < offsets.size(); ++ii) {
+  for(size_t ii = 0; ii < offsets.size(); ++ii) {
     if(progress) {
       pb.tick(ii);
     }
@@ -172,7 +172,7 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
     std::vector<bool> equal_to_offset(links.size());
     std::vector<NewNode> new_node_info;
 
-    for(int jj = 0; jj < links.size(); jj++) {
+    for(size_t jj = 0; jj < links.size(); jj++) {
       visited[jj] = (bool)links[jj].edge;
       away_from_offset[jj] = (links[jj].source_time < offset && links[jj].destination_time < offset) ||
                              (links[jj].source_time > offset && links[jj].destination_time > offset);

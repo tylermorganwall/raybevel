@@ -38,7 +38,7 @@ typedef typename Ss::Halfedge_const_iterator Halfedge_const_iterator ;
 // [[Rcpp::export]]
 bool is_ccw_polygon(NumericMatrix vertices) {
   Polygon_2 base_poly;
-  for(size_t i = 0; i < vertices.rows(); i++) {
+  for(int i = 0; i < vertices.rows(); i++) {
     base_poly.push_back(Point(vertices(i,0),vertices(i,1)));
   }
   if(base_poly.is_counterclockwise_oriented()) {
@@ -51,7 +51,7 @@ bool is_ccw_polygon(NumericMatrix vertices) {
 // [[Rcpp::export]]
 bool is_simple_polygon(NumericMatrix vertices) {
   Polygon_2 base_poly;
-  for(size_t i = 0; i < vertices.rows(); i++) {
+  for(int i = 0; i < vertices.rows(); i++) {
     base_poly.push_back(Point(vertices(i,0),vertices(i,1)));
   }
   if(base_poly.is_simple()) {
@@ -66,7 +66,7 @@ List skeletonize_rcpp(NumericMatrix vertices,
                       List holes,
                       double offset) {
   Polygon_2 base_poly;
-  for(size_t i = 0; i < vertices.rows(); i++) {
+  for(int i = 0; i < vertices.rows(); i++) {
     // Rcpp::Rcout << "Vert: " << vertices(i,0) << " " << vertices(i,1) << "\n";
 
     base_poly.push_back(Point(vertices(i,0),vertices(i,1)));
@@ -79,11 +79,11 @@ List skeletonize_rcpp(NumericMatrix vertices,
   }
   Polygon_with_holes poly(base_poly);
 
-  for(size_t i = 0; i < holes.length(); i++) {
+  for(int i = 0; i < holes.length(); i++) {
     Polygon_2 new_hole;
     bool all_inside = true;
     NumericMatrix hole = Rcpp::as<NumericMatrix>(holes(i));
-    for(size_t i = 0; i < hole.rows(); i++) {
+    for(int i = 0; i < hole.rows(); i++) {
       Point tmp_point(hole(i,0),hole(i,1));
       if(!is_inside(oriented_side(tmp_point,poly))) {
         all_inside = false;

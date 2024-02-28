@@ -22,7 +22,7 @@ std::size_t vec_hash(const std::vector<int>& vec) {
   return seed;
 }
 
-struct Node {
+struct Node2 {
   int id;
   double x;
   double y;
@@ -30,7 +30,7 @@ struct Node {
   int edge;
 };
 
-struct Link {
+struct Link2 {
   int source;
   int destination;
   int edge;
@@ -39,7 +39,7 @@ struct Link {
   int visited;
 };
 
-static std::vector<double> getNodePositionById(const std::vector<Node>& nodes, int id) {
+static std::vector<double> getNodePositionById(const std::vector<Node2>& nodes, int id) {
   for(const auto& node : nodes) {
     if(node.id == id) {
       return {node.x, node.y};
@@ -49,7 +49,7 @@ static std::vector<double> getNodePositionById(const std::vector<Node>& nodes, i
 }
 
 // Helper function definitions
-std::vector<double> getNodePositionById(const std::vector<Node>& nodes, int id);
+std::vector<double> getNodePositionById(const std::vector<Node2>& nodes, int id);
 double determinant2x2(const std::vector<double>& v1, const std::vector<double>& v2);
 double dot(const std::vector<double>& v1, const std::vector<double>& v2);
 
@@ -66,9 +66,9 @@ List convert_ss_to_polygons_rcpp(List ss, int numbercores, bool progress) {
   NumericVector node_time = nodesDF["time"];
   LogicalVector node_edge = nodesDF["edge"];
 
-  std::vector<Node> nodes;
-  for(int i = 0; i < node_ids.size(); ++i) {
-    Node n = {node_ids[i], node_x[i], node_y[i], node_time[i], node_edge[i]};
+  std::vector<Node2> nodes;
+  for(int i = 0; i < static_cast<int>(node_ids.size()); ++i) {
+    Node2 n = {node_ids[i], node_x[i], node_y[i], node_time[i], node_edge[i]};
     nodes.push_back(n);
   }
 
@@ -79,9 +79,9 @@ List convert_ss_to_polygons_rcpp(List ss, int numbercores, bool progress) {
   NumericVector link_source_time = linksDF["source_time"];
   NumericVector link_dest_time = linksDF["destination_time"];
 
-  std::vector<Link> links;
-  for(int i = 0; i < link_source.size(); ++i) {
-    Link l = {link_source[i], link_dest[i], link_edge[i], link_source_time[i], link_dest_time[i], false};
+  std::vector<Link2> links;
+  for(int i = 0; i < static_cast<int>(link_source.size()); ++i) {
+    Link2 l = {link_source[i], link_dest[i], link_edge[i], link_source_time[i], link_dest_time[i], false};
     links.push_back(l);
   }
   RcppThread::ProgressCounter pb(link_source.size(), 1, "Polygonizing: ");
@@ -196,9 +196,9 @@ List convert_ss_to_polygons_rcpp(List ss, int numbercores, bool progress) {
   }
 
   List all_polygons;
-  for(int i = 0; i < unique_polygons.size(); i++) {
+  for(int i = 0; i < static_cast<int>(unique_polygons.size()); i++) {
     IntegerVector one_polygon;
-    for(int j = 0; j < unique_polygons[i].size(); j++) {
+    for(int j = 0; j < static_cast<int>(unique_polygons[i].size()); j++) {
       one_polygon.push_back(unique_polygons[i][j]);
     }
     all_polygons.push_back(one_polygon);
