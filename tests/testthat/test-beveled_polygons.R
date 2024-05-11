@@ -11,7 +11,7 @@ compare_image = function(path1, path2) {
 
 library(rayrender)
 
-run_tests_bevel = function(argument_grid, plot_prefix="", interactive_run=FALSE, ...) {
+run_tests_bevel = function(argument_grid, plot_prefix="", interactive_run=FALSE, seed = 1, ...) {
   stopifnot(inherits(argument_grid,"data.frame"))
   for(i in seq_len(nrow(argument_grid))){
     args = unlist(argument_grid[i,], recursive = FALSE)
@@ -30,6 +30,7 @@ run_tests_bevel = function(argument_grid, plot_prefix="", interactive_run=FALSE,
       next
     }
     if(interactive_run) {
+      set.seed(seed)
       raymesh_model(poly_bevel_mesh, material = diffuse(color="dodgerblue"), override_material = TRUE) |>
         add_object(sphere(y=15,x=10,z=-10,material=light(intensity = 200))) |>
         add_object(sphere(y=-15,x=10,z=-10,material=light(intensity = 200))) |>
@@ -38,6 +39,7 @@ run_tests_bevel = function(argument_grid, plot_prefix="", interactive_run=FALSE,
                      preview=TRUE, debug_channel="normal",
                      samples=128, width=100,height=100)
     } else {
+      set.seed(seed)
       raymesh_model(poly_bevel_mesh, material = diffuse(color="dodgerblue"), override_material = TRUE) |>
         add_object(sphere(y=15,x=10,z=-10,material=light(intensity = 200))) |>
         add_object(sphere(y=-15,x=10,z=-10,material=light(intensity = 200))) |>
@@ -51,12 +53,12 @@ run_tests_bevel = function(argument_grid, plot_prefix="", interactive_run=FALSE,
 }
 
 test_that("Checking generate_beveled_polygon() raw extrusion ", {
-  set.seed(1)
   vertices = matrix(c(0,0, 7,0, 7,7, 0,7, 0,0), ncol = 2, byrow = TRUE)-3.5
   # Holes inside the polygon
   hole_1 = matrix(c(1,1, 2,1, 2,2, 1,2, 1,1), ncol = 2, byrow = TRUE)[5:1,]-3.5
   hole_2 = matrix(c(5,5, 6,5, 6,6, 5,6, 5,5), ncol = 2, byrow = TRUE)[5:1,]-3.5
   skeleton = skeletonize(vertices, holes = list(hole_1,hole_2))
+  set.seed(1)
 
   generate_polygon_args = expand.grid(bevel_offsets = list(c(0.25,0.5,1,1.5,2)),
                               bevel_heights = list(c(0.25,0.25,0.5,0.5,0.75)*2),
@@ -71,6 +73,7 @@ test_that("Checking generate_beveled_polygon() raw extrusion ", {
                               vertical_offset = list(NA,-0.5,0.5))
 
   run_tests_bevel(generate_polygon_args, plot_prefix = "bevel_raw", interactive_run = FALSE,
+                  seed = 1,
                   list(skeleton = skeleton))
 })
 

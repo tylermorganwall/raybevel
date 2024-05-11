@@ -85,11 +85,10 @@ List skeletonize_rcpp(NumericMatrix vertices,
     NumericMatrix hole = Rcpp::as<NumericMatrix>(holes(i));
     for(int i = 0; i < hole.rows(); i++) {
       Point tmp_point(hole(i,0),hole(i,1));
-      if(!is_inside(oriented_side(tmp_point,poly))) {
+      if(!is_inside(base_poly.oriented_side(tmp_point))) {
         all_inside = false;
         break;
       }
-      // Rcpp::Rcout << "Hole: " << hole(i,0) << " " << hole(i,1) << "\n";
       new_hole.push_back(tmp_point);
     }
     if(all_inside) {
