@@ -51,7 +51,9 @@
 #' }
 #' # Highlighting certain links in the skeleton
 #' max_links =which(skeleton$links$destination_time == max(skeleton$links$destination_time))
-#' plot_skeleton(skeleton, highlight_links = max_links, highlight_color = "green")
+#' if(length(find.package("ggplot2",quiet = TRUE)) > 0) {
+#'   plot_skeleton(skeleton, highlight_links = max_links, highlight_color = "green")
+#' }
 plot_skeleton = function(skeleton, use_arrow = TRUE, use_points = TRUE, xlim = c(0,1), ylim = c(0,1),
                          arrow_color = "red", polygon_color = "black", size = 1,
                          arrow_size = 0.05, highlight_links = NULL, highlight_color = "green",

@@ -85,5 +85,7 @@ if(length(find.package("spData",quiet = TRUE)) > 0) {
 }
 # Highlighting certain links in the skeleton
 max_links =which(skeleton$links$destination_time == max(skeleton$links$destination_time))
-plot_skeleton(skeleton, highlight_links = max_links, highlight_color = "green")
+if(length(find.package("ggplot2",quiet = TRUE)) > 0) {
+  plot_skeleton(skeleton, highlight_links = max_links, highlight_color = "green")
+}
 }

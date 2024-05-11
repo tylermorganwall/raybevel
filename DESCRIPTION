@@ -26,7 +26,7 @@ Suggests:
     testthat (>= 3.0.0),
     ggplot2,
     png
-RoxygenNote: 7.3.0
+RoxygenNote: 7.3.1
 Config/testthat/edition: 3
 URL: https://www.raybevel.com, https://github.com/tylermorganwall/raybevel/
 BugReports: https://github.com/tylermorganwall/raybevel/issues
