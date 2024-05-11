@@ -75,8 +75,9 @@ vertices = matrix(c(0,0, 7,0, 7,7, 0,7, 0,0), ncol = 2, byrow = TRUE)
 hole1 = matrix(c(1,1, 1,2, 2,2, 2,1, 1,1), ncol = 2, byrow = TRUE)
 hole2 = matrix(c(5,5, 5,6, 6,6, 6,5, 5,5), ncol = 2, byrow = TRUE)
 skeleton = skeletonize(vertices, holes = list(hole1, hole2))
-plot_skeleton(skeleton)
-
+if(length(find.package("ggplot2",quiet = TRUE)) > 0) {
+  plot_skeleton(skeleton)
+}
 # Skeletonize and plot an {sf} object
 if(length(find.package("spData",quiet = TRUE)) > 0) {
   us_states = spData::us_states
