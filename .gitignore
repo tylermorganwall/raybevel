@@ -8,3 +8,5 @@ src/*.dll
 README_cache
 *.mp4
 docs
+compile_commands.json
+.cache

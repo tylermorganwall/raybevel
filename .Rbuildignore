@@ -11,3 +11,5 @@ README_cache
 ^pkgdown$
 ^man/figures$
 ^man/.+.png$
+^compile_commands\.json$
+^\.cache$

@@ -11,7 +11,6 @@ using namespace Rcpp;
 #include <CGAL/Boolean_set_operations_2.h>
 #include <CGAL/General_polygon_set_2.h>
 #include "print.h"
-#include <boost/shared_ptr.hpp>
 #include <vector>
 #include <cassert>
 
@@ -24,8 +23,8 @@ typedef K::Point_2                   Point ;
 typedef CGAL::Polygon_2<K>           Polygon_2 ;
 // typedef CGAL::Polygon_set_2<K>       PolygonSet;
 typedef CGAL::Straight_skeleton_2<K> Ss ;
-typedef boost::shared_ptr<Polygon_2> PolygonPtr ;
-typedef boost::shared_ptr<Ss> SsPtr ;
+typedef std::shared_ptr<Polygon_2> PolygonPtr ;
+typedef std::shared_ptr<Ss> SsPtr ;
 typedef std::vector<PolygonPtr> PolygonPtrVector ;
 typedef CGAL::Polygon_with_holes_2<K> Polygon_with_holes ;
 typedef CGAL::Gps_segment_traits_2<K> Traits_2;

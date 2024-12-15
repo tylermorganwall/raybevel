@@ -1,2 +1,2 @@
-PKG_CXXFLAGS = -DCGAL_NO_GMP=1 -I../inst/include
+PKG_CXXFLAGS = -DCGAL_DISABLE_GMP=ON -I../inst/include
 PKG_LIBS = `"$(R_HOME)/bin/Rscript" -e "RcppThread::LdFlags()"`
