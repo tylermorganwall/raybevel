@@ -3,6 +3,8 @@
 #include <cmath>
 #include <algorithm>
 #include <RProgress.h>
+#undef R_NO_REMAP
+
 #include "RcppThread.h"
 #include "math.h"
 #include <iostream>
