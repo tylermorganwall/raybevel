@@ -1,111 +1,39 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/404.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/index.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/arrange_base.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/change_polygon_bevel.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/convert_ss_to_polygons.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/determinant2x2.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/discretize_and_merge_nodes.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/dot.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/extrude_sides.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/find_dangling_nodes.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/generate_bevel.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/generate_beveled_polygon.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/generate_complex_bevel.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/generate_offset_links_nodes.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/generate_offset_polygon.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/generate_roof.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/get_time.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/identify_maxima_nodes.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/init_time.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/insert_polygon_links_nodes.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/interpolate_location.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/make_incremental_nodes.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/modify_bevel_with_skeleton.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/plot_offset_polygon.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/plot_skeleton.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/print_time.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/process_sliced_links.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/recalculate_ordered_ids.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/remove_node_duplicates.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/remove_reversed_links.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/run_documentation.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/skeletonize.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/swap_yz.html</loc>
-  </url>
-  <url>
-    <loc>https://tylermorganwall.github.io/raybevel/reference/unit_vector.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>http://www.raybevel.com/404.html</loc></url>
+<url><loc>http://www.raybevel.com/authors.html</loc></url>
+<url><loc>http://www.raybevel.com/index.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/arrange_base.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/change_polygon_bevel.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/convert_ss_to_polygons.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/determinant2x2.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/discretize_and_merge_nodes.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/dot.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/extrude_sides.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/find_dangling_nodes.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/generate_bevel.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/generate_beveled_polygon.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/generate_complex_bevel.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/generate_offset_links_nodes.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/generate_offset_polygon.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/generate_roof.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/get_time.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/identify_maxima_nodes.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/index.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/init_time.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/insert_polygon_links_nodes.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/interpolate_location.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/make_incremental_nodes.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/modify_bevel_with_skeleton.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/plot_offset_polygon.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/plot_skeleton.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/print_time.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/process_sliced_links.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/recalculate_ordered_ids.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/remove_node_duplicates.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/remove_reversed_links.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/run_documentation.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/skeletonize.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/swap_yz.html</loc></url>
+<url><loc>http://www.raybevel.com/reference/unit_vector.html</loc></url>
 </urlset>
+
