@@ -145,7 +145,7 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
   std::vector<Node> nodes = convertDataFrameToNodes(ss_nodes);
 
   int max_node = -1;
-  for(int ii = 0; ii < nodes.size(); ii++) {
+  for(size_t ii = 0; ii < (size_t)nodes.size(); ii++) {
     max_node = std::max(nodes[ii].id,max_node);
   }
   int new_node_start = max_node + 1;
@@ -162,7 +162,7 @@ List generate_offset_links_nodes_rcpp(DataFrame ss_links, DataFrame ss_nodes, Nu
    pb.set_total(offsets.size());
    pb.tick(0);
   }
-  for(size_t ii = 0; ii < offsets.size(); ++ii) {
+  for(size_t ii = 0; ii < (size_t)offsets.size(); ++ii) {
     if(progress) {
       pb.tick(ii);
     }
