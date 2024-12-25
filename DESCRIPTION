@@ -16,13 +16,13 @@ Depends: R (>= 3.0.2)
 Imports: progress,
          digest,
          decido,
-         rayvertex (>= 0.10.4),
+         rayvertex (>= 0.11.4),
          sf,
          grid
 LinkingTo: Rcpp, BH, RcppCGAL (>= 6.0.0), progress, RcppThread (>= 2.1.6)
 Suggests: 
     spData,
-    rayrender,
+    rayrender (>=0.38.0),
     testthat (>= 3.0.0),
     ggplot2,
     png
@@ -30,4 +30,5 @@ RoxygenNote: 7.3.2
 Config/testthat/edition: 3
 URL: https://www.raybevel.com, https://github.com/tylermorganwall/raybevel/, http://www.raybevel.com/
 BugReports: https://github.com/tylermorganwall/raybevel/issues
+Remotes: tylermorganwall/rayrender
 Config/build/compilation-database: true
