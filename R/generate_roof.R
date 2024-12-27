@@ -102,8 +102,7 @@
 #'     add_object(scene_base) |>
 #'     add_object(sphere(x=-10,z=-10,y=4,material=light(color="red", intensity=40))) |>
 #'     add_object(sphere(x=10,z=-10,y=4,material=light(color="orange", intensity=40))) |>
-#'     render_scene(lookfrom=c(0,10,-1), sample_method = "sobol_blue",
-#' denoise=FALSE,
+#'     render_scene(lookfrom=c(0,10,-1), sample_method = "sobol_blue", ambient_light=TRUE,
 #'                  width=800,height=800,fov=0, ortho_dimensions=c(12,12))
 #' }
 generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,

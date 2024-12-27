@@ -30,5 +30,5 @@ RoxygenNote: 7.3.2
 Config/testthat/edition: 3
 URL: https://www.raybevel.com, https://github.com/tylermorganwall/raybevel/, http://www.raybevel.com/
 BugReports: https://github.com/tylermorganwall/raybevel/issues
-Remotes: tylermorganwall/rayrender
+Remotes: tylermorganwall/rayrender, tylermorganwall/rayvertex
 Config/build/compilation-database: true
