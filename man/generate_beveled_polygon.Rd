@@ -97,6 +97,7 @@ if(run_docs_raybevel()) {
                                         bevel_offsets = bevel,
                                         material = material_list(diffuse="purple"))
   print(roof_model)
+  rayimage::plot_image(rayimage::dragon)
   #raymesh_model(roof_model, override_material = FALSE) |>
     scene_base |>
     render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue", parallel=FALSE,
