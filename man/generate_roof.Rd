@@ -137,6 +137,7 @@ if(run_docs_raybevel()) {
     add_object(sphere(x=-10,z=-10,y=4,material=light(color="red", intensity=40))) |>
     add_object(sphere(x=10,z=-10,y=4,material=light(color="orange", intensity=40))) |>
     render_scene(lookfrom=c(0,10,-1), sample_method = "sobol_blue",
+denoise=FALSE,
                  width=800,height=800,fov=0, ortho_dimensions=c(12,12))
 }
 }
