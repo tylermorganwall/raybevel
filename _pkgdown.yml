@@ -5,7 +5,6 @@ pkgdown_sha: 2f40b4769ea9ad2312aa4cc93f27ab116461543b
 articles: []
 template:
   bootstrap: 5
-template:
   opengraph:
     twitter:
       creator: '@tylermorganwall'
