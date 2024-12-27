@@ -309,8 +309,8 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #'   print(roof_model)
 #'   #raymesh_model(roof_model, override_material = FALSE) |>
 #'     scene_base |>
-#'     render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue",
-#'                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
+#'     render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue", parallel=FALSE,
+#'                  width=800,height=800,fov=0,ortho_dimensions=c(10,10), verbose=TRUE)
 #' }
 #'
 #' # Change the bevel to be circular
