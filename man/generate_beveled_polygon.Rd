@@ -82,7 +82,7 @@ skeleton = skeletonize(vertices, holes = list(hole_1, hole_2))
 plot_skeleton(skeleton)
 
 #Generate a roof model and specify the material
-if(raybevel::run_documentation()) {
+if(run_docs_raybevel()) {
   library(rayrender)
   library(rayvertex)
   scene_base = xz_rect(xwidth=100,zwidth=100,
@@ -104,7 +104,7 @@ if(raybevel::run_documentation()) {
 }
 
 # Change the bevel to be circular
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   bevel = generate_bevel("circular", bevel_start = 0, bevel_end = 0.2, max_height=0.25)
   roof_model = generate_beveled_polygon(skeleton,
                                         bevel_offsets = bevel,
@@ -117,7 +117,7 @@ if(run_documentation()) {
 }
 
 # Change the bevel to type "bump", change the max height, and raise it off the surface
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   bevel = generate_bevel("bump", bevel_start = 0, bevel_end = 0.4, max_height=0.25)
   roof_model = generate_beveled_polygon(skeleton, base_height=1,
                                         bevel_offsets = bevel,
@@ -130,7 +130,7 @@ if(run_documentation()) {
 }
 
 # Generate a complex bevel and use the exact specified heights
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   bevel = generate_complex_bevel(c("bump", "exp", "circular","step"),
                                  bevel_start = c(0,0.3,0.7,0.95),
                                  bevel_end = c(0.1,0.6,0.95,1),
@@ -150,7 +150,7 @@ if(run_documentation()) {
 }
 
 # Turn the polygon into a ziggurat, using the step bevel type
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   offs = seq(0, 1, by = 0.05)
   bevel = generate_complex_bevel("step",
                                  bevel_start = offs[-length(offs)],
@@ -169,7 +169,7 @@ if(run_documentation()) {
 }
 
 # Turn the polygon into a smooth wavy slide, taking advantage of vector recycling to flip/reverse
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   offs = seq(0, 1, by = 0.1)
   bevel = generate_complex_bevel("exp",
                                  bevel_start = offs[-length(offs)],
@@ -190,7 +190,7 @@ if(run_documentation()) {
 }
 
 # Skeletonize and turn an {sf} object into a beveled polygon
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   us_states = spData::us_states
   texas = us_states[us_states$NAME == "Texas",]
   texas_skeleton = skeletonize(texas)
@@ -212,7 +212,7 @@ if(run_documentation()) {
 }
 
 # Generate a smooth bevel
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   bevel = generate_bevel("exp", bevel_start = 0, bevel_end=0.5, max_height=2)
   roof_model_texas = generate_beveled_polygon(texas_skeleton,
                                         bevel_offsets = bevel,

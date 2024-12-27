@@ -78,7 +78,7 @@ pre-existing polygons generated from the `generate_beveled_polygon` function whe
 # Skeletonize a complex {sf} object and set return_skeleton_polygons = TRUE in
 # generate_beveled_polygon(). This returns skeleton object with polygons included, which
 # allows for quickly generating 3D models with different bevels.
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   library(rayrender)
   library(rayvertex)
   us_states = spData::us_states
@@ -108,7 +108,7 @@ if(run_documentation()) {
                  width=800,height=800,fov=0,ortho_dimensions=c(12,12))
 }
 # Change to a smooth bevel
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   new_bevel = generate_bevel("circular", bevel_start = 0, bevel_end=1)
   bevel_new = change_polygon_bevel(bevel_model_cali,
                                    bevel_offsets = new_bevel, solid ) |>
@@ -120,7 +120,7 @@ if(run_documentation()) {
 }
 
 # Make a complex bevel
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   complex_coords = generate_complex_bevel(
     bevel_type  = c("angled","flat", "angled", "flat"),
     bevel_start = head(seq(0,1,by=0.05),-1),
@@ -140,7 +140,7 @@ if(run_documentation()) {
 }
 
 # Quickly generate new bevels to inflate California like a balloon using the arctan function.
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   inflate_california = function(magnitudes) {
   for(val in magnitudes) {
     bevel_new = change_polygon_bevel(bevel_model_cali,

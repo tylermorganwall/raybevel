@@ -65,12 +65,12 @@ vertices = matrix(c(0,0, 7,0, 7,7, 0,7, 0,0), ncol = 2, byrow = TRUE)-3.5
 hole_1 = matrix(c(1,1, 2,1, 2,2, 1,2, 1,1), ncol = 2, byrow = TRUE)[5:1,]-3.5
 hole_2 = matrix(c(5,5, 6,5, 6,6, 5,6, 5,5), ncol = 2, byrow = TRUE)[5:1,]-3.5
 skeleton = skeletonize(vertices, holes = list(hole_1, hole_2))
-if(run_documentation()) {
+if(run_docs_raybevel()) {
 plot_skeleton(skeleton)
 }
 
 #Generate a roof model and specify the material
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   library(rayrender)
   library(rayvertex)
   roof_model = generate_roof(skeleton, material = material_list(diffuse="purple"))
@@ -86,7 +86,7 @@ if(run_documentation()) {
 }
 
 # Change the maximum height of the roof
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   roof_model = generate_roof(skeleton, max_height=5)
   raymesh_model(roof_model, material = diffuse(color="purple")) |>
     add_object(scene_base) |>
@@ -95,7 +95,7 @@ if(run_documentation()) {
 }
 
 #Add a vertical_offset to the roof, without a base
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   roof_model = generate_roof(skeleton, vertical_offset = 2, base = FALSE)
   raymesh_model(roof_model, material = diffuse(color="purple")) |>
     add_object(scene_base) |>
@@ -104,7 +104,7 @@ if(run_documentation()) {
 }
 
 # Add a base
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   roof_model = generate_roof(skeleton, vertical_offset = 2, base = TRUE)
   raymesh_model(roof_model, material = diffuse(color="purple")) |>
     add_object(scene_base) |>
@@ -113,7 +113,7 @@ if(run_documentation()) {
 }
 
 # Change the base height (note that the vertical_offset is measured from the base, not from zero)
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   roof_model = generate_roof(skeleton, vertical_offset = 2, base = TRUE, base_height=1)
   raymesh_model(roof_model, material = diffuse(color="purple")) |>
     add_object(scene_base) |>
@@ -123,7 +123,7 @@ if(run_documentation()) {
 
 
 # Skeletonize and turn an {sf} object into a roof
-if(run_documentation()) {
+if(run_docs_raybevel()) {
   us_states = spData::us_states
   cali = us_states[us_states$NAME == "California",]
   cali_skeleton = skeletonize(cali)

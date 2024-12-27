@@ -7,7 +7,7 @@
 #' @return Boolean value.
 #' @examples
 #' # See if the documentation should be run.
-#' run_documentation()
-run_documentation = function() {
+#' run_docs_raybevel()
+run_docs_raybevel = function() {
   return(identical(Sys.getenv("IN_PKGDOWN"), "true"))
 }

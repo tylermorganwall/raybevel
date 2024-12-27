@@ -31,12 +31,12 @@
 #' hole_1 = matrix(c(1,1, 2,1, 2,2, 1,2, 1,1), ncol = 2, byrow = TRUE)[5:1,]-3.5
 #' hole_2 = matrix(c(5,5, 6,5, 6,6, 5,6, 5,5), ncol = 2, byrow = TRUE)[5:1,]-3.5
 #' skeleton = skeletonize(vertices, holes = list(hole_1, hole_2))
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #' plot_skeleton(skeleton)
 #' }
 #'
 #' #Generate a roof model and specify the material
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   library(rayrender)
 #'   library(rayvertex)
 #'   roof_model = generate_roof(skeleton, material = material_list(diffuse="purple"))
@@ -52,7 +52,7 @@
 #' }
 #'
 #' # Change the maximum height of the roof
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   roof_model = generate_roof(skeleton, max_height=5)
 #'   raymesh_model(roof_model, material = diffuse(color="purple")) |>
 #'     add_object(scene_base) |>
@@ -61,7 +61,7 @@
 #' }
 #'
 #' #Add a vertical_offset to the roof, without a base
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   roof_model = generate_roof(skeleton, vertical_offset = 2, base = FALSE)
 #'   raymesh_model(roof_model, material = diffuse(color="purple")) |>
 #'     add_object(scene_base) |>
@@ -70,7 +70,7 @@
 #' }
 #'
 #' # Add a base
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   roof_model = generate_roof(skeleton, vertical_offset = 2, base = TRUE)
 #'   raymesh_model(roof_model, material = diffuse(color="purple")) |>
 #'     add_object(scene_base) |>
@@ -79,7 +79,7 @@
 #' }
 #'
 #' # Change the base height (note that the vertical_offset is measured from the base, not from zero)
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   roof_model = generate_roof(skeleton, vertical_offset = 2, base = TRUE, base_height=1)
 #'   raymesh_model(roof_model, material = diffuse(color="purple")) |>
 #'     add_object(scene_base) |>
@@ -89,7 +89,7 @@
 #'
 #'
 #' # Skeletonize and turn an {sf} object into a roof
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   us_states = spData::us_states
 #'   cali = us_states[us_states$NAME == "California",]
 #'   cali_skeleton = skeletonize(cali)
@@ -112,7 +112,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
                          material = material_list(),
                          roof_material = NA,
                          verbose = FALSE) {
-  if(run_documentation() || !interactive()) {
+  if(run_docs_raybevel() || !interactive()) {
     progress = FALSE
   }
   if(!is.list(roof_material)) {
@@ -292,7 +292,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #' plot_skeleton(skeleton)
 #'
 #' #Generate a roof model and specify the material
-#' if(raybevel::run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   library(rayrender)
 #'   library(rayvertex)
 #'   scene_base = xz_rect(xwidth=100,zwidth=100,
@@ -314,7 +314,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #' }
 #'
 #' # Change the bevel to be circular
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   bevel = generate_bevel("circular", bevel_start = 0, bevel_end = 0.2, max_height=0.25)
 #'   roof_model = generate_beveled_polygon(skeleton,
 #'                                         bevel_offsets = bevel,
@@ -327,7 +327,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #' }
 #'
 #' # Change the bevel to type "bump", change the max height, and raise it off the surface
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   bevel = generate_bevel("bump", bevel_start = 0, bevel_end = 0.4, max_height=0.25)
 #'   roof_model = generate_beveled_polygon(skeleton, base_height=1,
 #'                                         bevel_offsets = bevel,
@@ -340,7 +340,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #' }
 #'
 #' # Generate a complex bevel and use the exact specified heights
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   bevel = generate_complex_bevel(c("bump", "exp", "circular","step"),
 #'                                  bevel_start = c(0,0.3,0.7,0.95),
 #'                                  bevel_end = c(0.1,0.6,0.95,1),
@@ -360,7 +360,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #' }
 #'
 #' # Turn the polygon into a ziggurat, using the step bevel type
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   offs = seq(0, 1, by = 0.05)
 #'   bevel = generate_complex_bevel("step",
 #'                                  bevel_start = offs[-length(offs)],
@@ -379,7 +379,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #' }
 #'
 #' # Turn the polygon into a smooth wavy slide, taking advantage of vector recycling to flip/reverse
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   offs = seq(0, 1, by = 0.1)
 #'   bevel = generate_complex_bevel("exp",
 #'                                  bevel_start = offs[-length(offs)],
@@ -400,7 +400,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #' }
 #'
 #' # Skeletonize and turn an {sf} object into a beveled polygon
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   us_states = spData::us_states
 #'   texas = us_states[us_states$NAME == "Texas",]
 #'   texas_skeleton = skeletonize(texas)
@@ -422,7 +422,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #' }
 #'
 #' # Generate a smooth bevel
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   bevel = generate_bevel("exp", bevel_start = 0, bevel_end=0.5, max_height=2)
 #'   roof_model_texas = generate_beveled_polygon(texas_skeleton,
 #'                                         bevel_offsets = bevel,
@@ -456,7 +456,7 @@ generate_beveled_polygon = function(skeleton,
                                     material = material_list(),
                                     bevel_material = NA,
                                     verbose = FALSE) {
-  if(run_documentation() || !interactive()) {
+  if(run_docs_raybevel() || !interactive()) {
     progress = FALSE
   }
   if(!is.list(bevel_material)) {
@@ -745,7 +745,7 @@ generate_beveled_polygon = function(skeleton,
 #' # Skeletonize a complex {sf} object and set return_skeleton_polygons = TRUE in
 #' # generate_beveled_polygon(). This returns skeleton object with polygons included, which
 #' # allows for quickly generating 3D models with different bevels.
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   library(rayrender)
 #'   library(rayvertex)
 #'   us_states = spData::us_states
@@ -775,7 +775,7 @@ generate_beveled_polygon = function(skeleton,
 #'                  width=800,height=800,fov=0,ortho_dimensions=c(12,12))
 #' }
 #' # Change to a smooth bevel
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   new_bevel = generate_bevel("circular", bevel_start = 0, bevel_end=1)
 #'   bevel_new = change_polygon_bevel(bevel_model_cali,
 #'                                    bevel_offsets = new_bevel, solid ) |>
@@ -787,7 +787,7 @@ generate_beveled_polygon = function(skeleton,
 #' }
 #'
 #' # Make a complex bevel
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   complex_coords = generate_complex_bevel(
 #'     bevel_type  = c("angled","flat", "angled", "flat"),
 #'     bevel_start = head(seq(0,1,by=0.05),-1),
@@ -807,7 +807,7 @@ generate_beveled_polygon = function(skeleton,
 #' }
 #'
 #' # Quickly generate new bevels to inflate California like a balloon using the arctan function.
-#' if(run_documentation()) {
+#' if(run_docs_raybevel()) {
 #'   inflate_california = function(magnitudes) {
 #'   for(val in magnitudes) {
 #'     bevel_new = change_polygon_bevel(bevel_model_cali,
@@ -844,7 +844,7 @@ change_polygon_bevel = function(skeleton_polygons,
                                 material = material_list(),
                                 bevel_material = NA,
                                 verbose = FALSE) {
-  if(run_documentation() || !interactive()) {
+  if(run_docs_raybevel() || !interactive()) {
     progress = FALSE
   }
   if(!is.list(bevel_material)) {
