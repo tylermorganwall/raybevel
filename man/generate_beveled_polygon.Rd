@@ -82,7 +82,7 @@ skeleton = skeletonize(vertices, holes = list(hole_1, hole_2))
 plot_skeleton(skeleton)
 
 #Generate a roof model and specify the material
-if(run_documentation()) {
+if(raybevel::run_documentation()) {
   library(rayrender)
   library(rayvertex)
   scene_base = xz_rect(xwidth=100,zwidth=100,

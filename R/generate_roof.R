@@ -292,7 +292,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #' plot_skeleton(skeleton)
 #'
 #' #Generate a roof model and specify the material
-#' if(run_documentation()) {
+#' if(raybevel::run_documentation()) {
 #'   library(rayrender)
 #'   library(rayvertex)
 #'   scene_base = xz_rect(xwidth=100,zwidth=100,
