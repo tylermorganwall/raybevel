@@ -295,6 +295,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #' if(run_docs_raybevel()) {
 #'   library(rayrender)
 #'   library(rayvertex)
+#'
 #'   scene_base = xz_rect(xwidth=100,zwidth=100,
 #'                        material=diffuse(color="grey20", checkercolor="white")) |>
 #'     add_object(sphere(y=8,z=10,x=-3,material=light(intensity=100))) |>
@@ -306,7 +307,13 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #'   roof_model = generate_beveled_polygon(skeleton,
 #'                                         bevel_offsets = bevel,
 #'                                         material = material_list(diffuse="purple"))
+#'   #Visualize with rayvertex
+#'   roof_model |>
+#'     add_shape(xz_rect_mesh(scale=c(20,1,20)) ) |>
+#'     rasterize_scene(lookfrom=c(10,10,10),fov=40,
+#'                     light_info = directional_light(c(-0.5,0.7,0.8)))
 #'
+#'   #Visualize with rayrender
 #'   raymesh_model(roof_model, override_material = FALSE) |>
 #'     add_object(scene_base) |>
 #'     render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue", parallel=FALSE,
