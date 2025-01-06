@@ -120,9 +120,7 @@
 <p>Now, we can offset this polygon inwards:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">offset_polygon</span> <span class="op">=</span> <span class="fu"><a href="reference/generate_offset_polygon.html">generate_offset_polygon</a></span><span class="op">(</span><span class="va">skeleton</span>, offset <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span>
-<span><span class="va">offset_polygon</span></span>
-<span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; [[1]]</span></span>
+<span><span class="va">offset_polygon</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="co">#&gt; $offset_1.200000_1</span></span>
 <span><span class="co">#&gt;      x    y</span></span>
 <span><span class="co">#&gt; 1  2.3 -2.3</span></span>
@@ -138,121 +136,6 @@
 <span><span class="co">#&gt; [1] "rayskeleton_offset_polygons" "list"                       </span></span>
 <span><span class="co">#&gt; attr(,"number_polygons")</span></span>
 <span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"class")</span></span>
-<span><span class="co">#&gt; [1] "rayskeleton_offset_polygons_collection"</span></span>
-<span><span class="co">#&gt; [2] "list"                                  </span></span>
-<span><span class="co">#&gt; attr(,"skeleton")</span></span>
-<span><span class="co">#&gt; $nodes</span></span>
-<span><span class="co">#&gt;    id    x    y time  edge</span></span>
-<span><span class="co">#&gt; 1   1 -3.5 -3.5  0.0  TRUE</span></span>
-<span><span class="co">#&gt; 2   2  3.5 -3.5  0.0  TRUE</span></span>
-<span><span class="co">#&gt; 3   3  3.5  3.5  0.0  TRUE</span></span>
-<span><span class="co">#&gt; 4   4 -3.5  3.5  0.0  TRUE</span></span>
-<span><span class="co">#&gt; 5   5 -2.5 -2.5  0.0  TRUE</span></span>
-<span><span class="co">#&gt; 6   6 -2.5 -1.5  0.0  TRUE</span></span>
-<span><span class="co">#&gt; 7   7 -1.5 -1.5  0.0  TRUE</span></span>
-<span><span class="co">#&gt; 8   8 -1.5 -2.5  0.0  TRUE</span></span>
-<span><span class="co">#&gt; 9   9  1.5  1.5  0.0  TRUE</span></span>
-<span><span class="co">#&gt; 10 10  1.5  2.5  0.0  TRUE</span></span>
-<span><span class="co">#&gt; 11 11  2.5  2.5  0.0  TRUE</span></span>
-<span><span class="co">#&gt; 12 12  2.5  1.5  0.0  TRUE</span></span>
-<span><span class="co">#&gt; 13 13 -3.0 -3.0  0.5 FALSE</span></span>
-<span><span class="co">#&gt; 14 14 -3.0 -1.0  0.5 FALSE</span></span>
-<span><span class="co">#&gt; 15 15  3.0  1.0  0.5 FALSE</span></span>
-<span><span class="co">#&gt; 16 16 -1.0 -3.0  0.5 FALSE</span></span>
-<span><span class="co">#&gt; 17 17  3.0  3.0  0.5 FALSE</span></span>
-<span><span class="co">#&gt; 18 18  1.0  3.0  0.5 FALSE</span></span>
-<span><span class="co">#&gt; 19 19  0.0  0.0  1.5 FALSE</span></span>
-<span><span class="co">#&gt; 20 20 -1.0  1.0  2.5 FALSE</span></span>
-<span><span class="co">#&gt; 21 21  1.0 -1.0  2.5 FALSE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $links</span></span>
-<span><span class="co">#&gt;    source destination  edge source_time destination_time</span></span>
-<span><span class="co">#&gt; 1      12          11  TRUE         0.0              0.0</span></span>
-<span><span class="co">#&gt; 2      11          10  TRUE         0.0              0.0</span></span>
-<span><span class="co">#&gt; 3      10           9  TRUE         0.0              0.0</span></span>
-<span><span class="co">#&gt; 4       9          12  TRUE         0.0              0.0</span></span>
-<span><span class="co">#&gt; 5       8           7  TRUE         0.0              0.0</span></span>
-<span><span class="co">#&gt; 6       7           6  TRUE         0.0              0.0</span></span>
-<span><span class="co">#&gt; 7       6           5  TRUE         0.0              0.0</span></span>
-<span><span class="co">#&gt; 8       5           8  TRUE         0.0              0.0</span></span>
-<span><span class="co">#&gt; 9       4           3  TRUE         0.0              0.0</span></span>
-<span><span class="co">#&gt; 10      3           2  TRUE         0.0              0.0</span></span>
-<span><span class="co">#&gt; 11      2           1  TRUE         0.0              0.0</span></span>
-<span><span class="co">#&gt; 12      1           4  TRUE         0.0              0.0</span></span>
-<span><span class="co">#&gt; 13      1          13 FALSE         0.0              0.5</span></span>
-<span><span class="co">#&gt; 14      3          17 FALSE         0.0              0.5</span></span>
-<span><span class="co">#&gt; 15      5          13 FALSE         0.0              0.5</span></span>
-<span><span class="co">#&gt; 16      6          14 FALSE         0.0              0.5</span></span>
-<span><span class="co">#&gt; 17      8          16 FALSE         0.0              0.5</span></span>
-<span><span class="co">#&gt; 18     10          18 FALSE         0.0              0.5</span></span>
-<span><span class="co">#&gt; 19     11          17 FALSE         0.0              0.5</span></span>
-<span><span class="co">#&gt; 20     12          15 FALSE         0.0              0.5</span></span>
-<span><span class="co">#&gt; 21      7          19 FALSE         0.0              1.5</span></span>
-<span><span class="co">#&gt; 22      9          19 FALSE         0.0              1.5</span></span>
-<span><span class="co">#&gt; 23      2          21 FALSE         0.0              2.5</span></span>
-<span><span class="co">#&gt; 24      4          20 FALSE         0.0              2.5</span></span>
-<span><span class="co">#&gt; 25     13          16 FALSE         0.5              0.5</span></span>
-<span><span class="co">#&gt; 26     13          14 FALSE         0.5              0.5</span></span>
-<span><span class="co">#&gt; 27     15          17 FALSE         0.5              0.5</span></span>
-<span><span class="co">#&gt; 28     17          18 FALSE         0.5              0.5</span></span>
-<span><span class="co">#&gt; 29     14          20 FALSE         0.5              2.5</span></span>
-<span><span class="co">#&gt; 30     15          21 FALSE         0.5              2.5</span></span>
-<span><span class="co">#&gt; 31     16          21 FALSE         0.5              2.5</span></span>
-<span><span class="co">#&gt; 32     18          20 FALSE         0.5              2.5</span></span>
-<span><span class="co">#&gt; 33     19          20 FALSE         1.5              2.5</span></span>
-<span><span class="co">#&gt; 34     19          21 FALSE         1.5              2.5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"class")</span></span>
-<span><span class="co">#&gt; [1] "rayskeleton"</span></span>
-<span><span class="co">#&gt; attr(,"original_vertices")</span></span>
-<span><span class="co">#&gt;         x    y</span></span>
-<span><span class="co">#&gt; [1,] -3.5 -3.5</span></span>
-<span><span class="co">#&gt; [2,]  3.5 -3.5</span></span>
-<span><span class="co">#&gt; [3,]  3.5  3.5</span></span>
-<span><span class="co">#&gt; [4,] -3.5  3.5</span></span>
-<span><span class="co">#&gt; attr(,"original_holes")</span></span>
-<span><span class="co">#&gt; attr(,"original_holes")[[1]]</span></span>
-<span><span class="co">#&gt;         x    y</span></span>
-<span><span class="co">#&gt; [1,] -2.5 -2.5</span></span>
-<span><span class="co">#&gt; [2,] -2.5 -1.5</span></span>
-<span><span class="co">#&gt; [3,] -1.5 -1.5</span></span>
-<span><span class="co">#&gt; [4,] -1.5 -2.5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"original_holes")[[2]]</span></span>
-<span><span class="co">#&gt;        x   y</span></span>
-<span><span class="co">#&gt; [1,] 1.5 1.5</span></span>
-<span><span class="co">#&gt; [2,] 1.5 2.5</span></span>
-<span><span class="co">#&gt; [3,] 2.5 2.5</span></span>
-<span><span class="co">#&gt; [4,] 2.5 1.5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"number_offsets")</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="co">#&gt; attr(,"original_vertices")</span></span>
-<span><span class="co">#&gt;         x    y</span></span>
-<span><span class="co">#&gt; [1,] -3.5 -3.5</span></span>
-<span><span class="co">#&gt; [2,]  3.5 -3.5</span></span>
-<span><span class="co">#&gt; [3,]  3.5  3.5</span></span>
-<span><span class="co">#&gt; [4,] -3.5  3.5</span></span>
-<span><span class="co">#&gt; attr(,"original_holes")</span></span>
-<span><span class="co">#&gt; attr(,"original_holes")[[1]]</span></span>
-<span><span class="co">#&gt;         x    y</span></span>
-<span><span class="co">#&gt; [1,] -2.5 -2.5</span></span>
-<span><span class="co">#&gt; [2,] -2.5 -1.5</span></span>
-<span><span class="co">#&gt; [3,] -1.5 -1.5</span></span>
-<span><span class="co">#&gt; [4,] -1.5 -2.5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"original_holes")[[2]]</span></span>
-<span><span class="co">#&gt;        x   y</span></span>
-<span><span class="co">#&gt; [1,] 1.5 1.5</span></span>
-<span><span class="co">#&gt; [2,] 1.5 2.5</span></span>
-<span><span class="co">#&gt; [3,] 2.5 2.5</span></span>
-<span><span class="co">#&gt; [4,] 2.5 1.5</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attr(,"class")</span></span>
-<span><span class="co">#&gt; [1] "rayskeleton_polygons" "list"</span></span>
 <span><span class="fu"><a href="reference/plot_offset_polygon.html">plot_offset_polygon</a></span><span class="op">(</span><span class="va">offset_polygon</span>, skeleton <span class="op">=</span> <span class="va">skeleton</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-offsets-1.png" style="display: block; margin: auto;"></p>
 <p>We can also plot multiple offsets and use color palettes.</p>
@@ -272,8 +155,8 @@
 <span><span class="fu"><a href="http://www.rayrender.net/reference/generate_ground.html" class="external-link">generate_ground</a></span><span class="op">(</span>depth <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>, material <span class="op">=</span> <span class="fu"><a href="http://www.rayrender.net/reference/diffuse.html" class="external-link">diffuse</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"grey"</span>, checkercolor <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="http://www.rayrender.net/reference/add_object.html" class="external-link">add_object</a></span><span class="op">(</span><span class="fu"><a href="http://www.rayrender.net/reference/raymesh_model.html" class="external-link">raymesh_model</a></span><span class="op">(</span><span class="va">roof</span>, material <span class="op">=</span> <span class="fu"><a href="http://www.rayrender.net/reference/diffuse.html" class="external-link">diffuse</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"dodgerblue"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="http://www.rayrender.net/reference/add_object.html" class="external-link">add_object</a></span><span class="op">(</span><span class="fu"><a href="http://www.rayrender.net/reference/sphere.html" class="external-link">sphere</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fl">20</span>, x <span class="op">=</span> <span class="fl">0</span>, z <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>, material <span class="op">=</span> <span class="fu"><a href="http://www.rayrender.net/reference/light.html" class="external-link">light</a></span><span class="op">(</span>intensity <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="http://www.rayrender.net/reference/render_scene.html" class="external-link">render_scene</a></span><span class="op">(</span>lookfrom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">0</span><span class="op">)</span>, sample_method <span class="op">=</span> <span class="st">"sobol_blue"</span>, fov <span class="op">=</span> <span class="fl">25</span>, </span>
-<span>               min_variance <span class="op">=</span> <span class="fl">1e-6</span>, clamp_value <span class="op">=</span> <span class="fl">10</span>, samples <span class="op">=</span> <span class="fl">256</span>, width <span class="op">=</span> <span class="fl">800</span>, height <span class="op">=</span> <span class="fl">800</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="http://www.rayrender.net/reference/render_scene.html" class="external-link">render_scene</a></span><span class="op">(</span>lookfrom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">0</span><span class="op">)</span>, fov <span class="op">=</span> <span class="fl">25</span>, </span>
+<span>               samples<span class="op">=</span><span class="fl">16</span>, width <span class="op">=</span> <span class="fl">800</span>, height <span class="op">=</span> <span class="fl">800</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-roof-1.png" style="display: block; margin: auto;"></p>
 <p>And here is a beveled roof (here, setting the base height to the level of the ground, which generates the sides of the polygon as well):</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -284,8 +167,8 @@
 <span><span class="fu"><a href="http://www.rayrender.net/reference/generate_ground.html" class="external-link">generate_ground</a></span><span class="op">(</span>depth <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>, material <span class="op">=</span> <span class="fu"><a href="http://www.rayrender.net/reference/diffuse.html" class="external-link">diffuse</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"grey"</span>, checkercolor <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="http://www.rayrender.net/reference/add_object.html" class="external-link">add_object</a></span><span class="op">(</span><span class="fu"><a href="http://www.rayrender.net/reference/raymesh_model.html" class="external-link">raymesh_model</a></span><span class="op">(</span><span class="va">roof_bevel</span>, material <span class="op">=</span> <span class="fu"><a href="http://www.rayrender.net/reference/diffuse.html" class="external-link">diffuse</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"dodgerblue"</span><span class="op">)</span>, override_material <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="http://www.rayrender.net/reference/add_object.html" class="external-link">add_object</a></span><span class="op">(</span><span class="fu"><a href="http://www.rayrender.net/reference/sphere.html" class="external-link">sphere</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fl">15</span>, x <span class="op">=</span> <span class="fl">0</span>, z <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>, material <span class="op">=</span> <span class="fu"><a href="http://www.rayrender.net/reference/light.html" class="external-link">light</a></span><span class="op">(</span>intensity <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="http://www.rayrender.net/reference/render_scene.html" class="external-link">render_scene</a></span><span class="op">(</span>lookfrom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">0</span><span class="op">)</span>, sample_method <span class="op">=</span> <span class="st">"sobol_blue"</span>, fov <span class="op">=</span> <span class="fl">25</span>, </span>
-<span>               min_variance <span class="op">=</span> <span class="fl">1e-6</span>, clamp_value <span class="op">=</span> <span class="fl">10</span>, samples <span class="op">=</span> <span class="fl">256</span>, width <span class="op">=</span> <span class="fl">800</span>, height <span class="op">=</span> <span class="fl">800</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="http://www.rayrender.net/reference/render_scene.html" class="external-link">render_scene</a></span><span class="op">(</span>lookfrom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">0</span><span class="op">)</span>, fov <span class="op">=</span> <span class="fl">25</span>, </span>
+<span>               samples<span class="op">=</span><span class="fl">16</span>, width <span class="op">=</span> <span class="fl">800</span>, height <span class="op">=</span> <span class="fl">800</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-bevelroof-1.png" style="display: block; margin: auto;"></p>
 <p>Multiple bevels are also supported (here, we use raw distance offsets, rather than percentage):</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -297,8 +180,8 @@
 <span><span class="fu"><a href="http://www.rayrender.net/reference/generate_ground.html" class="external-link">generate_ground</a></span><span class="op">(</span>depth <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>, material <span class="op">=</span> <span class="fu"><a href="http://www.rayrender.net/reference/diffuse.html" class="external-link">diffuse</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"grey"</span>, checkercolor <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="http://www.rayrender.net/reference/add_object.html" class="external-link">add_object</a></span><span class="op">(</span><span class="fu"><a href="http://www.rayrender.net/reference/raymesh_model.html" class="external-link">raymesh_model</a></span><span class="op">(</span><span class="va">roof_bevel_multi</span>, material <span class="op">=</span> <span class="fu"><a href="http://www.rayrender.net/reference/diffuse.html" class="external-link">diffuse</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"dodgerblue"</span><span class="op">)</span>, override_material <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="http://www.rayrender.net/reference/add_object.html" class="external-link">add_object</a></span><span class="op">(</span><span class="fu"><a href="http://www.rayrender.net/reference/sphere.html" class="external-link">sphere</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fl">15</span>, x <span class="op">=</span> <span class="fl">0</span>, z <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>, material <span class="op">=</span> <span class="fu"><a href="http://www.rayrender.net/reference/light.html" class="external-link">light</a></span><span class="op">(</span>intensity <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="http://www.rayrender.net/reference/render_scene.html" class="external-link">render_scene</a></span><span class="op">(</span>lookfrom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">0</span><span class="op">)</span>, sample_method <span class="op">=</span> <span class="st">"sobol_blue"</span>, fov <span class="op">=</span> <span class="fl">25</span>, </span>
-<span>               min_variance <span class="op">=</span> <span class="fl">1e-6</span>, clamp_value <span class="op">=</span> <span class="fl">10</span>, samples <span class="op">=</span> <span class="fl">256</span>, width <span class="op">=</span> <span class="fl">800</span>, height <span class="op">=</span> <span class="fl">800</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="http://www.rayrender.net/reference/render_scene.html" class="external-link">render_scene</a></span><span class="op">(</span>lookfrom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">0</span><span class="op">)</span>, fov <span class="op">=</span> <span class="fl">25</span>, </span>
+<span>               samples<span class="op">=</span><span class="fl">16</span>, width <span class="op">=</span> <span class="fl">800</span>, height <span class="op">=</span> <span class="fl">800</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-multibevelroof-1.png" style="display: block; margin: auto;"></p>
 <p>You can use this to generate smooth variations in roof height:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
@@ -311,8 +194,8 @@
 <span><span class="fu"><a href="http://www.rayrender.net/reference/generate_ground.html" class="external-link">generate_ground</a></span><span class="op">(</span>depth <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>, material <span class="op">=</span> <span class="fu"><a href="http://www.rayrender.net/reference/diffuse.html" class="external-link">diffuse</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"grey"</span>, checkercolor <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="http://www.rayrender.net/reference/add_object.html" class="external-link">add_object</a></span><span class="op">(</span><span class="fu"><a href="http://www.rayrender.net/reference/raymesh_model.html" class="external-link">raymesh_model</a></span><span class="op">(</span><span class="va">roof_bevel_multi</span>, material <span class="op">=</span> <span class="fu"><a href="http://www.rayrender.net/reference/diffuse.html" class="external-link">diffuse</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"dodgerblue"</span><span class="op">)</span>, override_material <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="http://www.rayrender.net/reference/add_object.html" class="external-link">add_object</a></span><span class="op">(</span><span class="fu"><a href="http://www.rayrender.net/reference/sphere.html" class="external-link">sphere</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fl">15</span>, x <span class="op">=</span> <span class="fl">0</span>, z <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>, material <span class="op">=</span> <span class="fu"><a href="http://www.rayrender.net/reference/light.html" class="external-link">light</a></span><span class="op">(</span>intensity <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="http://www.rayrender.net/reference/render_scene.html" class="external-link">render_scene</a></span><span class="op">(</span>lookfrom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">0</span><span class="op">)</span>, sample_method <span class="op">=</span> <span class="st">"sobol_blue"</span>, fov <span class="op">=</span> <span class="fl">25</span>,</span>
-<span>               min_variance <span class="op">=</span> <span class="fl">1e-6</span>, clamp_value <span class="op">=</span> <span class="fl">10</span>, samples <span class="op">=</span> <span class="fl">256</span>, width <span class="op">=</span> <span class="fl">800</span>, height <span class="op">=</span> <span class="fl">800</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="http://www.rayrender.net/reference/render_scene.html" class="external-link">render_scene</a></span><span class="op">(</span>lookfrom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">0</span><span class="op">)</span>, fov <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>               samples<span class="op">=</span><span class="fl">16</span>, width <span class="op">=</span> <span class="fl">800</span>, height <span class="op">=</span> <span class="fl">800</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-smoothbevelroof-1.png" style="display: block; margin: auto;"></p>
 <p>And you can specify more complex functions for bevel height as well:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -325,8 +208,8 @@
 <span><span class="fu"><a href="http://www.rayrender.net/reference/generate_ground.html" class="external-link">generate_ground</a></span><span class="op">(</span>depth <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>,material <span class="op">=</span> <span class="fu"><a href="http://www.rayrender.net/reference/diffuse.html" class="external-link">diffuse</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"grey"</span>, checkercolor <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="http://www.rayrender.net/reference/add_object.html" class="external-link">add_object</a></span><span class="op">(</span><span class="fu"><a href="http://www.rayrender.net/reference/raymesh_model.html" class="external-link">raymesh_model</a></span><span class="op">(</span><span class="va">roof_bevel_multi_sin</span>, material <span class="op">=</span> <span class="fu"><a href="http://www.rayrender.net/reference/diffuse.html" class="external-link">diffuse</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"dodgerblue"</span><span class="op">)</span>, override_material <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="http://www.rayrender.net/reference/add_object.html" class="external-link">add_object</a></span><span class="op">(</span><span class="fu"><a href="http://www.rayrender.net/reference/sphere.html" class="external-link">sphere</a></span><span class="op">(</span>y<span class="op">=</span><span class="fl">15</span>,x<span class="op">=</span><span class="fl">0</span>,z<span class="op">=</span><span class="op">-</span><span class="fl">10</span>,material<span class="op">=</span><span class="fu"><a href="http://www.rayrender.net/reference/light.html" class="external-link">light</a></span><span class="op">(</span>intensity <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="http://www.rayrender.net/reference/render_scene.html" class="external-link">render_scene</a></span><span class="op">(</span>lookfrom<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">20</span>,<span class="fl">0</span><span class="op">)</span>, sample_method <span class="op">=</span> <span class="st">"sobol_blue"</span>,fov<span class="op">=</span><span class="fl">25</span>, ortho_dimensions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>,<span class="fl">8</span><span class="op">)</span>,</span>
-<span>               min_variance <span class="op">=</span> <span class="fl">1e-6</span>, clamp_value <span class="op">=</span> <span class="fl">10</span>, samples <span class="op">=</span> <span class="fl">256</span>, width<span class="op">=</span><span class="fl">800</span>,height<span class="op">=</span><span class="fl">800</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="http://www.rayrender.net/reference/render_scene.html" class="external-link">render_scene</a></span><span class="op">(</span>lookfrom<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">20</span>,<span class="fl">0</span><span class="op">)</span>, fov<span class="op">=</span><span class="fl">25</span>, ortho_dimensions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>,<span class="fl">8</span><span class="op">)</span>,</span>
+<span>               samples<span class="op">=</span><span class="fl">16</span>, width<span class="op">=</span><span class="fl">800</span>,height<span class="op">=</span><span class="fl">800</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-functionbevelroof-1.png" style="display: block; margin: auto;"></p>
 <p>You can also plot {sf} objects. Here, we generate a roof in the shape of California.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -350,8 +233,7 @@
 <span>  <span class="fu"><a href="http://www.rayrender.net/reference/add_object.html" class="external-link">add_object</a></span><span class="op">(</span><span class="fu"><a href="http://www.rayrender.net/reference/sphere.html" class="external-link">sphere</a></span><span class="op">(</span>y<span class="op">=</span><span class="fl">20</span>, x<span class="op">=</span><span class="fl">20</span>, z<span class="op">=</span><span class="op">-</span><span class="fl">50</span>, radius<span class="op">=</span><span class="fl">10</span>, material<span class="op">=</span><span class="fu"><a href="http://www.rayrender.net/reference/light.html" class="external-link">light</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"white"</span>, intensity <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="http://www.rayrender.net/reference/add_object.html" class="external-link">add_object</a></span><span class="op">(</span><span class="fu"><a href="http://www.rayrender.net/reference/sphere.html" class="external-link">sphere</a></span><span class="op">(</span>y<span class="op">=</span><span class="fl">20</span>, x<span class="op">=</span><span class="fl">30</span>, z<span class="op">=</span><span class="fl">50</span>, radius<span class="op">=</span><span class="fl">10</span>, material<span class="op">=</span><span class="fu"><a href="http://www.rayrender.net/reference/light.html" class="external-link">light</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"orange"</span>, intensity <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="http://www.rayrender.net/reference/render_scene.html" class="external-link">render_scene</a></span><span class="op">(</span>lookfrom<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">10</span>,<span class="op">-</span><span class="fl">5</span><span class="op">)</span>, camera_up<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span>, lookat<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">0</span>,<span class="fl">0.25</span><span class="op">)</span>,</span>
-<span>               sample_method <span class="op">=</span> <span class="st">"sobol_blue"</span>, fov<span class="op">=</span><span class="fl">0</span>, ortho_dimensions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">12</span>,<span class="fl">12</span><span class="op">)</span>,</span>
-<span>               min_variance <span class="op">=</span> <span class="fl">0</span>, clamp_value <span class="op">=</span> <span class="fl">10</span>, samples <span class="op">=</span> <span class="fl">256</span>, width<span class="op">=</span><span class="fl">800</span>, height<span class="op">=</span><span class="fl">800</span><span class="op">)</span></span></code></pre></div>
+<span>               fov<span class="op">=</span><span class="fl">0</span>, ortho_dimensions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">12</span>,<span class="fl">12</span><span class="op">)</span>, samples<span class="op">=</span><span class="fl">16</span>, width<span class="op">=</span><span class="fl">800</span>, height<span class="op">=</span><span class="fl">800</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-ca_sf-1.png" style="display: block; margin: auto;"></p>
 <p>We can also generate a complex beveled polygon with <code><a href="reference/generate_beveled_polygon.html">generate_beveled_polygon()</a></code>. We’ll first generate and plot our more complex bevel:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
@@ -377,8 +259,7 @@
 <span>  <span class="fu"><a href="http://www.rayrender.net/reference/add_object.html" class="external-link">add_object</a></span><span class="op">(</span><span class="fu"><a href="http://www.rayrender.net/reference/xy_rect.html" class="external-link">xy_rect</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fl">15</span>, x <span class="op">=</span> <span class="fl">5</span>, z <span class="op">=</span> <span class="fl">60</span>, xwidth <span class="op">=</span> <span class="fl">100</span>, ywidth <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>                     flipped <span class="op">=</span> <span class="cn">TRUE</span>, angle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">45</span>, <span class="fl">0</span><span class="op">)</span>,</span>
 <span>                     material <span class="op">=</span> <span class="fu"><a href="http://www.rayrender.net/reference/light.html" class="external-link">light</a></span><span class="op">(</span>intensity <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="http://www.rayrender.net/reference/render_scene.html" class="external-link">render_scene</a></span><span class="op">(</span>lookfrom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span>, lookat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1.5</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>               sample_method <span class="op">=</span> <span class="st">"sobol_blue"</span>, samples <span class="op">=</span> <span class="fl">256</span>, clamp_value <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  <span class="fu"><a href="http://www.rayrender.net/reference/render_scene.html" class="external-link">render_scene</a></span><span class="op">(</span>lookfrom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span>, lookat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1.5</span>, <span class="fl">1</span><span class="op">)</span>, samples<span class="op">=</span><span class="fl">16</span>, </span>
 <span>               width <span class="op">=</span> <span class="fl">800</span>, height <span class="op">=</span> <span class="fl">800</span>, fov <span class="op">=</span> <span class="fl">15</span>, ortho_dimensions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-ca_sf_bevel-1.png" style="display: block; margin: auto;"></p>
 </div>
@@ -427,7 +308,9 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/tylermorganwall/raybevel/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/tylermorganwall/raybevel/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://github.com/tylermorganwall/raybevel/actions" class="external-link"><img src="https://github.com/tylermorganwall/raybevel/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://tylermorganwall.r-universe.dev/" class="external-link"><img src="https://tylermorganwall.r-universe.dev/badges/:name" alt="name status badge"></a></li>
+<li><a href="https://tylermorganwall.r-universe.dev/raybevel" class="external-link"><img src="https://tylermorganwall.r-universe.dev/raybevel/badges/version" alt="raybevel status badge"></a></li>
 </ul>
 </div>
 
