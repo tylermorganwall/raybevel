@@ -1,7 +1,7 @@
 Package: raybevel
 Type: Package
 Title: Generates Polygon Straight Skeletons and 3D Bevels
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: 
     person("Tyler", "Morgan-Wall", email = "tylermw@gmail.com",
     role = c("aut", "cph", "cre"), comment = c(ORCID = "0000-0002-3131-3814"))
@@ -22,7 +22,7 @@ Imports: progress,
 LinkingTo: Rcpp, BH, RcppCGAL (>= 6.0.0), progress, RcppThread (>= 2.1.6)
 Suggests: 
     spData,
-    rayrender (>= 0.38.2),
+    rayrender (>= 0.38.3),
     testthat (>= 3.0.0),
     ggplot2,
     png
