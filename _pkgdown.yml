@@ -36,7 +36,7 @@ reference:
 - title: 2D Profiles
   desc: Functions to generate 2D bevel profiles
   contents:
-  - matches("generate_bevel")
+  - ends_with("generate_bevel")
   - matches("generate_complex_bevel")
 - title: Plotting
   desc: Functions to plot skeletons and bevels

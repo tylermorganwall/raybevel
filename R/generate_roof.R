@@ -47,7 +47,7 @@
 #'
 #'   raymesh_model(roof_model, override_material = FALSE) |>
 #'     add_object(scene_base) |>
-#'     render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue",
+#'     render_scene(lookfrom=c(10,30,20), samples=16,
 #'                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
 #' }
 #'
@@ -56,7 +56,7 @@
 #'   roof_model = generate_roof(skeleton, max_height=5)
 #'   raymesh_model(roof_model, material = diffuse(color="purple")) |>
 #'     add_object(scene_base) |>
-#'     render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue",
+#'     render_scene(lookfrom=c(10,30,20), samples=16,
 #'                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
 #' }
 #'
@@ -65,7 +65,7 @@
 #'   roof_model = generate_roof(skeleton, vertical_offset = 2, base = FALSE)
 #'   raymesh_model(roof_model, material = diffuse(color="purple")) |>
 #'     add_object(scene_base) |>
-#'     render_scene(lookfrom=c(10,10,20), lookat=c(0,2,0), sample_method = "sobol_blue",
+#'     render_scene(lookfrom=c(10,10,20), lookat=c(0,2,0), samples=16,
 #'                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
 #' }
 #'
@@ -74,7 +74,7 @@
 #'   roof_model = generate_roof(skeleton, vertical_offset = 2, base = TRUE)
 #'   raymesh_model(roof_model, material = diffuse(color="purple")) |>
 #'     add_object(scene_base) |>
-#'     render_scene(lookfrom=c(10,10,20), lookat=c(0,2,0), sample_method = "sobol_blue",
+#'     render_scene(lookfrom=c(10,10,20), lookat=c(0,2,0), samples=16,
 #'                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
 #' }
 #'
@@ -83,7 +83,7 @@
 #'   roof_model = generate_roof(skeleton, vertical_offset = 2, base = TRUE, base_height=1)
 #'   raymesh_model(roof_model, material = diffuse(color="purple")) |>
 #'     add_object(scene_base) |>
-#'     render_scene(lookfrom=c(10,10,20), lookat=c(0,2,0), sample_method = "sobol_blue",
+#'     render_scene(lookfrom=c(10,10,20), lookat=c(0,2,0), samples=16,
 #'                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
 #' }
 #'
@@ -102,7 +102,7 @@
 #'     add_object(scene_base) |>
 #'     add_object(sphere(x=-10,z=-10,y=4,material=light(color="red", intensity=40))) |>
 #'     add_object(sphere(x=10,z=-10,y=4,material=light(color="orange", intensity=40))) |>
-#'     render_scene(lookfrom=c(0,10,-1), sample_method = "sobol_blue", ambient_light=TRUE,
+#'     render_scene(lookfrom=c(0,10,-1), samples=16, ambient_light=TRUE,
 #'                  width=800,height=800,fov=0, ortho_dimensions=c(12,12))
 #' }
 generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
@@ -316,7 +316,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #'   #Visualize with rayrender
 #'   raymesh_model(roof_model, override_material = FALSE) |>
 #'     add_object(scene_base) |>
-#'     render_scene(lookfrom=c(10,30,20),
+#'     render_scene(lookfrom=c(10,30,20),samples=16,
 #'                  width=800,height=800,fov=0,ortho_dimensions=c(10,10), verbose=TRUE)
 #' }
 #'
@@ -329,7 +329,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #'
 #'   raymesh_model(roof_model, override_material = FALSE) |>
 #'     add_object(scene_base) |>
-#'     render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue",
+#'     render_scene(lookfrom=c(10,30,20), samples=16,
 #'                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
 #' }
 #'
@@ -342,7 +342,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #'
 #'   raymesh_model(roof_model, override_material = FALSE) |>
 #'     add_object(scene_base) |>
-#'     render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue",
+#'     render_scene(lookfrom=c(10,30,20), samples=16,
 #'                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
 #' }
 #'
@@ -362,7 +362,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #'
 #'   raymesh_model(roof_model, override_material = FALSE) |>
 #'     add_object(scene_base) |>
-#'     render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue",
+#'     render_scene(lookfrom=c(10,30,20), samples=16,
 #'                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
 #' }
 #'
@@ -381,7 +381,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #'
 #'   raymesh_model(roof_model, override_material = FALSE) |>
 #'     add_object(scene_base) |>
-#'     render_scene(lookfrom = c(10,30,20), sample_method = "sobol_blue",
+#'     render_scene(lookfrom = c(10,30,20), samples=16,
 #'                  width = 800, height = 800, fov = 0, ortho_dimensions = c(10,10))
 #' }
 #'
@@ -402,7 +402,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #'
 #'   raymesh_model(roof_model, override_material = FALSE) |>
 #'     add_object(scene_base) |>
-#'     render_scene(lookfrom = c(10,30,20), sample_method = "sobol_blue",
+#'     render_scene(lookfrom = c(10,30,20), samples=16,
 #'                  width = 800, height = 800, fov = 0, ortho_dimensions = c(10,10))
 #' }
 #'
@@ -424,7 +424,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #'     add_object(scene_base) |>
 #'     add_object(sphere(x=-10,z=-10,y=5,material=light(color="red", intensity=40))) |>
 #'     add_object(sphere(x=10,z=-10,y=5,material=light(color="orange", intensity=40))) |>
-#'     render_scene(lookfrom=c(0,10,0),camera_up=c(0,0,1), sample_method = "sobol_blue",
+#'     render_scene(lookfrom=c(0,10,0),camera_up=c(0,0,1), samples=16,
 #'                  width=800,height=800,fov=0, ortho_dimensions=c(15,15))
 #' }
 #'
@@ -441,7 +441,7 @@ generate_roof = function(skeleton, max_height = NA, vertical_offset = 0,
 #'     add_object(scene_base) |>
 #'     add_object(sphere(x=-10,z=-10,y=5,material=light(color="red", intensity=40))) |>
 #'     add_object(sphere(x=10,z=-10,y=5,material=light(color="orange", intensity=40))) |>
-#'     render_scene(lookfrom=c(0,10,0),camera_up=c(0,0,1), sample_method = "sobol_blue",
+#'     render_scene(lookfrom=c(0,10,0),camera_up=c(0,0,1), samples=16,
 #'                  width=800,height=800,fov=0, ortho_dimensions=c(15,15))
 #' }
 generate_beveled_polygon = function(skeleton,
@@ -778,7 +778,7 @@ generate_beveled_polygon = function(skeleton,
 #'   raymesh_model(bevel_new, y=0.5, override_material = TRUE,
 #'                 material = diffuse(color="purple")) |>
 #'     add_object(scene_base) |>
-#'     render_scene(lookfrom=c(0,30,-10), sample_method = "sobol_blue",clamp_value = 10,
+#'     render_scene(lookfrom=c(0,30,-10), samples=16,
 #'                  width=800,height=800,fov=0,ortho_dimensions=c(12,12))
 #' }
 #' # Change to a smooth bevel
@@ -789,7 +789,7 @@ generate_beveled_polygon = function(skeleton,
 #'     center_mesh()
 #'   raymesh_model(bevel_new, override_material = TRUE, y=1,material = diffuse(color="purple")) |>
 #'     add_object(scene_base) |>
-#'     render_scene(lookfrom=c(0,30,-10), sample_method = "sobol_blue",clamp_value = 10,
+#'     render_scene(lookfrom=c(0,30,-10), samples=16,
 #'                  width=800,height=800,fov=0,ortho_dimensions=c(12,12))
 #' }
 #'
@@ -809,7 +809,7 @@ generate_beveled_polygon = function(skeleton,
 #'     center_mesh()
 #'   raymesh_model(bevel_new, override_material = TRUE, y=1,material = diffuse(color="purple")) |>
 #'     add_object(scene_base) |>
-#'     render_scene(lookfrom=c(0,30,-20), sample_method = "sobol_blue",clamp_value = 10,
+#'     render_scene(lookfrom=c(0,30,-20), samples=16,
 #'                  width=800,height=800,fov=0,ortho_dimensions=c(12,12))
 #' }
 #'
@@ -827,8 +827,7 @@ generate_beveled_polygon = function(skeleton,
 #'       add_object(scene_base) |>
 #'       add_object(sphere(x=-30,z=30,y=18,radius=30,material=light(color="white", intensity=5))) |>
 #'       render_scene(lookfrom=c(-1, 28, -20.32), lookat=c(-1, 1.46, -2),
-#'                    sample_method = "sobol_blue", clamp_value = 10,
-#'                    width=800,height=800,fov=20,samples=256)
+#'                    samples=16, width=800, height=800, fov=20)
 #'     }
 #'   }
 #'   inflate_california(c(1,4,16,64))

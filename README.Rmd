@@ -24,7 +24,9 @@ options(cores=8)
 <img src="man/figures/raybevelhex_big.png" align="right" width = "400px"/>
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/tylermorganwall/raybevel/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tylermorganwall/raybevel/actions/workflows/R-CMD-check.yaml)
+[![R build status](https://github.com/tylermorganwall/raybevel/workflows/R-CMD-check/badge.svg)](https://github.com/tylermorganwall/raybevel/actions)
+[![name status badge](https://tylermorganwall.r-universe.dev/badges/:name)](https://tylermorganwall.r-universe.dev/)
+[![raybevel status badge](https://tylermorganwall.r-universe.dev/raybevel/badges/version)](https://tylermorganwall.r-universe.dev/raybevel)
 <!-- badges: end -->
 
 `raybevel` is an R package that can create and visualize straight skeletons, generate offset polygons, and generate 3D roof models and 3D beveled polygons. The 3D beveled polygons can be given any arbitrary 1D bevel profile controlled by the user.
@@ -92,7 +94,7 @@ Now, we can offset this polygon inwards:
 
 ```{r offsets, fig.width=4,fig.height=4}
 offset_polygon = generate_offset_polygon(skeleton, offset = 1.2)
-offset_polygon
+offset_polygon[[1]][[1]]
 plot_offset_polygon(offset_polygon, skeleton = skeleton)
 ```
 
@@ -117,8 +119,8 @@ roof = generate_roof(skeleton)
 generate_ground(depth = -0.5, material = diffuse(color = "grey", checkercolor = "white")) |>
   add_object(raymesh_model(roof, material = diffuse(color = "dodgerblue"))) |>
   add_object(sphere(y = 20, x = 0, z = -10, material = light(intensity = 200))) |> 
-  render_scene(lookfrom = c(10, 20, 0), sample_method = "sobol_blue", fov = 25, 
-               min_variance = 1e-6, clamp_value = 10, samples = 256, width = 800, height = 800)
+  render_scene(lookfrom = c(10, 20, 0), fov = 25, 
+               samples=16, width = 800, height = 800)
 ```
 
 And here is a beveled roof (here, setting the base height to the level of the ground, which generates the sides of the polygon as well):
@@ -131,8 +133,8 @@ roof_bevel = generate_beveled_polygon(skeleton, base = TRUE, base_height = -0.5,
 generate_ground(depth = -0.5, material = diffuse(color = "grey", checkercolor = "white")) |>
   add_object(raymesh_model(roof_bevel, material = diffuse(color = "dodgerblue"), override_material = TRUE)) |>
   add_object(sphere(y = 15, x = 0, z = -10, material = light(intensity = 200))) |> 
-  render_scene(lookfrom = c(10, 20, 0), sample_method = "sobol_blue", fov = 25, 
-               min_variance = 1e-6, clamp_value = 10, samples = 256, width = 800, height = 800)
+  render_scene(lookfrom = c(10, 20, 0), fov = 25, 
+               samples=16, width = 800, height = 800)
 ```
 
 Multiple bevels are also supported (here, we use raw distance offsets, rather than percentage):
@@ -146,8 +148,8 @@ roof_bevel_multi = generate_beveled_polygon(skeleton,
 generate_ground(depth = -0.5, material = diffuse(color = "grey", checkercolor = "white")) |>
   add_object(raymesh_model(roof_bevel_multi, material = diffuse(color = "dodgerblue"), override_material = TRUE)) |>
   add_object(sphere(y = 15, x = 0, z = -10, material = light(intensity = 200))) |> 
-  render_scene(lookfrom = c(10, 20, 0), sample_method = "sobol_blue", fov = 25, 
-               min_variance = 1e-6, clamp_value = 10, samples = 256, width = 800, height = 800)
+  render_scene(lookfrom = c(10, 20, 0), fov = 25, 
+               samples=16, width = 800, height = 800)
 ```
 
 You can use this to generate smooth variations in roof height:
@@ -162,8 +164,8 @@ roof_bevel_multi = generate_beveled_polygon(skeleton, base_height = -0.5,
 generate_ground(depth = -0.5, material = diffuse(color = "grey", checkercolor = "white")) |>
   add_object(raymesh_model(roof_bevel_multi, material = diffuse(color = "dodgerblue"), override_material = TRUE)) |>
   add_object(sphere(y = 15, x = 0, z = -10, material = light(intensity = 200))) |> 
-  render_scene(lookfrom = c(10, 20, 0), sample_method = "sobol_blue", fov = 25,
-               min_variance = 1e-6, clamp_value = 10, samples = 256, width = 800, height = 800)
+  render_scene(lookfrom = c(10, 20, 0), fov = 25,
+               samples=16, width = 800, height = 800)
 ```
 
 And you can specify more complex functions for bevel height as well:
@@ -178,8 +180,8 @@ roof_bevel_multi_sin = generate_beveled_polygon(skeleton,
 generate_ground(depth = -0.5,material = diffuse(color="grey", checkercolor = "white")) |>
   add_object(raymesh_model(roof_bevel_multi_sin, material = diffuse(color="dodgerblue"), override_material = TRUE)) |>
   add_object(sphere(y=15,x=0,z=-10,material=light(intensity = 200))) |> 
-  render_scene(lookfrom=c(10,20,0), sample_method = "sobol_blue",fov=25, ortho_dimensions = c(8,8),
-               min_variance = 1e-6, clamp_value = 10, samples = 256, width=800,height=800)
+  render_scene(lookfrom=c(10,20,0), fov=25, ortho_dimensions = c(8,8),
+               samples=16, width=800,height=800)
 ```
 
 You can also plot {sf} objects. Here, we generate a roof in the shape of California.
@@ -205,8 +207,7 @@ generate_ground(depth = -0.1, material = diffuse(color="grey50", checkercolor = 
   add_object(sphere(y=20, x=20, z=-50, radius=10, material=light(color="white", intensity = 20))) |>
   add_object(sphere(y=20, x=30, z=50, radius=10, material=light(color="orange", intensity = 20))) |>
   render_scene(lookfrom=c(0,10,-5), camera_up=c(0,0,1), lookat=c(0,0,0.25),
-               sample_method = "sobol_blue", fov=0, ortho_dimensions = c(12,12),
-               min_variance = 0, clamp_value = 10, samples = 256, width=800, height=800)
+               fov=0, ortho_dimensions = c(12,12), samples=16, width=800, height=800)
 
 ```
 
@@ -237,8 +238,7 @@ ca_model |>
   add_object(xy_rect(y = 15, x = 5, z = 60, xwidth = 100, ywidth = 50,
                      flipped = TRUE, angle = c(0, 45, 0),
                      material = light(intensity = 3))) |>
-  render_scene(lookfrom = c(10, 10, 50), lookat = c(0, 1.5, 1),
-               sample_method = "sobol_blue", samples = 256, clamp_value = 10,
+  render_scene(lookfrom = c(10, 10, 50), lookat = c(0, 1.5, 1), samples=16, 
                width = 800, height = 800, fov = 15, ortho_dimensions = c(10, 10))
 ```
 

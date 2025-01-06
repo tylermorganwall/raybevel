@@ -106,7 +106,7 @@ if(run_docs_raybevel()) {
   #Visualize with rayrender
   raymesh_model(roof_model, override_material = FALSE) |>
     add_object(scene_base) |>
-    render_scene(lookfrom=c(10,30,20),
+    render_scene(lookfrom=c(10,30,20),samples=16,
                  width=800,height=800,fov=0,ortho_dimensions=c(10,10), verbose=TRUE)
 }
 
@@ -119,7 +119,7 @@ if(run_docs_raybevel()) {
 
   raymesh_model(roof_model, override_material = FALSE) |>
     add_object(scene_base) |>
-    render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue",
+    render_scene(lookfrom=c(10,30,20), samples=16,
                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
 }
 
@@ -132,7 +132,7 @@ if(run_docs_raybevel()) {
 
   raymesh_model(roof_model, override_material = FALSE) |>
     add_object(scene_base) |>
-    render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue",
+    render_scene(lookfrom=c(10,30,20), samples=16,
                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
 }
 
@@ -152,7 +152,7 @@ if(run_docs_raybevel()) {
 
   raymesh_model(roof_model, override_material = FALSE) |>
     add_object(scene_base) |>
-    render_scene(lookfrom=c(10,30,20), sample_method = "sobol_blue",
+    render_scene(lookfrom=c(10,30,20), samples=16,
                  width=800,height=800,fov=0,ortho_dimensions=c(10,10))
 }
 
@@ -171,7 +171,7 @@ if(run_docs_raybevel()) {
 
   raymesh_model(roof_model, override_material = FALSE) |>
     add_object(scene_base) |>
-    render_scene(lookfrom = c(10,30,20), sample_method = "sobol_blue",
+    render_scene(lookfrom = c(10,30,20), samples=16,
                  width = 800, height = 800, fov = 0, ortho_dimensions = c(10,10))
 }
 
@@ -192,7 +192,7 @@ if(run_docs_raybevel()) {
 
   raymesh_model(roof_model, override_material = FALSE) |>
     add_object(scene_base) |>
-    render_scene(lookfrom = c(10,30,20), sample_method = "sobol_blue",
+    render_scene(lookfrom = c(10,30,20), samples=16,
                  width = 800, height = 800, fov = 0, ortho_dimensions = c(10,10))
 }
 
@@ -214,7 +214,7 @@ if(run_docs_raybevel()) {
     add_object(scene_base) |>
     add_object(sphere(x=-10,z=-10,y=5,material=light(color="red", intensity=40))) |>
     add_object(sphere(x=10,z=-10,y=5,material=light(color="orange", intensity=40))) |>
-    render_scene(lookfrom=c(0,10,0),camera_up=c(0,0,1), sample_method = "sobol_blue",
+    render_scene(lookfrom=c(0,10,0),camera_up=c(0,0,1), samples=16,
                  width=800,height=800,fov=0, ortho_dimensions=c(15,15))
 }
 
@@ -231,7 +231,7 @@ if(run_docs_raybevel()) {
     add_object(scene_base) |>
     add_object(sphere(x=-10,z=-10,y=5,material=light(color="red", intensity=40))) |>
     add_object(sphere(x=10,z=-10,y=5,material=light(color="orange", intensity=40))) |>
-    render_scene(lookfrom=c(0,10,0),camera_up=c(0,0,1), sample_method = "sobol_blue",
+    render_scene(lookfrom=c(0,10,0),camera_up=c(0,0,1), samples=16,
                  width=800,height=800,fov=0, ortho_dimensions=c(15,15))
 }
 }

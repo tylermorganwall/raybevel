@@ -37,7 +37,7 @@ run_tests_bevel = function(argument_grid, plot_prefix="", interactive_run=FALSE,
 
         render_scene(lookfrom=c(10,10,0), sample_method = "sobol_blue",fov=50,
                      preview=TRUE, debug_channel="normal",
-                     samples=128, width=100,height=100)
+                     samples=1, width=100,height=100)
     } else {
       set.seed(seed)
       raymesh_model(poly_bevel_mesh, material = diffuse(color="dodgerblue"), override_material = TRUE) |>

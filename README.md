@@ -7,7 +7,12 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/tylermorganwall/raybevel/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tylermorganwall/raybevel/actions/workflows/R-CMD-check.yaml)
+[![R build
+status](https://github.com/tylermorganwall/raybevel/workflows/R-CMD-check/badge.svg)](https://github.com/tylermorganwall/raybevel/actions)
+[![name status
+badge](https://tylermorganwall.r-universe.dev/badges/:name)](https://tylermorganwall.r-universe.dev/)
+[![raybevel status
+badge](https://tylermorganwall.r-universe.dev/raybevel/badges/version)](https://tylermorganwall.r-universe.dev/raybevel)
 <!-- badges: end -->
 
 `raybevel` is an R package that can create and visualize straight
@@ -94,9 +99,7 @@ Now, we can offset this polygon inwards:
 
 ``` r
 offset_polygon = generate_offset_polygon(skeleton, offset = 1.2)
-offset_polygon
-#> [[1]]
-#> [[1]]
+offset_polygon[[1]][[1]]
 #> $offset_1.200000_1
 #>      x    y
 #> 1  2.3 -2.3
@@ -112,121 +115,6 @@ offset_polygon
 #> [1] "rayskeleton_offset_polygons" "list"                       
 #> attr(,"number_polygons")
 #> [1] 1
-#> 
-#> attr(,"class")
-#> [1] "rayskeleton_offset_polygons_collection"
-#> [2] "list"                                  
-#> attr(,"skeleton")
-#> $nodes
-#>    id    x    y time  edge
-#> 1   1 -3.5 -3.5  0.0  TRUE
-#> 2   2  3.5 -3.5  0.0  TRUE
-#> 3   3  3.5  3.5  0.0  TRUE
-#> 4   4 -3.5  3.5  0.0  TRUE
-#> 5   5 -2.5 -2.5  0.0  TRUE
-#> 6   6 -2.5 -1.5  0.0  TRUE
-#> 7   7 -1.5 -1.5  0.0  TRUE
-#> 8   8 -1.5 -2.5  0.0  TRUE
-#> 9   9  1.5  1.5  0.0  TRUE
-#> 10 10  1.5  2.5  0.0  TRUE
-#> 11 11  2.5  2.5  0.0  TRUE
-#> 12 12  2.5  1.5  0.0  TRUE
-#> 13 13 -3.0 -3.0  0.5 FALSE
-#> 14 14 -3.0 -1.0  0.5 FALSE
-#> 15 15  3.0  1.0  0.5 FALSE
-#> 16 16 -1.0 -3.0  0.5 FALSE
-#> 17 17  3.0  3.0  0.5 FALSE
-#> 18 18  1.0  3.0  0.5 FALSE
-#> 19 19  0.0  0.0  1.5 FALSE
-#> 20 20 -1.0  1.0  2.5 FALSE
-#> 21 21  1.0 -1.0  2.5 FALSE
-#> 
-#> $links
-#>    source destination  edge source_time destination_time
-#> 1      12          11  TRUE         0.0              0.0
-#> 2      11          10  TRUE         0.0              0.0
-#> 3      10           9  TRUE         0.0              0.0
-#> 4       9          12  TRUE         0.0              0.0
-#> 5       8           7  TRUE         0.0              0.0
-#> 6       7           6  TRUE         0.0              0.0
-#> 7       6           5  TRUE         0.0              0.0
-#> 8       5           8  TRUE         0.0              0.0
-#> 9       4           3  TRUE         0.0              0.0
-#> 10      3           2  TRUE         0.0              0.0
-#> 11      2           1  TRUE         0.0              0.0
-#> 12      1           4  TRUE         0.0              0.0
-#> 13      1          13 FALSE         0.0              0.5
-#> 14      3          17 FALSE         0.0              0.5
-#> 15      5          13 FALSE         0.0              0.5
-#> 16      6          14 FALSE         0.0              0.5
-#> 17      8          16 FALSE         0.0              0.5
-#> 18     10          18 FALSE         0.0              0.5
-#> 19     11          17 FALSE         0.0              0.5
-#> 20     12          15 FALSE         0.0              0.5
-#> 21      7          19 FALSE         0.0              1.5
-#> 22      9          19 FALSE         0.0              1.5
-#> 23      2          21 FALSE         0.0              2.5
-#> 24      4          20 FALSE         0.0              2.5
-#> 25     13          16 FALSE         0.5              0.5
-#> 26     13          14 FALSE         0.5              0.5
-#> 27     15          17 FALSE         0.5              0.5
-#> 28     17          18 FALSE         0.5              0.5
-#> 29     14          20 FALSE         0.5              2.5
-#> 30     15          21 FALSE         0.5              2.5
-#> 31     16          21 FALSE         0.5              2.5
-#> 32     18          20 FALSE         0.5              2.5
-#> 33     19          20 FALSE         1.5              2.5
-#> 34     19          21 FALSE         1.5              2.5
-#> 
-#> attr(,"class")
-#> [1] "rayskeleton"
-#> attr(,"original_vertices")
-#>         x    y
-#> [1,] -3.5 -3.5
-#> [2,]  3.5 -3.5
-#> [3,]  3.5  3.5
-#> [4,] -3.5  3.5
-#> attr(,"original_holes")
-#> attr(,"original_holes")[[1]]
-#>         x    y
-#> [1,] -2.5 -2.5
-#> [2,] -2.5 -1.5
-#> [3,] -1.5 -1.5
-#> [4,] -1.5 -2.5
-#> 
-#> attr(,"original_holes")[[2]]
-#>        x   y
-#> [1,] 1.5 1.5
-#> [2,] 1.5 2.5
-#> [3,] 2.5 2.5
-#> [4,] 2.5 1.5
-#> 
-#> attr(,"number_offsets")
-#> [1] 1
-#> attr(,"original_vertices")
-#>         x    y
-#> [1,] -3.5 -3.5
-#> [2,]  3.5 -3.5
-#> [3,]  3.5  3.5
-#> [4,] -3.5  3.5
-#> attr(,"original_holes")
-#> attr(,"original_holes")[[1]]
-#>         x    y
-#> [1,] -2.5 -2.5
-#> [2,] -2.5 -1.5
-#> [3,] -1.5 -1.5
-#> [4,] -1.5 -2.5
-#> 
-#> attr(,"original_holes")[[2]]
-#>        x   y
-#> [1,] 1.5 1.5
-#> [2,] 1.5 2.5
-#> [3,] 2.5 2.5
-#> [4,] 2.5 1.5
-#> 
-#> 
-#> attr(,"class")
-#> [1] "rayskeleton_polygons" "list"
 plot_offset_polygon(offset_polygon, skeleton = skeleton)
 ```
 
@@ -256,8 +144,8 @@ roof = generate_roof(skeleton)
 generate_ground(depth = -0.5, material = diffuse(color = "grey", checkercolor = "white")) |>
   add_object(raymesh_model(roof, material = diffuse(color = "dodgerblue"))) |>
   add_object(sphere(y = 20, x = 0, z = -10, material = light(intensity = 200))) |> 
-  render_scene(lookfrom = c(10, 20, 0), sample_method = "sobol_blue", fov = 25, 
-               min_variance = 1e-6, clamp_value = 10, samples = 256, width = 800, height = 800)
+  render_scene(lookfrom = c(10, 20, 0), fov = 25, 
+               samples=16, width = 800, height = 800)
 ```
 
 <img src="man/figures/README-roof-1.png" style="display: block; margin: auto;" />
@@ -273,8 +161,8 @@ roof_bevel = generate_beveled_polygon(skeleton, base = TRUE, base_height = -0.5,
 generate_ground(depth = -0.5, material = diffuse(color = "grey", checkercolor = "white")) |>
   add_object(raymesh_model(roof_bevel, material = diffuse(color = "dodgerblue"), override_material = TRUE)) |>
   add_object(sphere(y = 15, x = 0, z = -10, material = light(intensity = 200))) |> 
-  render_scene(lookfrom = c(10, 20, 0), sample_method = "sobol_blue", fov = 25, 
-               min_variance = 1e-6, clamp_value = 10, samples = 256, width = 800, height = 800)
+  render_scene(lookfrom = c(10, 20, 0), fov = 25, 
+               samples=16, width = 800, height = 800)
 ```
 
 <img src="man/figures/README-bevelroof-1.png" style="display: block; margin: auto;" />
@@ -291,8 +179,8 @@ roof_bevel_multi = generate_beveled_polygon(skeleton,
 generate_ground(depth = -0.5, material = diffuse(color = "grey", checkercolor = "white")) |>
   add_object(raymesh_model(roof_bevel_multi, material = diffuse(color = "dodgerblue"), override_material = TRUE)) |>
   add_object(sphere(y = 15, x = 0, z = -10, material = light(intensity = 200))) |> 
-  render_scene(lookfrom = c(10, 20, 0), sample_method = "sobol_blue", fov = 25, 
-               min_variance = 1e-6, clamp_value = 10, samples = 256, width = 800, height = 800)
+  render_scene(lookfrom = c(10, 20, 0), fov = 25, 
+               samples=16, width = 800, height = 800)
 ```
 
 <img src="man/figures/README-multibevelroof-1.png" style="display: block; margin: auto;" />
@@ -309,8 +197,8 @@ roof_bevel_multi = generate_beveled_polygon(skeleton, base_height = -0.5,
 generate_ground(depth = -0.5, material = diffuse(color = "grey", checkercolor = "white")) |>
   add_object(raymesh_model(roof_bevel_multi, material = diffuse(color = "dodgerblue"), override_material = TRUE)) |>
   add_object(sphere(y = 15, x = 0, z = -10, material = light(intensity = 200))) |> 
-  render_scene(lookfrom = c(10, 20, 0), sample_method = "sobol_blue", fov = 25,
-               min_variance = 1e-6, clamp_value = 10, samples = 256, width = 800, height = 800)
+  render_scene(lookfrom = c(10, 20, 0), fov = 25,
+               samples=16, width = 800, height = 800)
 ```
 
 <img src="man/figures/README-smoothbevelroof-1.png" style="display: block; margin: auto;" />
@@ -327,8 +215,8 @@ roof_bevel_multi_sin = generate_beveled_polygon(skeleton,
 generate_ground(depth = -0.5,material = diffuse(color="grey", checkercolor = "white")) |>
   add_object(raymesh_model(roof_bevel_multi_sin, material = diffuse(color="dodgerblue"), override_material = TRUE)) |>
   add_object(sphere(y=15,x=0,z=-10,material=light(intensity = 200))) |> 
-  render_scene(lookfrom=c(10,20,0), sample_method = "sobol_blue",fov=25, ortho_dimensions = c(8,8),
-               min_variance = 1e-6, clamp_value = 10, samples = 256, width=800,height=800)
+  render_scene(lookfrom=c(10,20,0), fov=25, ortho_dimensions = c(8,8),
+               samples=16, width=800,height=800)
 ```
 
 <img src="man/figures/README-functionbevelroof-1.png" style="display: block; margin: auto;" />
@@ -357,8 +245,7 @@ generate_ground(depth = -0.1, material = diffuse(color="grey50", checkercolor = 
   add_object(sphere(y=20, x=20, z=-50, radius=10, material=light(color="white", intensity = 20))) |>
   add_object(sphere(y=20, x=30, z=50, radius=10, material=light(color="orange", intensity = 20))) |>
   render_scene(lookfrom=c(0,10,-5), camera_up=c(0,0,1), lookat=c(0,0,0.25),
-               sample_method = "sobol_blue", fov=0, ortho_dimensions = c(12,12),
-               min_variance = 0, clamp_value = 10, samples = 256, width=800, height=800)
+               fov=0, ortho_dimensions = c(12,12), samples=16, width=800, height=800)
 ```
 
 <img src="man/figures/README-ca_sf-1.png" style="display: block; margin: auto;" />
@@ -395,8 +282,7 @@ ca_model |>
   add_object(xy_rect(y = 15, x = 5, z = 60, xwidth = 100, ywidth = 50,
                      flipped = TRUE, angle = c(0, 45, 0),
                      material = light(intensity = 3))) |>
-  render_scene(lookfrom = c(10, 10, 50), lookat = c(0, 1.5, 1),
-               sample_method = "sobol_blue", samples = 256, clamp_value = 10,
+  render_scene(lookfrom = c(10, 10, 50), lookat = c(0, 1.5, 1), samples=16, 
                width = 800, height = 800, fov = 15, ortho_dimensions = c(10, 10))
 ```
 
