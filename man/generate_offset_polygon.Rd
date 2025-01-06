@@ -33,16 +33,22 @@ vertices = matrix(c(0,0, 7,0, 7,7, 0,7, 0,0), ncol = 2, byrow = TRUE)
 hole_1 = matrix(c(1,1, 2,1, 2,2, 1,2, 1,1), ncol = 2, byrow = TRUE)[5:1,]
 hole_2 = matrix(c(5,5, 6,5, 6,6, 5,6, 5,5), ncol = 2, byrow = TRUE)[5:1,]
 skeleton = skeletonize(vertices, holes = list(hole_1, hole_2))
+if(run_docs_raybevel()) {
 plot_skeleton(skeleton)
+}
 
 #Generate three offsets
+if(run_docs_raybevel()) {
 plot_offset_polygon(generate_offset_polygon(skeleton, c(0.25,0.75,1.5,2)))
+}
 
 #Generate many offsets
+if(run_docs_raybevel()) {
 plot_offset_polygon(generate_offset_polygon(skeleton, seq(0,2.5,by=0.1)+0.05))
+}
 
 # Skeletonize and plot an {sf} object
-if(length(find.package("spData",quiet = TRUE)) > 0) {
+if(run_docs_raybevel()) {
   us_states = spData::us_states
   texas = us_states[us_states$NAME == "Texas",]
   texas_skeleton = skeletonize(texas)

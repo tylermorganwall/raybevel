@@ -9,5 +9,7 @@
 #' # See if the documentation should be run.
 #' run_docs_raybevel()
 run_docs_raybevel = function() {
-  return(identical(Sys.getenv("IN_PKGDOWN"), "true"))
+  return(identical(Sys.getenv("IN_PKGDOWN"), "true") && 
+         length(find.package("ggplot2",quiet = TRUE)) > 0 &&
+         length(find.package("spData",quiet = TRUE)) > 0)
 }

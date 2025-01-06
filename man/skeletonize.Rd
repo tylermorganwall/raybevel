@@ -41,12 +41,16 @@ and then parses that file into a more manageable format.
 # Example 1: Simple rectangle polygon with no holes
 vertices1 = matrix(c(0,0, 4,0, 4,3, 0,3, 0,0), ncol = 2, byrow = TRUE)
 skeleton1 = skeletonize(vertices1)
+if(run_docs_raybevel()){
 plot_skeleton(skeleton1)
+}
 
 # Example 2: Triangle polygon with no holes
 vertices2 = matrix(c(0,0, 2,0, 1,2, 0,0), ncol = 2, byrow = TRUE)
 skeleton2 = skeletonize(vertices2)
+if(run_docs_raybevel()) {
 plot_skeleton(skeleton2)
+}
 
 # Example 3: Polygon with a hole
 # Outer polygon
@@ -54,7 +58,9 @@ vertices3 = matrix(c(0,0, 5,0, 5,5, 0,5, 0,0), ncol = 2, byrow = TRUE)
 # Hole inside the polygon
 hole3 = matrix(c(1,1, 4,1, 4,4, 1,4, 1,1), ncol = 2, byrow = TRUE)[5:1,]
 skeleton3 = skeletonize(vertices3, holes = list(hole3))
+if(run_docs_raybevel()) {
 plot_skeleton(skeleton3)
+}
 
 # Example 4: Polygon with multiple holes
 # Outer polygon
@@ -63,14 +69,16 @@ vertices4 = matrix(c(0,0, 7,0, 7,7, 0,7, 0,0), ncol = 2, byrow = TRUE)
 hole4_1 = matrix(c(1,1, 2,1, 2,2, 1,2, 1,1), ncol = 2, byrow = TRUE)[5:1,]
 hole4_2 = matrix(c(5,5, 6,5, 6,6, 5,6, 5,5), ncol = 2, byrow = TRUE)[5:1,]
 skeleton4 = skeletonize(vertices4, holes = list(hole4_1, hole4_2))
+if(run_docs_raybevel()) {
 plot_skeleton(skeleton4)
+}
 
 # Example 5: Using debug and returning raw straight skeleton
 vertices5 = matrix(c(0,0, 3,0, 3,3, 0,3, 0,0), ncol = 2, byrow = TRUE)
 raw_skeleton5 = skeletonize(vertices5, debug = TRUE, return_raw_ss = TRUE)
 
 # Skeletonize and plot an {sf} object
-if(length(find.package("spData",quiet = TRUE)) > 0) {
+if(run_docs_raybevel()) {
   us_states = spData::us_states
   texas = us_states[us_states$NAME == "Texas",]
   plot_skeleton(skeletonize(texas))
