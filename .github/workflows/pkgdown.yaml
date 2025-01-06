@@ -68,6 +68,11 @@ jobs:
           extra-packages: any::pkgdown, local::.
           needs: website
 
+      - name: Install rayrender
+        run: |
+          Rscript -e "if(!requireNamespace('remotes', quietly = TRUE)) install.packages('remotes')"
+          Rscript -e "remotes::install_github('tylermorganwall/rayrender')"
+
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = TRUE, install = FALSE)
         shell: Rscript {0}
