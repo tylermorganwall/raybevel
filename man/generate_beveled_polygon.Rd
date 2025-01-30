@@ -79,7 +79,9 @@ vertices = matrix(c(0,0, 7,0, 7,7, 0,7, 0,0), ncol = 2, byrow = TRUE)-3.5
 hole_1 = matrix(c(1,1, 2,1, 2,2, 1,2, 1,1), ncol = 2, byrow = TRUE)[5:1,]-3.5
 hole_2 = matrix(c(5,5, 6,5, 6,6, 5,6, 5,5), ncol = 2, byrow = TRUE)[5:1,]-3.5
 skeleton = skeletonize(vertices, holes = list(hole_1, hole_2))
+if(run_docs_raybevel()) {
 plot_skeleton(skeleton)
+}
 
 #Generate a roof model and specify the material
 if(run_docs_raybevel()) {
