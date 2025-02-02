@@ -12,7 +12,7 @@ Description: Generates polygon straight skeletons and 3D models.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.0.2)
+Depends: R (>= 4.1.0)
 Imports: progress,
          digest,
          decido,
