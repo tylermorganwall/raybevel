@@ -56,6 +56,10 @@ double dot(const std::vector<double>& v1, const std::vector<double>& v2);
 
 // [[Rcpp::export]]
 List convert_ss_to_polygons_rcpp(List ss, int numbercores, bool progress) {
+  if(numbercores == NA_INTEGER || numbercores < 1) {
+    numbercores = 1;
+  }
+
   List nodesDF = ss["nodes"];
   List linksDF = ss["links"];
 
@@ -88,9 +92,8 @@ List convert_ss_to_polygons_rcpp(List ss, int numbercores, bool progress) {
   RcppThread::ProgressCounter pb(link_source.size(), 1, "Polygonizing: ");
   std::vector<std::vector<int>> list_all_polygons;
   list_all_polygons.resize(links.size());
-  RcppThread::ThreadPool pool(numbercores);
   // for(int k = 0; k< links.size(); k++) {
-  RcppThread::parallelFor(0, links.size(), [&links, &nodes, &list_all_polygons, &pb, &progress] (int k) {
+  RcppThread::parallelFor(static_cast<size_t>(0), links.size(), [&links, &nodes, &list_all_polygons, &pb, &progress] (size_t k) {
     bool first = true;
     int first_node = links[k].source;
     int tmp_source = first_node;
@@ -177,7 +180,7 @@ List convert_ss_to_polygons_rcpp(List ss, int numbercores, bool progress) {
       pb++;
     }
     list_all_polygons[k] = single_polygon_indices;
-  });
+  }, static_cast<size_t>(numbercores));
   // }
 
   // Here I'm doing the sorting and hashing in C++
