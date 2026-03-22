@@ -10,3 +10,5 @@ README_cache
 docs
 compile_commands.json
 .cache
+
+/.quarto/
