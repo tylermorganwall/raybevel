@@ -182,10 +182,10 @@ if(run_docs_raybevel()) {
 #> Generated Camera           : 0.0 secs (Total: 0.0 secs)
 #> Built Scene BVH            : 0.0 secs (Total: 0.0 secs)
 #> Loaded background          : 0.0 secs (Total: 0.0 secs)
-#> Allocating sampler         : 0.0 secs (Total: 0.0 secs)
-#> Finished rendering         : 13.8 secs (Total: 13.9 secs)
+#> Allocating sampler         : 0.0 secs (Total: 0.1 secs)
+#> Finished rendering         : 13.6 secs (Total: 13.7 secs)
 
-#> Post-processed image       : 0.8 secs (Total: 14.7 secs)
+#> Post-processed image       : 0.8 secs (Total: 14.5 secs)
 
 # Change the bevel to be circular
 if(run_docs_raybevel()) {
